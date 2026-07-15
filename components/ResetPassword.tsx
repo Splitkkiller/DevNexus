@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Loader2, CheckCircle, AlertCircle } from "lucide-react";
+import { API_BASE_URL } from "../apiConfig";
 
 export const ResetPassword = () => {
   const [password, setPassword] = useState("");
@@ -27,7 +28,7 @@ export const ResetPassword = () => {
     setStatus("idle");
 
     try {
-      const res = await fetch("http://localhost/devnexus-api/reset_password.php", {
+      const res = await fetch(`${API_BASE_URL}/reset_password.php`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, password }),

@@ -1,9 +1,11 @@
+import { API_BASE_URL } from "./apiConfig";
+
 export async function fetchCurrentUser() {
   const token = localStorage.getItem("token");
   if (!token) return null;
 
   try {
-    const res = await fetch("http://localhost/devnexus-api/me.php", {
+    const res = await fetch(`${API_BASE_URL}/me.php`, {
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token}`,

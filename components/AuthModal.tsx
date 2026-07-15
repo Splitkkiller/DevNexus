@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { X, Check, ArrowRight, Loader2, ArrowLeft } from "lucide-react"; 
 import { User as UserType, ThemeColors } from "../types";
+import { API_BASE_URL } from "../apiConfig";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -43,9 +44,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setSuccessMsg(null);
 
     let endpoint = "";
-    if (mode === "login") endpoint = "http://localhost/devnexus-api/login.php";
-    else if (mode === "register") endpoint = "http://localhost/devnexus-api/register.php";
-    else if (mode === "forgot") endpoint = "http://localhost/devnexus-api/forgot_password.php";
+    if (mode === "login") endpoint = `${API_BASE_URL}/login.php`;
+    else if (mode === "register") endpoint = `${API_BASE_URL}/register.php`;
+    else if (mode === "forgot") endpoint = `${API_BASE_URL}/forgot_password.php`;
 
     try {
       // Construct body based on mode

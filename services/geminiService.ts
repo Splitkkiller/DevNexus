@@ -1,7 +1,6 @@
-// NOTE: hardcoded like the rest of the API calls for now (auth.ts, AuthModal.tsx,
-// ResetPassword.tsx) — all of these should move to a single env-based base URL
-// together in one pass.
-const AI_ASSISTANT_ENDPOINT = "http://localhost/devnexus-api/ai_assistant.php";
+import { API_BASE_URL } from "../apiConfig";
+
+const AI_ASSISTANT_ENDPOINT = `${API_BASE_URL}/ai_assistant.php`;
 
 export const askGeminiAboutHtml = async (question: string, contextDocName?: string): Promise<string> => {
   const token = localStorage.getItem("token");
