@@ -3,6 +3,7 @@ import { Sidebar, DevNexusLogo } from './components/Sidebar';
 import { DocContent } from './components/DocContent';
 import { Assistant } from './components/Assistant';
 import { AuthModal } from "./components/AuthModal";
+import { ResetPassword } from "./components/ResetPassword";
 import { Playground } from './components/Playground';
 import { Quiz } from './components/Quiz';
 import { Flashcards } from './components/Flashcards';
@@ -90,8 +91,17 @@ function App() {
 
   const themeColors = THEMES[theme];
 
+  // A password reset link (e.g. https://yoursite.com/?token=...) should show
+  // the reset screen directly — it's not part of the normal app navigation,
+  // and the person clicking it isn't logged in yet.
+  const isResetPasswordRoute = new URLSearchParams(window.location.search).has('token');
+
   // ========= PERSISTENT LOGIN CHECK =========
   useEffect(() => {
+    if (isResetPasswordRoute) {
+      setLoadingUser(false);
+      return;
+    }
     const initAuth = async () => {
       const currentUser = await fetchCurrentUser();
       if (currentUser) {
@@ -100,7 +110,7 @@ function App() {
       setLoadingUser(false); // Stop loading only after verification
     };
     initAuth();
-  }, []);
+  }, [isResetPasswordRoute]);
 
   const handleLogin = (u: User, token?: string) => {
     if (token) localStorage.setItem("token", token);
@@ -135,6 +145,10 @@ function App() {
     setActiveView(view);
     setIsMobileMenuOpen(false);
   };
+
+  if (isResetPasswordRoute) {
+    return <ResetPassword />;
+  }
 
   if (loadingUser) {
     return (
