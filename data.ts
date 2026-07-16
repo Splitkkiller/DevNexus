@@ -513,6 +513,1282 @@ export const DOCS: DocItem[] = [
         ]
     },
 
+    {
+        id: 'html-headings',
+        title: '<h1> - <h6>',
+        library: 'html',
+        category: 'text',
+        description: 'The heading elements <h1> through <h6> represent six levels of section headings, with <h1> being the most important and <h6> the least. Headings create a document outline that both sighted users and assistive technologies rely on to understand and navigate page structure. Search engines also use heading hierarchy to interpret content relevance. Each page should typically have exactly one <h1> describing its main topic, with subsequent headings nested logically to reflect the content hierarchy.',
+        syntax: '<h1>Main Heading</h1>\n<h2>Subheading</h2>\n<h3>Sub-subheading</h3>',
+        examples: [
+            {
+                title: 'Basic Heading Hierarchy',
+                description: 'A properly nested heading structure for an article.',
+                code: '<h1>How to Bake Bread</h1>\n<h2>Ingredients</h2>\n<h2>Instructions</h2>\n<h3>Preparing the Dough</h3>\n<h3>Baking</h3>'
+            },
+            {
+                title: 'Page Layout with Headings',
+                description: 'Using headings to structure a typical page layout.',
+                code: '<h1>DevNexus Blog</h1>\n<article>\n  <h2>Understanding Closures in JavaScript</h2>\n  <h3>What is a Closure?</h3>\n  <p>A closure gives a function access to its outer scope...</p>\n  <h3>Common Use Cases</h3>\n</article>'
+            },
+            {
+                title: 'Styled Headings',
+                description: 'Applying custom styles while preserving semantic meaning.',
+                code: '<h1 style="font-size: 2.5rem; color: #1a1a1a; border-bottom: 3px solid #3b82f6; padding-bottom: 8px;">Welcome</h1>\n<h2 style="font-size: 1.5rem; color: #4b5563;">Getting Started</h2>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use exactly one <h1> per page that describes the main content',
+            'Never skip heading levels (e.g., going from <h2> straight to <h4>) as it breaks the document outline',
+            'Choose heading levels based on document structure, not visual size — use CSS for styling instead',
+            'Keep heading text concise and descriptive so it makes sense out of context (screen reader users often navigate by headings alone)',
+            'Avoid using headings purely for visual emphasis on text that is not actually a section title'
+        ]
+    },
+
+    {
+        id: 'p',
+        title: '<p>',
+        library: 'html',
+        category: 'text',
+        description: 'The <p> element represents a paragraph of text — one of the most fundamental building blocks of written content on the web. Browsers automatically add margin above and below paragraphs to visually separate them. The <p> element cannot contain other block-level elements like <div> or headings, only inline content and text. It is a block-level element, meaning it always starts on a new line.',
+        syntax: '<p>This is a paragraph of text.</p>',
+        examples: [
+            {
+                title: 'Basic Paragraph',
+                description: 'A simple paragraph of body text.',
+                code: '<p>HTML provides the structure for every web page. Without it, browsers would have no way to understand how content should be organized.</p>'
+            },
+            {
+                title: 'Multiple Paragraphs',
+                description: 'Separating distinct ideas into individual paragraphs.',
+                code: '<p>The first paragraph introduces the topic.</p>\n<p>The second paragraph builds on that idea with more detail.</p>\n<p>A closing paragraph wraps up the thought.</p>'
+            },
+            {
+                title: 'Paragraph with Inline Elements',
+                description: 'Combining a paragraph with inline formatting like links and emphasis.',
+                code: '<p>Learn more about <strong>semantic HTML</strong> by reading the <a href="/docs/html">official documentation</a>. It really <em>does</em> make a difference.</p>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <p> for actual paragraphs of text, not for spacing or layout purposes',
+            'Never nest block-level elements like <div> or <h1> inside a <p> — browsers will auto-close the paragraph',
+            'Use CSS margin/padding to control spacing rather than empty paragraphs or multiple <br> tags',
+            'Keep paragraphs focused on a single idea for better readability'
+        ]
+    },
+
+    {
+        id: 'ul',
+        title: '<ul>',
+        library: 'html',
+        category: 'lists',
+        description: 'The <ul> element represents an unordered list of items, typically displayed with bullet points. The order of items has no semantic meaning — use <ol> instead when sequence matters. Every item inside a <ul> must be wrapped in an <li> (list item) element. Unordered lists are commonly used for navigation menus, feature lists, and any collection of related items.',
+        syntax: '<ul>\n  <li>Item one</li>\n  <li>Item two</li>\n</ul>',
+        examples: [
+            {
+                title: 'Basic List',
+                description: 'A simple unordered list.',
+                code: '<ul>\n  <li>HTML</li>\n  <li>CSS</li>\n  <li>JavaScript</li>\n</ul>'
+            },
+            {
+                title: 'Navigation Menu',
+                description: 'Using a list to build a semantic navigation menu.',
+                code: '<nav>\n  <ul style="list-style: none; display: flex; gap: 20px; padding: 0;">\n    <li><a href="#home">Home</a></li>\n    <li><a href="#about">About</a></li>\n    <li><a href="#contact">Contact</a></li>\n  </ul>\n</nav>'
+            },
+            {
+                title: 'Nested List',
+                description: 'Lists can be nested inside list items to represent hierarchy.',
+                code: '<ul>\n  <li>Frontend\n    <ul>\n      <li>React</li>\n      <li>Vue</li>\n    </ul>\n  </li>\n  <li>Backend\n    <ul>\n      <li>PHP</li>\n      <li>Node.js</li>\n    </ul>\n  </li>\n</ul>'
+            }
+        ],
+        attributes: [
+            { name: 'type', type: 'disc | circle | square', description: 'Deprecated — use the CSS list-style-type property instead' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Only place <li> elements as direct children of <ul>',
+            'Use <ul> when the order of items does not matter; use <ol> when it does',
+            'Style bullet appearance with CSS list-style-type rather than the deprecated type attribute',
+            'Wrap navigation lists in a <nav> element for better accessibility'
+        ]
+    },
+
+    {
+        id: 'ol',
+        title: '<ol>',
+        library: 'html',
+        category: 'lists',
+        description: 'The <ol> element represents an ordered (numbered) list, where the sequence of items is meaningful. Like <ul>, every item must be wrapped in an <li> element. Browsers automatically number items starting from 1, but this can be customized using the start and reversed attributes, or a different numbering style with the type attribute. Ordered lists are ideal for step-by-step instructions, rankings, and recipes.',
+        syntax: '<ol>\n  <li>First step</li>\n  <li>Second step</li>\n</ol>',
+        examples: [
+            {
+                title: 'Basic Numbered List',
+                description: 'Step-by-step instructions using an ordered list.',
+                code: '<ol>\n  <li>Preheat the oven to 350°F</li>\n  <li>Mix the dry ingredients</li>\n  <li>Add wet ingredients and stir</li>\n  <li>Bake for 25 minutes</li>\n</ol>'
+            },
+            {
+                title: 'Custom Start Number',
+                description: 'Starting the list count from a specific number.',
+                code: '<ol start="5">\n  <li>Step five</li>\n  <li>Step six</li>\n  <li>Step seven</li>\n</ol>'
+            },
+            {
+                title: 'Reversed and Custom Type',
+                description: 'Counting down and using letters instead of numbers.',
+                code: '<ol reversed>\n  <li>Third place</li>\n  <li>Second place</li>\n  <li>First place</li>\n</ol>\n\n<ol type="A">\n  <li>Option A</li>\n  <li>Option B</li>\n</ol>'
+            }
+        ],
+        attributes: [
+            { name: 'start', type: 'number', description: 'Sets the starting number of the list (default is 1)' },
+            { name: 'reversed', type: 'boolean', description: 'Numbers the list in descending order' },
+            { name: 'type', type: '1 | A | a | I | i', description: 'Sets the numbering style: numbers, letters, or Roman numerals' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <ol> whenever the sequence of items carries meaning, such as instructions or rankings',
+            'Use the start attribute rather than manually numbering items in the text',
+            'Reach for the reversed attribute for countdowns instead of reordering the markup',
+            'Keep list item text parallel in structure and grammar for readability'
+        ]
+    },
+
+    {
+        id: 'table',
+        title: '<table>',
+        library: 'html',
+        category: 'tables',
+        description: 'The <table> element displays tabular data in rows and columns. A well-structured table uses <thead> for column headers, <tbody> for the main data, <tr> for each row, <th> for header cells, and <td> for regular data cells. Tables should only be used for genuinely tabular data — never for page layout, which is what CSS Grid and Flexbox are for.',
+        syntax: '<table>\n  <thead>\n    <tr><th>Header 1</th><th>Header 2</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>Data 1</td><td>Data 2</td></tr>\n  </tbody>\n</table>',
+        examples: [
+            {
+                title: 'Basic Table',
+                description: 'A simple data table with headers and rows.',
+                code: '<table>\n  <thead>\n    <tr>\n      <th>Name</th>\n      <th>Role</th>\n      <th>Location</th>\n    </tr>\n  </thead>\n  <tbody>\n    <tr>\n      <td>Alice</td>\n      <td>Developer</td>\n      <td>Manchester</td>\n    </tr>\n    <tr>\n      <td>Ben</td>\n      <td>Designer</td>\n      <td>Leeds</td>\n    </tr>\n  </tbody>\n</table>'
+            },
+            {
+                title: 'Table with Caption and Footer',
+                description: 'Adding a caption and a summary row using tfoot.',
+                code: '<table>\n  <caption>Quarterly Sales</caption>\n  <thead>\n    <tr><th>Quarter</th><th>Revenue</th></tr>\n  </thead>\n  <tbody>\n    <tr><td>Q1</td><td>$12,000</td></tr>\n    <tr><td>Q2</td><td>$15,500</td></tr>\n  </tbody>\n  <tfoot>\n    <tr><td>Total</td><td>$27,500</td></tr>\n  </tfoot>\n</table>'
+            },
+            {
+                title: 'Styled Table',
+                description: 'A table with basic CSS styling for readability.',
+                code: '<table style="border-collapse: collapse; width: 100%;">\n  <tr style="background: #f3f4f6;">\n    <th style="border: 1px solid #d1d5db; padding: 8px; text-align: left;">Item</th>\n    <th style="border: 1px solid #d1d5db; padding: 8px; text-align: left;">Price</th>\n  </tr>\n  <tr>\n    <td style="border: 1px solid #d1d5db; padding: 8px;">Coffee</td>\n    <td style="border: 1px solid #d1d5db; padding: 8px;">$4.50</td>\n  </tr>\n</table>'
+            }
+        ],
+        attributes: [
+            { name: 'colspan', type: 'number', description: 'Used on <td>/<th> to span multiple columns' },
+            { name: 'rowspan', type: 'number', description: 'Used on <td>/<th> to span multiple rows' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Only use tables for genuinely tabular data, never for visual page layout',
+            'Always use <th> for header cells so screen readers can announce column/row context',
+            'Use <thead>, <tbody>, and <tfoot> to give the table clear structure',
+            'Add a <caption> to describe what the table contains',
+            'Use the scope attribute on <th> elements in complex tables to clarify row vs. column headers'
+        ]
+    },
+
+    {
+        id: 'button',
+        title: '<button>',
+        library: 'html',
+        category: 'forms',
+        description: 'The <button> element creates a clickable button that can trigger actions like submitting a form, resetting a form, or running custom JavaScript. Unlike <input type="button">, <button> can contain other HTML content such as icons or styled text, not just plain text. Its type attribute determines its default behavior within a form.',
+        syntax: '<button type="button">Click Me</button>',
+        examples: [
+            {
+                title: 'Basic Button',
+                description: 'A standalone button with a click handler.',
+                code: '<button type="button" onclick="alert(\'Hello!\')">Click Me</button>'
+            },
+            {
+                title: 'Form Submit Button',
+                description: 'A button that submits its enclosing form.',
+                code: '<form>\n  <input type="text" placeholder="Your name" required>\n  <button type="submit">Submit</button>\n</form>'
+            },
+            {
+                title: 'Button with Icon Content',
+                description: 'Buttons can contain more than just text.',
+                code: '<button type="button" style="display: flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 8px; background: #3b82f6; color: white; border: none;">\n  <span>⬇</span>\n  <span>Download</span>\n</button>'
+            }
+        ],
+        attributes: [
+            { name: 'type', type: 'submit | reset | button', description: 'Determines default behavior; submit sends the form, reset clears it, button does nothing by default' },
+            { name: 'disabled', type: 'boolean', description: 'Disables the button, preventing interaction' },
+            { name: 'form', type: 'string', description: 'Associates the button with a form by its id, even if not nested inside it' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always specify a type attribute — inside a <form>, a button defaults to type="submit", which can cause accidental form submissions',
+            'Use <button> instead of a styled <div> or <span> for clickable actions, so it is keyboard-accessible and works with assistive technology out of the box',
+            'Disable buttons during async actions (e.g., form submission) to prevent duplicate clicks',
+            'Give icon-only buttons an aria-label describing their action for screen reader users'
+        ]
+    },
+
+    {
+        id: 'input',
+        title: '<input>',
+        library: 'html',
+        category: 'forms',
+        description: 'The <input> element creates interactive form controls for collecting user data. Its behavior changes dramatically based on the type attribute — a single element can become a text field, checkbox, radio button, date picker, file uploader, and more. It is a void (self-closing) element with no closing tag or child content.',
+        syntax: '<input type="text" name="fieldname" placeholder="Enter value">',
+        examples: [
+            {
+                title: 'Common Input Types',
+                description: 'A few of the most frequently used input types.',
+                code: '<input type="text" placeholder="Name">\n<input type="email" placeholder="Email">\n<input type="password" placeholder="Password">\n<input type="number" placeholder="Age">\n<input type="date">'
+            },
+            {
+                title: 'Checkbox and Radio Buttons',
+                description: 'Using inputs for multiple-choice selections.',
+                code: '<label><input type="checkbox" name="subscribe" checked> Subscribe to newsletter</label>\n\n<label><input type="radio" name="plan" value="free"> Free</label>\n<label><input type="radio" name="plan" value="pro"> Pro</label>'
+            },
+            {
+                title: 'Input Validation Attributes',
+                description: 'Using built-in HTML validation without JavaScript.',
+                code: '<input type="email" required placeholder="you@example.com">\n<input type="text" minlength="3" maxlength="20" pattern="[A-Za-z]+" placeholder="Letters only">\n<input type="number" min="1" max="100" step="1">'
+            }
+        ],
+        attributes: [
+            { name: 'type', type: 'string', description: 'Determines the input\'s behavior: text, email, password, number, checkbox, radio, date, file, etc.' },
+            { name: 'name', type: 'string', description: 'Identifies the field when the form data is submitted' },
+            { name: 'value', type: 'string', description: 'The input\'s current or default value' },
+            { name: 'placeholder', type: 'string', description: 'Hint text shown when the field is empty' },
+            { name: 'required', type: 'boolean', description: 'Marks the field as mandatory for form submission' },
+            { name: 'disabled', type: 'boolean', description: 'Disables the input and excludes it from form submission' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always pair an <input> with a <label> using matching for and id attributes',
+            'Use the most specific type available (email, tel, date, number) to get built-in validation and the right mobile keyboard',
+            'Use the name attribute consistently — it is what actually gets sent to the server, not the id',
+            'Rely on built-in validation attributes (required, pattern, min, max) before reaching for JavaScript',
+            'Never use placeholder text as a replacement for a proper label — it disappears once the user starts typing'
+        ]
+    },
+
+    {
+        id: 'label',
+        title: '<label>',
+        library: 'html',
+        category: 'forms',
+        description: 'The <label> element defines a caption for a form control, improving both usability and accessibility. Clicking a label activates or focuses its associated input — useful for small targets like checkboxes and radio buttons. Labels can be associated with an input either by wrapping it, or by using a for attribute that matches the input\'s id.',
+        syntax: '<label for="email">Email:</label>\n<input type="email" id="email">',
+        examples: [
+            {
+                title: 'Label with for Attribute',
+                description: 'Explicitly associating a label with an input using matching for/id.',
+                code: '<label for="username">Username:</label>\n<input type="text" id="username" name="username">'
+            },
+            {
+                title: 'Wrapped Label',
+                description: 'Associating a label implicitly by wrapping the input inside it.',
+                code: '<label>\n  Accept terms and conditions\n  <input type="checkbox" name="terms">\n</label>'
+            },
+            {
+                title: 'Styled Label with Input',
+                description: 'A label and input styled together as a form field.',
+                code: '<div style="display: flex; flex-direction: column; gap: 4px;">\n  <label for="pw" style="font-weight: 600; font-size: 14px;">Password</label>\n  <input type="password" id="pw" style="padding: 8px; border: 1px solid #d1d5db; border-radius: 6px;">\n</div>'
+            }
+        ],
+        attributes: [
+            { name: 'for', type: 'string', description: 'The id of the form control this label describes' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Every form input should have an associated label — never rely on placeholder text alone',
+            'Prefer the explicit for/id association over wrapping, as it is more robust with custom-styled inputs',
+            'Keep label text short and descriptive of exactly what the field expects',
+            'Make sure the for value exactly matches the input\'s id, including capitalization'
+        ]
+    },
+
+    {
+        id: 'textarea',
+        title: '<textarea>',
+        library: 'html',
+        category: 'forms',
+        description: 'The <textarea> element creates a multi-line plain-text input control, ideal for comments, messages, and any content longer than a single line. Unlike <input>, its default value is placed between the opening and closing tags rather than in a value attribute, and users can typically resize it by dragging its corner.',
+        syntax: '<textarea name="message" rows="4" cols="50">Default text</textarea>',
+        examples: [
+            {
+                title: 'Basic Textarea',
+                description: 'A simple multi-line text field.',
+                code: '<label for="msg">Message:</label>\n<textarea id="msg" name="message" rows="5" placeholder="Type your message here..."></textarea>'
+            },
+            {
+                title: 'Textarea with Character Limit',
+                description: 'Restricting input length with maxlength.',
+                code: '<textarea name="bio" maxlength="200" rows="4" placeholder="Tell us about yourself (200 characters max)"></textarea>'
+            },
+            {
+                title: 'Non-resizable Styled Textarea',
+                description: 'Preventing resizing and applying custom styles.',
+                code: '<textarea rows="6" style="width: 100%; resize: none; padding: 10px; border-radius: 8px; border: 1px solid #d1d5db; font-family: inherit;" placeholder="Write a review..."></textarea>'
+            }
+        ],
+        attributes: [
+            { name: 'rows', type: 'number', description: 'The visible number of text lines' },
+            { name: 'cols', type: 'number', description: 'The visible width in average character widths' },
+            { name: 'maxlength', type: 'number', description: 'The maximum number of characters allowed' },
+            { name: 'placeholder', type: 'string', description: 'Hint text shown when empty' },
+            { name: 'required', type: 'boolean', description: 'Marks the field as mandatory' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Set sensible default rows so the field looks appropriately sized before the user starts typing',
+            'Use the CSS resize property to control whether users can resize the textarea, rather than removing the ability entirely',
+            'Pair with a <label>, same as any other form field',
+            'Consider maxlength with a visible character counter for fields like bios or reviews'
+        ]
+    },
+
+    {
+        id: 'select',
+        title: '<select>',
+        library: 'html',
+        category: 'forms',
+        description: 'The <select> element creates a dropdown list of options, letting users pick one or more predefined values. Each choice is defined with an <option> element inside it. Related options can be grouped visually using <optgroup>. It is a compact way to offer a constrained set of choices without the space a list of radio buttons would need.',
+        syntax: '<select name="choice">\n  <option value="1">Option One</option>\n  <option value="2">Option Two</option>\n</select>',
+        examples: [
+            {
+                title: 'Basic Dropdown',
+                description: 'A simple select with a few options.',
+                code: '<label for="country">Country:</label>\n<select id="country" name="country">\n  <option value="uk">United Kingdom</option>\n  <option value="us">United States</option>\n  <option value="ca">Canada</option>\n</select>'
+            },
+            {
+                title: 'Select with Default and Disabled Option',
+                description: 'Showing a placeholder option that cannot be selected as a real value.',
+                code: '<select name="role" required>\n  <option value="" disabled selected>Choose a role...</option>\n  <option value="student">Student</option>\n  <option value="developer">Developer</option>\n</select>'
+            },
+            {
+                title: 'Grouped Options',
+                description: 'Organizing options into labeled groups with optgroup.',
+                code: '<select name="language">\n  <optgroup label="Frontend">\n    <option value="js">JavaScript</option>\n    <option value="ts">TypeScript</option>\n  </optgroup>\n  <optgroup label="Backend">\n    <option value="php">PHP</option>\n    <option value="python">Python</option>\n  </optgroup>\n</select>'
+            }
+        ],
+        attributes: [
+            { name: 'name', type: 'string', description: 'Identifies the field in submitted form data' },
+            { name: 'multiple', type: 'boolean', description: 'Allows selecting more than one option' },
+            { name: 'required', type: 'boolean', description: 'Requires a non-empty selection before submission' },
+            { name: 'disabled', type: 'boolean', description: 'Disables the entire dropdown' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use a disabled, selected placeholder option instead of leaving the first real option selected by default',
+            'Pair with a <label> for accessibility, same as any other form control',
+            'Use optgroup to organize long lists of options into logical categories',
+            'For a handful of mutually exclusive options, consider whether radio buttons might actually be clearer than a dropdown'
+        ]
+    },
+
+    {
+        id: 'header',
+        title: '<header>',
+        library: 'html',
+        category: 'semantic',
+        description: 'The <header> element represents introductory content for its nearest ancestor sectioning element, typically containing a logo, site title, navigation, or search form. A page can have multiple <header> elements — one for the page itself, and others for individual <article> or <section> elements. It has no default visual styling of its own.',
+        syntax: '<header>\n  <h1>Site Title</h1>\n  <nav><!-- navigation links --></nav>\n</header>',
+        examples: [
+            {
+                title: 'Page Header',
+                description: 'A typical site-wide header with logo and navigation.',
+                code: '<header>\n  <h1>DevNexus</h1>\n  <nav>\n    <a href="/docs">Docs</a>\n    <a href="/playground">Playground</a>\n  </nav>\n</header>'
+            },
+            {
+                title: 'Article Header',
+                description: 'A header scoped to a single article, containing its title and metadata.',
+                code: '<article>\n  <header>\n    <h2>Understanding CSS Grid</h2>\n    <p>Published on March 3, 2026 by Jane Doe</p>\n  </header>\n  <p>CSS Grid is a two-dimensional layout system...</p>\n</article>'
+            },
+            {
+                title: 'Styled Header',
+                description: 'A page header with basic styling.',
+                code: '<header style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: #1f2937; color: white;">\n  <strong>DevNexus</strong>\n  <nav style="display: flex; gap: 16px;">\n    <a href="#" style="color: white;">Home</a>\n    <a href="#" style="color: white;">About</a>\n  </nav>\n</header>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <header> for introductory content, not as a generic styling wrapper — that is what <div> is for',
+            'A page can have more than one <header>, scoped to different sections or articles',
+            '<header> should not be nested inside <footer>, <address>, or another <header>',
+            'Combine with <nav> for the primary site navigation rather than placing links loose inside <header>'
+        ]
+    },
+
+    {
+        id: 'nav',
+        title: '<nav>',
+        library: 'html',
+        category: 'semantic',
+        description: 'The <nav> element marks a section of major navigation links, such as a main menu, table of contents, or pagination controls. Not every group of links needs to be a <nav> — reserve it for primary navigation blocks. Screen readers can identify <nav> regions, letting users jump straight to navigation or skip past it.',
+        syntax: '<nav>\n  <a href="/">Home</a>\n  <a href="/about">About</a>\n</nav>',
+        examples: [
+            {
+                title: 'Primary Navigation',
+                description: 'A site\'s main navigation menu.',
+                code: '<nav>\n  <ul>\n    <li><a href="/">Home</a></li>\n    <li><a href="/docs">Docs</a></li>\n    <li><a href="/contact">Contact</a></li>\n  </ul>\n</nav>'
+            },
+            {
+                title: 'Breadcrumb Navigation',
+                description: 'Using nav for breadcrumb trails, with an aria-label to distinguish it from the main menu.',
+                code: '<nav aria-label="Breadcrumb">\n  <ol style="display: flex; gap: 8px; list-style: none; padding: 0;">\n    <li><a href="/">Home</a></li>\n    <li>/</li>\n    <li><a href="/docs">Docs</a></li>\n    <li>/</li>\n    <li>HTML</li>\n  </ol>\n</nav>'
+            },
+            {
+                title: 'Styled Horizontal Nav',
+                description: 'A horizontally laid out navigation bar.',
+                code: '<nav style="display: flex; gap: 24px; padding: 12px 0; border-bottom: 1px solid #e5e7eb;">\n  <a href="#" style="text-decoration: none; color: #374151; font-weight: 500;">Home</a>\n  <a href="#" style="text-decoration: none; color: #374151; font-weight: 500;">Docs</a>\n  <a href="#" style="text-decoration: none; color: #374151; font-weight: 500;">Blog</a>\n</nav>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Reserve <nav> for major navigation blocks, not every list of links on a page',
+            'Use aria-label to distinguish multiple <nav> elements on the same page, like "Main" vs. "Breadcrumb"',
+            'Wrap navigation links in a list (<ul>/<li>) for proper semantic structure',
+            'Avoid nesting a <nav> inside another <nav>'
+        ]
+    },
+
+    {
+        id: 'footer',
+        title: '<footer>',
+        library: 'html',
+        category: 'semantic',
+        description: 'The <footer> element represents closing content for its nearest ancestor sectioning element, typically containing copyright notices, contact information, related links, or author details. Like <header>, a page can have multiple footers — one for the whole page and others scoped to individual articles or sections.',
+        syntax: '<footer>\n  <p>&copy; 2026 Company Name</p>\n</footer>',
+        examples: [
+            {
+                title: 'Page Footer',
+                description: 'A typical site-wide footer with copyright and links.',
+                code: '<footer>\n  <p>&copy; 2026 DevNexus. All rights reserved.</p>\n  <nav>\n    <a href="/terms">Terms</a>\n    <a href="/privacy">Privacy</a>\n  </nav>\n</footer>'
+            },
+            {
+                title: 'Article Footer',
+                description: 'A footer scoped to a single article, containing author info.',
+                code: '<article>\n  <h2>10 CSS Tricks You Should Know</h2>\n  <p>Article content goes here...</p>\n  <footer>\n    <p>Written by Alex Chen. Posted in <a href="/category/css">CSS</a>.</p>\n  </footer>\n</article>'
+            },
+            {
+                title: 'Styled Footer',
+                description: 'A page footer with basic layout styling.',
+                code: '<footer style="display: flex; justify-content: space-between; padding: 24px; background: #111827; color: #9ca3af; font-size: 14px;">\n  <span>&copy; 2026 DevNexus</span>\n  <span>Made with care in Manchester</span>\n</footer>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <footer> for closing/supplementary content, not as a generic bottom-of-page wrapper for unrelated content',
+            'A <footer> can appear inside an <article> or <section>, not just at the very bottom of the page',
+            '<footer> should not be nested inside <header> or another <footer>',
+            'Include meaningful contact or copyright information rather than leaving it purely decorative'
+        ]
+    },
+
+    {
+        id: 'section',
+        title: '<section>',
+        library: 'html',
+        category: 'semantic',
+        description: 'The <section> element groups related content that typically has its own heading, representing a distinct thematic section of a document — like a chapter, tab panel, or a chunk of a landing page. Unlike <div>, which carries no semantic meaning, <section> tells browsers and assistive technology that its content forms a standalone, related group. If content does not have a natural heading or is not thematically distinct, a plain <div> is usually the better choice.',
+        syntax: '<section>\n  <h2>Section Title</h2>\n  <p>Section content...</p>\n</section>',
+        examples: [
+            {
+                title: 'Landing Page Sections',
+                description: 'Breaking a page into distinct thematic sections.',
+                code: '<section>\n  <h2>Features</h2>\n  <p>Everything you need to learn to code.</p>\n</section>\n\n<section>\n  <h2>Pricing</h2>\n  <p>Free forever for individual learners.</p>\n</section>'
+            },
+            {
+                title: 'Section Within an Article',
+                description: 'Using sections to divide a long article into parts.',
+                code: '<article>\n  <h1>The Complete Guide to Flexbox</h1>\n  <section>\n    <h2>What is Flexbox?</h2>\n    <p>Flexbox is a one-dimensional layout model...</p>\n  </section>\n  <section>\n    <h2>Main Properties</h2>\n    <p>justify-content, align-items, and flex-direction...</p>\n  </section>\n</article>'
+            },
+            {
+                title: 'Styled Section',
+                description: 'A visually separated content section.',
+                code: '<section style="padding: 40px 20px; background: #f9fafb; border-radius: 12px;">\n  <h2 style="margin-bottom: 12px;">Why Choose Us</h2>\n  <p>We focus on practical, hands-on learning.</p>\n</section>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Only use <section> when the content is thematically related and would make sense with its own heading',
+            'If you just need a styling hook with no semantic meaning, use <div> instead',
+            'Give each <section> a heading (<h2>-<h6>) so it makes sense in a document outline',
+            'Do not use <section> as a wrapper purely for CSS layout purposes — that dilutes its semantic value'
+        ]
+    },
+
+    {
+        id: 'html-text-formatting',
+        title: 'Text Formatting: <strong>, <em>, <b>, <i>, <mark>, <small>',
+        library: 'html',
+        category: 'text',
+        description: 'HTML provides several inline elements for formatting text with semantic and visual meaning. <strong> indicates strong importance (typically rendered bold), and <em> indicates stress emphasis (typically rendered italic) — both carry semantic weight that screen readers can announce. <b> and <i> are their purely visual counterparts, used when bold/italic styling is needed without implying importance or emphasis. <mark> highlights text as relevant to the current context, and <small> represents side comments like fine print or disclaimers.',
+        syntax: '<strong>Important text</strong>\n<em>Emphasized text</em>\n<mark>Highlighted text</mark>',
+        examples: [
+            {
+                title: 'Semantic Emphasis',
+                description: 'Using strong and em for meaningful emphasis within a sentence.',
+                code: '<p>This step is <strong>absolutely required</strong> before continuing, and you should <em>really</em> double-check it.</p>'
+            },
+            {
+                title: 'Visual-Only Styling',
+                description: 'Using b and i when bold/italic styling is needed without implying importance.',
+                code: '<p>The ship <i>Titanic</i> set sail in 1912. Its name was later used for <b>Titanic</b>, the 1997 film.</p>'
+            },
+            {
+                title: 'Highlighting Search Results',
+                description: 'Using mark to highlight matched text, and small for a disclaimer.',
+                code: '<p>Results for "closures": JavaScript <mark>closures</mark> let inner functions access outer scope.</p>\n<p><small>Prices shown do not include tax.</small></p>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <strong>/<em> when the emphasis is semantically meaningful; use <b>/<i> for purely visual styling with no added meaning',
+            'Do not use these elements just to make text bold or italic for decoration — prefer CSS font-weight/font-style for pure styling',
+            'Use <mark> sparingly, for content that is genuinely relevant to what the user is currently looking for',
+            '<small> is for fine print and side comments, not for making arbitrary text visually smaller'
+        ]
+    },
+
+    {
+        id: 'html-line-break-rule',
+        title: '<br>, <hr>',
+        library: 'html',
+        category: 'text',
+        description: 'These are two simple void (self-closing) elements for controlling text flow. <br> inserts a single line break within text, forcing the next content onto a new line without starting a new paragraph. <hr> represents a thematic break between paragraph-level content — visually rendered as a horizontal line, but semantically indicating a shift in topic, such as a scene change in a story or a new section.',
+        syntax: 'Line one<br>Line two\n<hr>',
+        examples: [
+            {
+                title: 'Line Breaks in an Address',
+                description: 'Using br to break lines within a single logical block.',
+                code: '<p>123 Main Street<br>Manchester<br>M1 1AA</p>'
+            },
+            {
+                title: 'Thematic Break',
+                description: 'Using hr to separate distinct sections of content.',
+                code: '<p>The first chapter ends here.</p>\n<hr>\n<p>Chapter two begins with a new setting.</p>'
+            },
+            {
+                title: 'Styled Horizontal Rule',
+                description: 'Customizing the appearance of an hr with CSS.',
+                code: '<hr style="border: none; height: 2px; background: linear-gradient(to right, #3b82f6, transparent); margin: 24px 0;">'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <br> sparingly — reach for it only when a line break is part of the content itself (like an address or poem), not for adding visual spacing between elements',
+            'Never use multiple <br> tags in a row to fake paragraph spacing — use CSS margin instead',
+            'Use <hr> to signal an actual topic or scene change, not purely as a decorative divider line',
+            'Style <hr> appearance with CSS border/background rather than relying on its default look'
+        ]
+    },
+
+    {
+        id: 'html-quotations',
+        title: '<blockquote>, <q>',
+        library: 'html',
+        category: 'text',
+        description: 'HTML provides two elements for quoting content from another source. <blockquote> is used for longer, block-level quotations that are typically set apart from surrounding text with indentation. <q> is used for shorter, inline quotations within a sentence, and browsers automatically render it with quotation marks. Both support a cite attribute pointing to the source URL.',
+        syntax: '<blockquote cite="https://source.com">Quoted text</blockquote>\n<p>She said <q>hello</q>.</p>',
+        examples: [
+            {
+                title: 'Block Quotation',
+                description: 'A longer quotation set apart from the main text.',
+                code: '<blockquote cite="https://example.com/article">\n  <p>The best way to predict the future is to invent it.</p>\n</blockquote>'
+            },
+            {
+                title: 'Inline Quotation',
+                description: 'A short quote embedded within a sentence.',
+                code: '<p>As the saying goes, <q>a journey of a thousand miles begins with a single step</q>.</p>'
+            },
+            {
+                title: 'Quotation with Attribution',
+                description: 'Adding a citation for a blockquote using the footer/cite pattern.',
+                code: '<blockquote>\n  <p>Simplicity is the ultimate sophistication.</p>\n  <footer>— <cite>Leonardo da Vinci</cite></footer>\n</blockquote>'
+            }
+        ],
+        attributes: [
+            { name: 'cite', type: 'URL', description: 'A URL pointing to the source of the quotation' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <blockquote> for multi-line or block-level quotes, and <q> for short quotes within a sentence',
+            'Do not add manual quotation marks inside <q> — browsers add them automatically via CSS',
+            'Use the cite attribute to link back to the original source when available',
+            'Pair a <blockquote> with a <footer><cite>...</cite></footer> to properly attribute the author'
+        ]
+    },
+
+    {
+        id: 'html-code-elements',
+        title: '<code>, <pre>, <kbd>',
+        library: 'html',
+        category: 'text',
+        description: 'These elements are especially relevant for a developer-focused site like this one. <code> marks up a short inline fragment of computer code, typically rendered in a monospace font. <pre> preserves whitespace and line breaks exactly as written, making it ideal for displaying blocks of code or formatted text. <kbd> represents user keyboard input, commonly used in tutorials to show keyboard shortcuts. <pre> and <code> are frequently combined to display multi-line, syntax-preserved code blocks.',
+        syntax: '<code>const x = 5;</code>\n<pre><code>function add(a, b) {\n  return a + b;\n}</code></pre>',
+        examples: [
+            {
+                title: 'Inline Code',
+                description: 'Referencing a variable or short code snippet within a sentence.',
+                code: '<p>Use the <code>Array.map()</code> method to transform each item in an array.</p>'
+            },
+            {
+                title: 'Code Block',
+                description: 'Displaying a multi-line code block with preserved formatting.',
+                code: '<pre><code>function greet(name) {\n  console.log(`Hello, ${name}!`);\n}\n\ngreet("DevNexus");</code></pre>'
+            },
+            {
+                title: 'Keyboard Shortcut',
+                description: 'Documenting a keyboard shortcut in a tutorial.',
+                code: '<p>Press <kbd>Ctrl</kbd> + <kbd>S</kbd> to save your file.</p>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <code> for inline references to code, variable names, or file names within regular text',
+            'Combine <pre> and <code> together for multi-line code blocks so both whitespace and code semantics are preserved',
+            'Use <kbd> specifically for keyboard input instructions, not for styling arbitrary text to look like a key',
+            'Add a language-specific class (like class="language-javascript") to <code> blocks if using a syntax highlighter'
+        ]
+    },
+
+    {
+        id: 'article',
+        title: '<article>',
+        library: 'html',
+        category: 'semantic',
+        description: 'The <article> element represents a self-contained piece of content that could theoretically be distributed or reused independently — like a blog post, news story, forum post, or product card. The key test is whether the content would still make sense if syndicated on its own, separate from the rest of the page. Articles can be nested (e.g., a blog post article containing comment articles).',
+        syntax: '<article>\n  <h2>Article Title</h2>\n  <p>Article content...</p>\n</article>',
+        examples: [
+            {
+                title: 'Blog Post',
+                description: 'A self-contained blog post as an article.',
+                code: '<article>\n  <h2>Getting Started with TypeScript</h2>\n  <p>Published March 3, 2026</p>\n  <p>TypeScript adds static typing to JavaScript...</p>\n</article>'
+            },
+            {
+                title: 'Multiple Articles in a Feed',
+                description: 'A list of independent articles, such as in a news feed.',
+                code: '<section>\n  <article>\n    <h3>Breaking: New JS Framework Released</h3>\n    <p>Summary of the news...</p>\n  </article>\n  <article>\n    <h3>CSS Grid Level 3 Draft Published</h3>\n    <p>Summary of the news...</p>\n  </article>\n</section>'
+            },
+            {
+                title: 'Nested Articles (Comments)',
+                description: 'A blog post article containing individual comment articles.',
+                code: '<article>\n  <h2>Why Semantic HTML Matters</h2>\n  <p>Main post content...</p>\n  <section>\n    <h3>Comments</h3>\n    <article>\n      <p>Great explanation, thanks!</p>\n    </article>\n  </section>\n</article>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <article> only for content that would make sense on its own if extracted from the page',
+            'Give each <article> its own heading so it is meaningful out of context',
+            'It is fine to nest <article> elements, such as comments within a blog post',
+            'If content only makes sense in the context of the surrounding page, use <section> or <div> instead'
+        ]
+    },
+
+    {
+        id: 'main',
+        title: '<main>',
+        library: 'html',
+        category: 'semantic',
+        description: 'The <main> element represents the dominant, unique content of the document — the content that is directly related to the page\'s central topic, excluding repeated elements like headers, navigation, sidebars, and footers. There must be no more than one visible <main> element per page, and it should not be nested inside <article>, <header>, <footer>, <nav>, or <aside>.',
+        syntax: '<main>\n  <!-- primary page content -->\n</main>',
+        examples: [
+            {
+                title: 'Basic Page Structure',
+                description: 'Using main to wrap the primary content of a page.',
+                code: '<header>...</header>\n<nav>...</nav>\n<main>\n  <h1>Product Details</h1>\n  <p>This is the main content unique to this page.</p>\n</main>\n<footer>...</footer>'
+            },
+            {
+                title: 'Main with Multiple Sections',
+                description: 'A main element containing several content sections.',
+                code: '<main>\n  <section>\n    <h2>About Us</h2>\n    <p>...</p>\n  </section>\n  <section>\n    <h2>Our Services</h2>\n    <p>...</p>\n  </section>\n</main>'
+            },
+            {
+                title: 'Skip Link Target',
+                description: 'Using main as the target for a "skip to content" accessibility link.',
+                code: '<a href="#main-content">Skip to main content</a>\n<nav>...</nav>\n<main id="main-content">\n  <h1>Page Title</h1>\n</main>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use exactly one <main> element per page, and never nest it inside <header>, <footer>, <nav>, <article>, or <aside>',
+            'Give <main> an id so it can be used as a target for "skip to content" accessibility links',
+            'Only include content in <main> that is unique to the current page — repeated site-wide elements belong outside it',
+            'Screen reader users can jump straight to <main>, so make sure it truly contains the page\'s primary content'
+        ]
+    },
+
+    {
+        id: 'aside',
+        title: '<aside>',
+        library: 'html',
+        category: 'semantic',
+        description: 'The <aside> element represents content that is tangentially related to the surrounding content, such as a sidebar, pull quote, advertisement, or a group of related links. It can be used both as a page-level sidebar and nested inside an <article> for content that is related to, but separate from, the main article text.',
+        syntax: '<aside>\n  <h3>Related Links</h3>\n  <ul>...</ul>\n</aside>',
+        examples: [
+            {
+                title: 'Page Sidebar',
+                description: 'Using aside as a sidebar with supplementary content.',
+                code: '<main>\n  <article>...</article>\n</main>\n<aside>\n  <h3>Popular Posts</h3>\n  <ul>\n    <li><a href="#">Post One</a></li>\n    <li><a href="#">Post Two</a></li>\n  </ul>\n</aside>'
+            },
+            {
+                title: 'Pull Quote Within an Article',
+                description: 'Using aside inside an article for a related but separate callout.',
+                code: '<article>\n  <p>Long article text continues here...</p>\n  <aside>\n    <blockquote>Key takeaway: semantic HTML improves accessibility.</blockquote>\n  </aside>\n  <p>The article continues...</p>\n</article>'
+            },
+            {
+                title: 'Author Bio Aside',
+                description: 'A tangential author information box.',
+                code: '<article>\n  <h2>10 Tips for Clean Code</h2>\n  <p>Article content...</p>\n</article>\n<aside>\n  <h4>About the Author</h4>\n  <p>Jane writes about software craftsmanship.</p>\n</aside>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <aside> for content that is related but not essential to understanding the main content',
+            'Do not use <aside> purely as a styling hook for a sidebar-looking box that is actually essential content',
+            'An <aside> nested inside an <article> should relate specifically to that article, not the whole page',
+            'Give the aside its own heading when it has one, so it makes sense as an independent block'
+        ]
+    },
+
+    {
+        id: 'html-figure',
+        title: '<figure>, <figcaption>',
+        library: 'html',
+        category: 'media',
+        description: 'The <figure> element wraps self-contained content — typically an image, illustration, diagram, code snippet, or chart — along with an optional caption provided by <figcaption>. Content in a figure is meant to be referenceable independently of the main flow; a reader should be able to move it elsewhere on the page (or even to an appendix) without breaking the document\'s meaning.',
+        syntax: '<figure>\n  <img src="chart.png" alt="Sales chart">\n  <figcaption>Figure 1: Quarterly sales</figcaption>\n</figure>',
+        examples: [
+            {
+                title: 'Image with Caption',
+                description: 'The most common use of figure: an image with a descriptive caption.',
+                code: '<figure>\n  <img src="https://via.placeholder.com/500x300" alt="Mountain landscape at sunset">\n  <figcaption>A sunset over the mountains, taken in 2025.</figcaption>\n</figure>'
+            },
+            {
+                title: 'Code Snippet as a Figure',
+                description: 'Using figure to present a labeled code example.',
+                code: '<figure>\n  <pre><code>const sum = (a, b) => a + b;</code></pre>\n  <figcaption>Example: an arrow function that adds two numbers</figcaption>\n</figure>'
+            },
+            {
+                title: 'Multiple Images in One Figure',
+                description: 'Grouping several related images under a single caption.',
+                code: '<figure>\n  <img src="before.png" alt="Before redesign">\n  <img src="after.png" alt="After redesign">\n  <figcaption>Before and after the homepage redesign</figcaption>\n</figure>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use figure when content (and its caption) should make sense even if moved elsewhere on the page',
+            'figcaption can appear as either the first or last child of figure — both are valid',
+            'Not every image needs a figure — use it when a caption or independent referencing genuinely adds value',
+            'The alt attribute on img still matters even inside a figure; figcaption is a caption, not alt text'
+        ]
+    },
+
+    {
+        id: 'video',
+        title: '<video>',
+        library: 'html',
+        category: 'media',
+        description: 'The <video> element embeds video content directly in a web page without needing a third-party plugin. It supports built-in playback controls, multiple source formats via nested <source> elements for browser compatibility, and various attributes for controlling autoplay, looping, and muting.',
+        syntax: '<video src="movie.mp4" controls width="640"></video>',
+        examples: [
+            {
+                title: 'Basic Video Player',
+                description: 'A video with standard browser playback controls.',
+                code: '<video controls width="640" height="360">\n  <source src="video.mp4" type="video/mp4">\n  Your browser does not support the video tag.\n</video>'
+            },
+            {
+                title: 'Multiple Source Formats',
+                description: 'Providing fallback formats for broader browser support.',
+                code: '<video controls width="640">\n  <source src="movie.webm" type="video/webm">\n  <source src="movie.mp4" type="video/mp4">\n  Your browser does not support HTML5 video.\n</video>'
+            },
+            {
+                title: 'Autoplay Muted Background Video',
+                description: 'A common pattern for looping background videos.',
+                code: '<video autoplay muted loop playsinline style="width: 100%; object-fit: cover;">\n  <source src="background.mp4" type="video/mp4">\n</video>'
+            }
+        ],
+        attributes: [
+            { name: 'controls', type: 'boolean', description: 'Shows the browser\'s built-in playback controls' },
+            { name: 'autoplay', type: 'boolean', description: 'Starts playback automatically (most browsers require muted for this to work)' },
+            { name: 'loop', type: 'boolean', description: 'Restarts the video automatically when it ends' },
+            { name: 'muted', type: 'boolean', description: 'Mutes audio by default' },
+            { name: 'poster', type: 'URL', description: 'An image shown before playback starts' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always include the controls attribute unless you have a very specific reason to hide them — autoplay-only videos are a poor user experience',
+            'Autoplay only works reliably in most browsers when combined with muted',
+            'Provide multiple <source> formats (MP4, WebM) for cross-browser compatibility',
+            'Include fallback text between the tags for very old browsers that do not support <video>',
+            'Use the poster attribute to show a meaningful thumbnail before playback'
+        ]
+    },
+
+    {
+        id: 'audio',
+        title: '<audio>',
+        library: 'html',
+        category: 'media',
+        description: 'The <audio> element embeds sound content — music, podcasts, or sound effects — directly in a page. Like <video>, it supports multiple <source> elements for format fallback and built-in playback controls, without needing Flash or other plugins.',
+        syntax: '<audio src="song.mp3" controls></audio>',
+        examples: [
+            {
+                title: 'Basic Audio Player',
+                description: 'An audio player with standard controls.',
+                code: '<audio controls>\n  <source src="podcast.mp3" type="audio/mpeg">\n  Your browser does not support the audio element.\n</audio>'
+            },
+            {
+                title: 'Multiple Format Fallback',
+                description: 'Providing both MP3 and OGG formats for compatibility.',
+                code: '<audio controls>\n  <source src="track.ogg" type="audio/ogg">\n  <source src="track.mp3" type="audio/mpeg">\n</audio>'
+            },
+            {
+                title: 'Looping Sound Effect',
+                description: 'A muted-by-default, loopable audio clip.',
+                code: '<audio id="notification" src="ding.mp3" preload="auto"></audio>\n<button onclick="document.getElementById(\'notification\').play()">Play Sound</button>'
+            }
+        ],
+        attributes: [
+            { name: 'controls', type: 'boolean', description: 'Shows the browser\'s built-in playback controls' },
+            { name: 'autoplay', type: 'boolean', description: 'Starts playback automatically (subject to browser autoplay restrictions)' },
+            { name: 'loop', type: 'boolean', description: 'Restarts playback automatically when it ends' },
+            { name: 'preload', type: 'none | metadata | auto', description: 'Hints how much of the file to preload before playback' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always show controls unless the audio is purely decorative (like a UI sound effect triggered by JavaScript)',
+            'Provide MP3 and OGG sources together for the widest browser compatibility',
+            'Be mindful of autoplay — most browsers block auto-playing audio with sound unless the user has interacted with the page',
+            'Use preload="none" for pages with many audio elements to avoid unnecessary bandwidth usage'
+        ]
+    },
+
+    {
+        id: 'iframe',
+        title: '<iframe>',
+        library: 'html',
+        category: 'media',
+        description: 'The <iframe> element embeds another HTML document within the current page, creating a nested browsing context. It is commonly used for embedding maps, videos from external platforms, payment widgets, or ads. Because it loads content from potentially untrusted sources, the sandbox attribute is important for restricting what an embedded page is allowed to do.',
+        syntax: '<iframe src="https://example.com" width="600" height="400"></iframe>',
+        examples: [
+            {
+                title: 'Embedding a Map',
+                description: 'A basic embedded iframe, such as a map widget.',
+                code: '<iframe src="https://maps.example.com/embed?q=Manchester" width="600" height="450" style="border:0;" loading="lazy"></iframe>'
+            },
+            {
+                title: 'Sandboxed Iframe',
+                description: 'Restricting what an embedded page is allowed to do for security.',
+                code: '<iframe src="https://untrusted-widget.com" sandbox="allow-scripts" width="400" height="300"></iframe>'
+            },
+            {
+                title: 'Responsive Iframe',
+                description: 'Making an iframe scale with its container using CSS.',
+                code: '<div style="position: relative; padding-bottom: 56.25%; height: 0;">\n  <iframe src="https://example.com/video" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" frameborder="0"></iframe>\n</div>'
+            }
+        ],
+        attributes: [
+            { name: 'src', type: 'URL', description: 'The URL of the page to embed' },
+            { name: 'sandbox', type: 'string', description: 'Restricts capabilities of the embedded content, such as scripts or form submission' },
+            { name: 'loading', type: 'lazy | eager', description: 'Controls when the iframe content loads relative to the viewport' },
+            { name: 'allow', type: 'string', description: 'Specifies permissions policy features the iframe can use, like camera or fullscreen' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always use the sandbox attribute when embedding content from a source you do not fully control',
+            'Use loading="lazy" for iframes below the fold to improve initial page load performance',
+            'Give the iframe a descriptive title attribute for screen reader users',
+            'Avoid iframes for content that could just as easily be a normal part of the page — they add overhead and complicate styling'
+        ]
+    },
+
+    {
+        id: 'meta',
+        title: '<meta>',
+        library: 'html',
+        category: 'meta',
+        description: 'The <meta> element provides metadata about the HTML document that is not displayed on the page itself — used for things like character encoding, viewport configuration, page descriptions for search engines, and social media preview data. Meta tags live inside the <head> and are void (self-closing) elements.',
+        syntax: '<meta name="description" content="Page description">',
+        examples: [
+            {
+                title: 'Essential Meta Tags',
+                description: 'The meta tags almost every page should include.',
+                code: '<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<meta name="description" content="Learn web development with DevNexus.">'
+            },
+            {
+                title: 'Social Media Preview (Open Graph)',
+                description: 'Meta tags that control how a link looks when shared on social media.',
+                code: '<meta property="og:title" content="DevNexus - Learn to Code">\n<meta property="og:description" content="An interactive platform for learning web development.">\n<meta property="og:image" content="https://devnexus.com/preview.png">'
+            },
+            {
+                title: 'SEO and Robots',
+                description: 'Controlling how search engines index the page.',
+                code: '<meta name="robots" content="index, follow">\n<meta name="keywords" content="html, css, javascript, learn to code">'
+            }
+        ],
+        attributes: [
+            { name: 'charset', type: 'string', description: 'Declares the document\'s character encoding, typically UTF-8' },
+            { name: 'name', type: 'string', description: 'Identifies the type of metadata, e.g. viewport, description, author' },
+            { name: 'content', type: 'string', description: 'The value associated with the name or property attribute' },
+            { name: 'property', type: 'string', description: 'Used for Open Graph metadata (og:title, og:image, etc.)' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always include charset and viewport meta tags as early as possible in <head>',
+            'Write a unique, concise description for each page (roughly 150-160 characters) to improve search engine snippets',
+            'Add Open Graph meta tags so links look good when shared on social platforms',
+            'Do not overload the description with keywords — write for humans first'
+        ]
+    },
+
+    {
+        id: 'link',
+        title: '<link>',
+        library: 'html',
+        category: 'meta',
+        description: 'The <link> element establishes a relationship between the current document and an external resource, most commonly a stylesheet. It lives in the <head> and is a void element. Beyond stylesheets, <link> is also used for favicons, preloading resources, and specifying alternate versions of a page.',
+        syntax: '<link rel="stylesheet" href="styles.css">',
+        examples: [
+            {
+                title: 'Linking a Stylesheet',
+                description: 'The most common use — connecting an external CSS file.',
+                code: '<link rel="stylesheet" href="/css/main.css">'
+            },
+            {
+                title: 'Favicon',
+                description: 'Setting the small icon shown in browser tabs.',
+                code: '<link rel="icon" type="image/png" href="/favicon.png">'
+            },
+            {
+                title: 'Preloading a Font',
+                description: 'Hinting the browser to fetch a critical resource earlier.',
+                code: '<link rel="preload" href="/fonts/main.woff2" as="font" type="font/woff2" crossorigin>'
+            }
+        ],
+        attributes: [
+            { name: 'rel', type: 'stylesheet | icon | preload | canonical', description: 'The relationship between the current document and the linked resource' },
+            { name: 'href', type: 'URL', description: 'The path to the linked resource' },
+            { name: 'type', type: 'string', description: 'The MIME type of the linked resource' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Place stylesheet <link> tags in <head> so styles are ready before content renders, avoiding a flash of unstyled content',
+            'Use rel="preload" sparingly, only for genuinely critical above-the-fold resources',
+            'Always include a favicon link — browsers will request /favicon.ico by default even without one, so being explicit avoids wasted requests',
+            'Use rel="canonical" to tell search engines the preferred URL when the same content is reachable from multiple paths'
+        ]
+    },
+
+    {
+        id: 'script',
+        title: '<script>',
+        library: 'html',
+        category: 'scripting',
+        description: 'The <script> element embeds or references executable JavaScript code within an HTML document. It can contain inline code directly between its tags, or load an external file via the src attribute. Where scripts are placed and how they load (defer, async, or neither) significantly affects page load performance and execution order.',
+        syntax: '<script src="app.js"></script>',
+        examples: [
+            {
+                title: 'External Script',
+                description: 'Loading JavaScript from a separate file.',
+                code: '<script src="/js/app.js"></script>'
+            },
+            {
+                title: 'Inline Script',
+                description: 'Writing JavaScript directly within the HTML document.',
+                code: '<script>\n  console.log("Page loaded");\n  document.addEventListener("DOMContentLoaded", () => {\n    console.log("DOM ready");\n  });\n</script>'
+            },
+            {
+                title: 'Deferred and Module Scripts',
+                description: 'Controlling load timing and using ES modules.',
+                code: '<script src="/js/analytics.js" defer></script>\n<script type="module" src="/js/main.js"></script>'
+            }
+        ],
+        attributes: [
+            { name: 'src', type: 'URL', description: 'Path to an external JavaScript file' },
+            { name: 'defer', type: 'boolean', description: 'Delays execution until after the document is parsed, preserving order' },
+            { name: 'async', type: 'boolean', description: 'Downloads the script in parallel and executes as soon as it is ready, out of order' },
+            { name: 'type', type: 'module | text/javascript', description: 'Specifies the scripting language or module type' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Place scripts before the closing </body> tag, or use defer, so they do not block HTML rendering',
+            'Use defer for scripts that need to run in order and depend on the full DOM being parsed',
+            'Use async only for independent scripts where execution order does not matter, like analytics',
+            'Prefer external scripts with src over large inline scripts for better caching and readability'
+        ]
+    },
+
+    {
+        id: 'html-disclosure',
+        title: '<details>, <summary>',
+        library: 'html',
+        category: 'interactive',
+        description: 'The <details> element creates a native, collapsible disclosure widget — content that can be toggled open or closed by the user without any JavaScript. The <summary> element inside it defines the always-visible heading that acts as the toggle control. This is the standard way to build FAQ accordions or collapsible sections without hand-rolling the interaction logic.',
+        syntax: '<details>\n  <summary>Click to expand</summary>\n  <p>Hidden content</p>\n</details>',
+        examples: [
+            {
+                title: 'Basic Collapsible Section',
+                description: 'A simple expandable/collapsible content block.',
+                code: '<details>\n  <summary>What is HTML?</summary>\n  <p>HTML is the standard markup language for creating web pages.</p>\n</details>'
+            },
+            {
+                title: 'FAQ Accordion',
+                description: 'Multiple details elements used to build an FAQ section.',
+                code: '<details>\n  <summary>Is DevNexus free?</summary>\n  <p>Yes, all core learning content is free.</p>\n</details>\n<details>\n  <summary>Do I need an account?</summary>\n  <p>An account is needed to save progress and take quizzes.</p>\n</details>'
+            },
+            {
+                title: 'Open by Default',
+                description: 'Using the open attribute so the content starts expanded.',
+                code: '<details open>\n  <summary>Important Notice</summary>\n  <p>This section is expanded by default when the page loads.</p>\n</details>'
+            }
+        ],
+        attributes: [
+            { name: 'open', type: 'boolean', description: 'Shows the details content expanded by default' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <details>/<summary> for simple show/hide UI instead of building the same thing manually with JavaScript and ARIA attributes',
+            'Always include a <summary> — without one, browsers show a generic default label',
+            'Style the disclosure triangle with the ::marker pseudo-element rather than hiding it and building a custom one, when possible',
+            'Great fit for FAQs, changelogs, and "read more" sections'
+        ]
+    },
+
+    {
+        id: 'dialog',
+        title: '<dialog>',
+        library: 'html',
+        category: 'interactive',
+        description: 'The <dialog> element represents a native modal or non-modal dialog box, such as a confirmation prompt, settings panel, or alert. It comes with built-in modal behavior (via the showModal() JavaScript method) including a backdrop and focus trapping, removing the need to hand-build accessible modal logic from scratch.',
+        syntax: '<dialog id="myDialog">\n  <p>Dialog content</p>\n  <button onclick="this.closest(\'dialog\').close()">Close</button>\n</dialog>',
+        examples: [
+            {
+                title: 'Basic Modal Dialog',
+                description: 'A dialog opened and closed via JavaScript.',
+                code: '<dialog id="confirmDialog">\n  <p>Are you sure you want to delete this item?</p>\n  <button onclick="document.getElementById(\'confirmDialog\').close()">Cancel</button>\n  <button onclick="document.getElementById(\'confirmDialog\').close()">Delete</button>\n</dialog>\n<button onclick="document.getElementById(\'confirmDialog\').showModal()">Delete Item</button>'
+            },
+            {
+                title: 'Non-modal Dialog',
+                description: 'Using show() instead of showModal() for a non-blocking dialog.',
+                code: '<dialog id="tipDialog">\n  <p>Tip: You can use keyboard shortcuts to navigate faster.</p>\n</dialog>\n<script>\n  document.getElementById("tipDialog").show();\n</script>'
+            },
+            {
+                title: 'Styled Dialog',
+                description: 'A dialog with custom appearance and backdrop styling.',
+                code: '<dialog style="border: none; border-radius: 12px; padding: 24px; max-width: 400px;">\n  <h3>Settings</h3>\n  <p>Dialog content goes here.</p>\n</dialog>\n<style>\n  dialog::backdrop { background: rgba(0,0,0,0.5); }\n</style>'
+            }
+        ],
+        attributes: [
+            { name: 'open', type: 'boolean', description: 'Reflects whether the dialog is currently visible' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use showModal() rather than the open attribute directly when you need modal behavior with a backdrop and focus trapping',
+            'Always provide a clear way to close the dialog, such as a close button or the Escape key (built in by default)',
+            'Style the ::backdrop pseudo-element to dim the rest of the page behind a modal dialog',
+            'Prefer the native <dialog> over a hand-built modal — it handles focus management and accessibility concerns you would otherwise have to build yourself'
+        ]
+    },
+
+    {
+        id: 'time',
+        title: '<time>',
+        library: 'html',
+        category: 'text',
+        description: 'The <time> element represents a specific date, time, or duration in a machine-readable format via its datetime attribute, while displaying a human-friendly version as its content. This lets browsers, search engines, and assistive technology understand dates unambiguously, even when the visible text is casual (like "yesterday" or "3 days ago").',
+        syntax: '<time datetime="2026-03-03">March 3rd</time>',
+        examples: [
+            {
+                title: 'Publication Date',
+                description: 'Marking up an article\'s publish date.',
+                code: '<p>Published on <time datetime="2026-03-03">March 3, 2026</time></p>'
+            },
+            {
+                title: 'Relative Time with Machine-Readable Value',
+                description: 'Showing a friendly relative time while keeping an exact machine-readable value.',
+                code: '<p>Posted <time datetime="2026-07-16T09:30:00Z">3 hours ago</time></p>'
+            },
+            {
+                title: 'Duration',
+                description: 'Representing a duration rather than a specific point in time.',
+                code: '<p>Video length: <time datetime="PT15M30S">15:30</time></p>'
+            }
+        ],
+        attributes: [
+            { name: 'datetime', type: 'string', description: 'A machine-readable ISO 8601 date, time, or duration' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always include a datetime attribute in ISO 8601 format, even when the visible text is a casual phrase like "yesterday"',
+            'Use <time> for any date shown on the page — it helps search engines understand publish dates and freshness',
+            'Duration values use the ISO 8601 duration format, e.g. PT15M30S for 15 minutes 30 seconds',
+            'Do not use <time> for vague, non-specific references to time that cannot be expressed as a real date'
+        ]
+    },
+
+    {
+        id: 'address',
+        title: '<address>',
+        library: 'html',
+        category: 'text',
+        description: 'The <address> element provides contact information for its nearest <article> or <body> ancestor. This might be a person, organization, or the author of the page, and typically includes things like an email, physical address, or social media link. It is not meant for arbitrary postal addresses that are not related to page authorship — use a plain <p> for those.',
+        syntax: '<address>\n  Contact: <a href="mailto:hello@example.com">hello@example.com</a>\n</address>',
+        examples: [
+            {
+                title: 'Page Footer Contact Info',
+                description: 'Author contact information in a site footer.',
+                code: '<footer>\n  <address>\n    Written by Jane Doe. Contact: <a href="mailto:jane@example.com">jane@example.com</a>\n  </address>\n</footer>'
+            },
+            {
+                title: 'Article Author Info',
+                description: 'Contact details specific to a single article.',
+                code: '<article>\n  <h2>Understanding Async/Await</h2>\n  <p>Article content...</p>\n  <address>\n    By <a href="/authors/alex">Alex Chen</a>\n  </address>\n</article>'
+            },
+            {
+                title: 'Organization Contact Block',
+                description: 'Business contact information.',
+                code: '<address>\n  DevNexus HQ<br>\n  123 Tech Street<br>\n  Manchester, UK<br>\n  <a href="tel:+441234567890">+44 1234 567890</a>\n</address>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Only use <address> for contact information related to the page or article author, not arbitrary postal addresses',
+            'It is fine to include a physical address, email, phone number, or social links inside <address>',
+            'Do not nest headings, sectioning elements, or other addresses inside <address>',
+            'Browsers render <address> content in italics by default — override with CSS if that does not fit your design'
+        ]
+    },
+
+    {
+        id: 'abbr',
+        title: '<abbr>',
+        library: 'html',
+        category: 'text',
+        description: 'The <abbr> element marks up an abbreviation or acronym, with the title attribute providing the full expansion. Browsers typically show the expansion as a tooltip on hover, and screen readers can announce it, helping readers who are unfamiliar with the shortened term.',
+        syntax: '<abbr title="HyperText Markup Language">HTML</abbr>',
+        examples: [
+            {
+                title: 'Basic Abbreviation',
+                description: 'Marking up a common acronym with its full meaning.',
+                code: '<p><abbr title="HyperText Markup Language">HTML</abbr> is the standard markup language for the web.</p>'
+            },
+            {
+                title: 'Multiple Abbreviations in Context',
+                description: 'Using abbr for several technical terms in a paragraph.',
+                code: '<p>Modern web development relies on <abbr title="Application Programming Interface">API</abbr>s that communicate using <abbr title="JavaScript Object Notation">JSON</abbr>.</p>'
+            },
+            {
+                title: 'Styled Abbreviation',
+                description: 'Giving the abbreviation a visual hint that it has a tooltip.',
+                code: '<abbr title="Cascading Style Sheets" style="text-decoration: underline dotted; cursor: help;">CSS</abbr>'
+            }
+        ],
+        attributes: [
+            { name: 'title', type: 'string', description: 'The full expansion of the abbreviation, shown as a tooltip' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always include the title attribute with the full expansion — without it, abbr provides little value',
+            'Expand the abbreviation in the title on its first meaningful use in a document',
+            'Do not overuse abbr for terms that are already universally understood, like "HTML" itself in a web dev context',
+            'Consider that hover-only tooltips are not accessible on touch devices, so do not rely on abbr as the only place an important term is explained'
+        ]
+    },
+
+    {
+        id: 'html-form-grouping',
+        title: '<fieldset>, <legend>',
+        library: 'html',
+        category: 'forms',
+        description: 'The <fieldset> element groups related form controls together, typically rendered with a visible border. The <legend> element provides a caption for the group, describing what the enclosed fields are collectively for. This is especially useful for grouping radio buttons, related checkboxes, or sections of a longer form like "Billing Address" versus "Shipping Address".',
+        syntax: '<fieldset>\n  <legend>Group Title</legend>\n  <!-- form controls -->\n</fieldset>',
+        examples: [
+            {
+                title: 'Grouped Radio Buttons',
+                description: 'Using fieldset to group a set of related radio options.',
+                code: '<fieldset>\n  <legend>Preferred Contact Method</legend>\n  <label><input type="radio" name="contact" value="email"> Email</label>\n  <label><input type="radio" name="contact" value="phone"> Phone</label>\n</fieldset>'
+            },
+            {
+                title: 'Multi-Section Form',
+                description: 'Breaking a longer form into clearly labeled groups.',
+                code: '<form>\n  <fieldset>\n    <legend>Personal Details</legend>\n    <input type="text" placeholder="Full Name">\n    <input type="email" placeholder="Email">\n  </fieldset>\n  <fieldset>\n    <legend>Address</legend>\n    <input type="text" placeholder="Street">\n    <input type="text" placeholder="City">\n  </fieldset>\n</form>'
+            },
+            {
+                title: 'Disabling a Whole Group',
+                description: 'The disabled attribute on fieldset disables every control inside it at once.',
+                code: '<fieldset disabled>\n  <legend>Payment Details (complete Step 1 first)</legend>\n  <input type="text" placeholder="Card Number">\n</fieldset>'
+            }
+        ],
+        attributes: [
+            { name: 'disabled', type: 'boolean', description: 'Disables every form control nested inside the fieldset' },
+            { name: 'name', type: 'string', description: 'Associates the fieldset with the form for scripting purposes' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always include a <legend> as the first child of a <fieldset> — it is what gives the group its accessible name',
+            'Use fieldset to group related radio buttons or checkboxes so screen readers announce the group context',
+            'Use the disabled attribute on a fieldset to disable a whole section at once instead of each input individually',
+            'Avoid using fieldset purely for visual styling — use a <div> if there is no genuine grouping of controls'
+        ]
+    },
+
+    {
+        id: 'html-progress-meter',
+        title: '<progress>, <meter>',
+        library: 'html',
+        category: 'interactive',
+        description: 'These two elements display quantities visually without needing custom-built progress bars. <progress> represents the completion progress of a task, like a file upload or multi-step form. <meter> represents a scalar value within a known range, like disk usage or a rating — it is for measuring a static value, not tracking progress toward completion.',
+        syntax: '<progress value="70" max="100"></progress>\n<meter value="6" min="0" max="10"></meter>',
+        examples: [
+            {
+                title: 'File Upload Progress',
+                description: 'Showing task completion with progress.',
+                code: '<label for="upload">Uploading file...</label>\n<progress id="upload" value="45" max="100"></progress>'
+            },
+            {
+                title: 'Indeterminate Progress',
+                description: 'A progress bar with no known completion percentage yet.',
+                code: '<p>Processing your request...</p>\n<progress></progress>'
+            },
+            {
+                title: 'Disk Usage Meter',
+                description: 'Using meter to represent a static measured value within a range.',
+                code: '<label for="disk">Disk usage:</label>\n<meter id="disk" value="7.2" min="0" max="10" low="3" high="8" optimum="0">7.2 out of 10 GB</meter>'
+            }
+        ],
+        attributes: [
+            { name: 'value', type: 'number', description: 'The current value' },
+            { name: 'max', type: 'number', description: 'The maximum value (progress and meter)' },
+            { name: 'min', type: 'number', description: 'The minimum value (meter only, defaults to 0)' },
+            { name: 'low', type: 'number', description: 'The upper bound of the low range (meter only)' },
+            { name: 'high', type: 'number', description: 'The lower bound of the high range (meter only)' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <progress> for tasks that are actively completing, like uploads or multi-step processes',
+            'Use <meter> for static measurements within a known range, like ratings, disk usage, or scores — not for task completion',
+            'Omit the value attribute on <progress> to show an indeterminate loading state',
+            'Always pair with a <label> so the purpose of the bar or gauge is clear'
+        ]
+    },
+
     // ================= PYTHON (Enhanced) =================
     {
         id: 'py-true',
