@@ -1789,6 +1789,1115 @@ export const DOCS: DocItem[] = [
         ]
     },
 
+    {
+        id: 'base',
+        title: '<base>',
+        library: 'html',
+        category: 'meta',
+        description: 'The <base> element specifies a base URL and/or target for all relative URLs in a document. It must appear inside <head>, and a document should have no more than one <base> element. Once set, every relative link, image src, and form action on the page resolves against it unless individually overridden.',
+        syntax: '<base href="https://example.com/" target="_blank">',
+        examples: [
+            {
+                title: 'Base URL',
+                description: 'Setting a base so relative links resolve consistently.',
+                code: '<head>\n  <base href="https://devnexus.com/docs/">\n</head>\n<body>\n  <a href="html">HTML Docs</a>\n  <!-- resolves to https://devnexus.com/docs/html -->\n</body>'
+            },
+            {
+                title: 'Base Target',
+                description: 'Making every link on the page open in a new tab by default.',
+                code: '<head>\n  <base target="_blank">\n</head>\n<body>\n  <a href="https://example.com">Opens in new tab</a>\n</body>'
+            },
+            {
+                title: 'Combined href and target',
+                description: 'Setting both a base URL and default target together.',
+                code: '<base href="https://cdn.example.com/assets/" target="_self">'
+            }
+        ],
+        attributes: [
+            { name: 'href', type: 'URL', description: 'The base URL for all relative URLs in the document' },
+            { name: 'target', type: '_blank | _self | _parent | _top', description: 'The default target for all links and forms' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use at most one <base> element per document, placed early inside <head>',
+            'Be careful with base href — it affects every relative URL on the page, including images and scripts, not just links',
+            'Prefer explicit absolute or relative paths over relying on base href for most projects, since it can cause confusing bugs when forgotten',
+            'Remember individual links can still override a base target with their own target attribute'
+        ]
+    },
+
+    {
+        id: 'html-description-list',
+        title: '<dl>, <dt>, <dd>',
+        library: 'html',
+        category: 'lists',
+        description: 'The description list group represents a list of term/description pairs — like a glossary or metadata list. <dl> wraps the whole list, <dt> defines each term, and <dd> defines its associated description. Unlike <ul>/<ol>, description lists are not bulleted or numbered by default.',
+        syntax: '<dl>\n  <dt>Term</dt>\n  <dd>Description of the term.</dd>\n</dl>',
+        examples: [
+            {
+                title: 'Glossary',
+                description: 'A simple glossary of terms and definitions.',
+                code: '<dl>\n  <dt>HTML</dt>\n  <dd>The standard markup language for creating web pages.</dd>\n  <dt>CSS</dt>\n  <dd>The language used to style HTML content.</dd>\n</dl>'
+            },
+            {
+                title: 'Multiple Descriptions',
+                description: 'A single term can have more than one description.',
+                code: '<dl>\n  <dt>API</dt>\n  <dd>Application Programming Interface</dd>\n  <dd>A set of rules that lets applications communicate.</dd>\n</dl>'
+            },
+            {
+                title: 'Metadata List',
+                description: 'Using a description list for key-value metadata.',
+                code: '<dl>\n  <dt>Author</dt>\n  <dd>Jane Smith</dd>\n  <dt>Published</dt>\n  <dd>July 16, 2026</dd>\n</dl>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use description lists for genuine term/description pairs, like glossaries, metadata, or FAQs — not as a generic layout tool',
+            'A dt can be followed by multiple dd elements if a term has several descriptions',
+            'Avoid using dl purely to achieve a two-column visual layout — that is a CSS concern unless the content really is term/description pairs',
+            'Style with CSS (e.g., display: grid or flex on dl) for custom layouts rather than default browser styling'
+        ]
+    },
+
+    {
+        id: 'cite',
+        title: '<cite>',
+        library: 'html',
+        category: 'text',
+        description: 'The <cite> element references the title of a creative work — a book, article, song, movie, or research paper — not the author\'s name. Browsers typically render it in italics. It is often paired with <blockquote> or <q> to credit the source of a quotation.',
+        syntax: '<cite>Title of Work</cite>',
+        examples: [
+            {
+                title: 'Citing a Book',
+                description: 'Referencing a book title within a sentence.',
+                code: '<p>I just finished reading <cite>Clean Code</cite> by Robert C. Martin.</p>'
+            },
+            {
+                title: 'Citing Alongside a Quote',
+                description: 'Using cite to credit the source of a blockquote.',
+                code: '<blockquote>\n  <p>Simplicity is the soul of efficiency.</p>\n</blockquote>\n<p>— <cite>Austin Freeman</cite></p>'
+            },
+            {
+                title: 'Citing a Web Article',
+                description: 'Referencing an online article by title.',
+                code: '<p>According to <cite>Understanding the DOM</cite> on MDN, the DOM represents the page as a tree structure.</p>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use cite for the title of a work, not for the name of a person — there is no dedicated element for author names',
+            'Pair with blockquote or q when crediting the source of a quotation',
+            'Do not use cite purely for its default italic styling on unrelated text',
+            'Combine with the cite attribute on blockquote/q (a URL) for machine-readable sourcing alongside the visible citation'
+        ]
+    },
+
+    {
+        id: 'html-ins-del',
+        title: '<ins> and <del>',
+        library: 'html',
+        category: 'text',
+        description: 'The <ins> element marks text that has been inserted into a document, typically rendered underlined. The <del> element marks text that has been deleted, typically rendered with strikethrough. Together they are commonly used to show tracked changes, edit history, or price updates, and both support cite and datetime attributes to document when and why the change was made.',
+        syntax: '<del>Old text</del> <ins>New text</ins>',
+        examples: [
+            {
+                title: 'Showing a Price Change',
+                description: 'A common e-commerce pattern for discounted pricing.',
+                code: '<p>Price: <del>$49.99</del> <ins>$34.99</ins></p>'
+            },
+            {
+                title: 'Document Revision',
+                description: 'Marking up an edited sentence to show what changed.',
+                code: '<p>The meeting is scheduled for <del>Monday</del> <ins>Wednesday</ins> at 3 PM.</p>'
+            },
+            {
+                title: 'With Attribution',
+                description: 'Documenting who made a change and when.',
+                code: '<p>\n  <del datetime="2026-07-01" cite="https://example.com/changelog">Removed the beta feature.</del>\n  <ins datetime="2026-07-16">Added the stable release notes.</ins>\n</p>'
+            }
+        ],
+        attributes: [
+            { name: 'cite', type: 'URL', description: 'A URL explaining why the change was made' },
+            { name: 'datetime', type: 'string', description: 'The date and time the change was made, in ISO 8601 format' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use ins/del for genuine tracked changes or edit history, not as a general-purpose styling shortcut for underline/strikethrough',
+            'For text that is simply no longer accurate (but was not literally deleted from a document), consider <s> instead of <del>',
+            'Include datetime for a proper audit trail on content like changelogs or legal documents',
+            'Remember del/ins can wrap both inline and block-level content'
+        ]
+    },
+
+    {
+        id: 'html-picture',
+        title: '<picture> and <source>',
+        library: 'html',
+        category: 'media',
+        description: 'The <picture> element lets the browser choose the most appropriate image from multiple <source> options based on screen size, resolution, or format support, falling back to a required <img> element if none match. This is the standard way to serve responsive, art-directed, or next-gen image formats (like WebP or AVIF) with automatic fallback.',
+        syntax: '<picture>\n  <source srcset="image.webp" type="image/webp">\n  <img src="image.jpg" alt="Description">\n</picture>',
+        examples: [
+            {
+                title: 'Format Fallback',
+                description: 'Serving a modern format with a JPEG fallback.',
+                code: '<picture>\n  <source srcset="photo.avif" type="image/avif">\n  <source srcset="photo.webp" type="image/webp">\n  <img src="photo.jpg" alt="Mountain landscape">\n</picture>'
+            },
+            {
+                title: 'Responsive Art Direction',
+                description: 'Showing a different crop of the same image depending on screen width.',
+                code: '<picture>\n  <source media="(min-width: 800px)" srcset="banner-wide.jpg">\n  <source media="(min-width: 400px)" srcset="banner-medium.jpg">\n  <img src="banner-small.jpg" alt="Homepage banner">\n</picture>'
+            },
+            {
+                title: 'Resolution Switching',
+                description: 'Serving higher-resolution images to high-density screens.',
+                code: '<picture>\n  <source srcset="icon.png 1x, icon@2x.png 2x">\n  <img src="icon.png" alt="App icon">\n</picture>'
+            }
+        ],
+        attributes: [
+            { name: 'srcset', type: 'string', description: 'Used on source; one or more candidate image URLs' },
+            { name: 'media', type: 'string', description: 'A media query controlling when that source is used' },
+            { name: 'type', type: 'string', description: 'The MIME type of the image resource, letting the browser skip unsupported formats' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always include a fallback <img> as the last child — it is what renders if no source matches, and is required for accessibility',
+            'Put the alt attribute on the fallback <img>, not on picture or source',
+            'List source elements from most to least preferred format, since the browser uses the first one it supports',
+            'Use picture for format/art-direction switching, and the simpler img srcset attribute for pure resolution switching'
+        ]
+    },
+
+    {
+        id: 'canvas',
+        title: '<canvas>',
+        library: 'html',
+        category: 'scripting',
+        description: 'The <canvas> element provides a blank, resizable bitmap surface for drawing graphics, animations, and visualizations via JavaScript — typically using the Canvas 2D API or WebGL. Unlike SVG, canvas content is pixel-based rather than made of individually addressable DOM elements, which makes it well-suited for games, charts, and pixel-level image manipulation.',
+        syntax: '<canvas id="myCanvas" width="400" height="300"></canvas>',
+        examples: [
+            {
+                title: 'Basic Canvas Setup',
+                description: 'Creating a canvas and drawing a simple rectangle.',
+                code: '<canvas id="myCanvas" width="300" height="150" style="border:1px solid #ccc;"></canvas>\n<script>\n  const ctx = document.getElementById("myCanvas").getContext("2d");\n  ctx.fillStyle = "#3b82f6";\n  ctx.fillRect(20, 20, 100, 80);\n</script>'
+            },
+            {
+                title: 'Drawing a Circle',
+                description: 'Using canvas arc methods to draw shapes.',
+                code: '<canvas id="circleCanvas" width="200" height="200"></canvas>\n<script>\n  const ctx = document.getElementById("circleCanvas").getContext("2d");\n  ctx.beginPath();\n  ctx.arc(100, 100, 60, 0, Math.PI * 2);\n  ctx.fillStyle = "#10b981";\n  ctx.fill();\n</script>'
+            },
+            {
+                title: 'Fallback Content',
+                description: 'Providing fallback content for browsers or users without canvas/script support.',
+                code: '<canvas id="chart" width="400" height="200">\n  Your browser does not support canvas. Here is a summary: Sales grew 20% in Q2.\n</canvas>'
+            }
+        ],
+        attributes: [
+            { name: 'width', type: 'number', description: 'The canvas width in pixels (default 300)' },
+            { name: 'height', type: 'number', description: 'The canvas height in pixels (default 150)' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Set width/height as HTML attributes rather than CSS to avoid blurry, stretched rendering',
+            'Provide meaningful fallback content between the tags for cases where canvas or JavaScript is unavailable',
+            'For charts, diagrams, or icons that need to stay interactive and accessible as individual elements, consider SVG instead of canvas',
+            'Canvas content is not part of the accessibility tree by default — add ARIA attributes or fallback text for accessibility when the content is meaningful'
+        ]
+    },
+
+    {
+        id: 'html-embed-object',
+        title: '<embed> and <object>',
+        library: 'html',
+        category: 'media',
+        description: 'The <embed> and <object> elements embed external content — like PDFs, other HTML pages, or browser plugins — into a document. <object> is the more capable and standards-based of the two, supporting fallback content between its tags, while <embed> is simpler but has no fallback mechanism. Modern use cases increasingly favor <iframe> for HTML content and dedicated elements like <img>, <video>, or <picture> where applicable.',
+        syntax: '<object data="file.pdf" type="application/pdf" width="600" height="400"></object>',
+        examples: [
+            {
+                title: 'Embedding a PDF',
+                description: 'Displaying a PDF file directly in the page using object.',
+                code: '<object data="/docs/guide.pdf" type="application/pdf" width="100%" height="500">\n  <p>Your browser cannot display PDFs. <a href="/docs/guide.pdf">Download it instead</a>.</p>\n</object>'
+            },
+            {
+                title: 'Embedding with embed',
+                description: 'A simpler embed of a PDF with no fallback content.',
+                code: '<embed src="/docs/report.pdf" type="application/pdf" width="100%" height="500">'
+            },
+            {
+                title: 'Embedding an SVG File as an Object',
+                description: 'Loading an external SVG file as interactive content.',
+                code: '<object data="/icons/logo.svg" type="image/svg+xml" width="120" height="120"></object>'
+            }
+        ],
+        attributes: [
+            { name: 'data', type: 'URL', description: 'Used on object; the URL of the resource to embed' },
+            { name: 'src', type: 'URL', description: 'Used on embed; the URL of the resource to embed' },
+            { name: 'type', type: 'string', description: 'The MIME type of the embedded resource' },
+            { name: 'width', type: 'number', description: 'Display width in pixels' },
+            { name: 'height', type: 'number', description: 'Display height in pixels' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Prefer object over embed when you need fallback content for unsupported browsers',
+            'For embedding other web pages specifically, use iframe instead, which is more widely supported and flexible',
+            'Always provide a direct download link as a fallback when embedding documents like PDFs',
+            'Test embedded content across browsers, since plugin-dependent behavior for embed/object varies more than other media elements'
+        ]
+    },
+
+    {
+        id: 'html-image-map',
+        title: '<map> and <area>',
+        library: 'html',
+        category: 'media',
+        description: 'Image maps let different regions of a single image act as separate clickable links. The <map> element defines the map, referenced from an <img> via its usemap attribute, and each <area> inside it defines one clickable region using coordinates and a shape.',
+        syntax: '<img src="image.jpg" usemap="#map1">\n<map name="map1">\n  <area shape="rect" coords="0,0,100,100" href="/page1">\n</map>',
+        examples: [
+            {
+                title: 'Rectangular Regions',
+                description: 'A simple image map with rectangular clickable areas.',
+                code: '<img src="nav-diagram.png" usemap="#navmap" alt="Site navigation diagram">\n<map name="navmap">\n  <area shape="rect" coords="0,0,150,50" href="/home" alt="Home">\n  <area shape="rect" coords="150,0,300,50" href="/about" alt="About">\n</map>'
+            },
+            {
+                title: 'Circular Region',
+                description: 'Defining a circular clickable area.',
+                code: '<img src="world-map.png" usemap="#continents" alt="World map">\n<map name="continents">\n  <area shape="circle" coords="200,150,40" href="/europe" alt="Europe">\n</map>'
+            },
+            {
+                title: 'Polygon Region',
+                description: 'Defining a custom-shaped clickable area.',
+                code: '<map name="shapes">\n  <area shape="poly" coords="50,10,90,90,10,90" href="/triangle-info" alt="Triangle">\n</map>'
+            }
+        ],
+        attributes: [
+            { name: 'name', type: 'string', description: 'Used on map; must match the img\'s usemap value' },
+            { name: 'usemap', type: 'string', description: 'Used on img; references a map by name, prefixed with #' },
+            { name: 'shape', type: 'rect | circle | poly | default', description: 'Used on area; the shape of the clickable region' },
+            { name: 'coords', type: 'string', description: 'Used on area; coordinates defining the region\'s boundaries' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always include alt text on each area for accessibility, same as a regular link',
+            'Consider whether separate, individually styled elements (like a CSS grid of linked images) would be simpler than coordinate-based regions',
+            'Image maps do not scale coordinates automatically with responsive images — test carefully on different screen sizes',
+            'Keep coordinate math simple by using rect and circle shapes where possible rather than complex polygons'
+        ]
+    },
+
+    {
+        id: 'noscript',
+        title: '<noscript>',
+        library: 'html',
+        category: 'scripting',
+        description: 'The <noscript> element defines content to display only when JavaScript is disabled or unsupported in the browser. It commonly contains a message explaining that the page requires JavaScript, or a fallback version of functionality that would otherwise depend on scripting.',
+        syntax: '<noscript>\n  <p>This site requires JavaScript to function.</p>\n</noscript>',
+        examples: [
+            {
+                title: 'Basic Warning Message',
+                description: 'Informing users that JavaScript is required.',
+                code: '<noscript>\n  <p>Please enable JavaScript to use this application.</p>\n</noscript>'
+            },
+            {
+                title: 'Fallback Content',
+                description: 'Providing a non-JavaScript fallback for an interactive feature.',
+                code: '<div id="live-chart"></div>\n<noscript>\n  <img src="/static-chart.png" alt="Sales chart (static fallback)">\n</noscript>'
+            },
+            {
+                title: 'Styled Notice',
+                description: 'A styled banner shown only without JavaScript.',
+                code: '<noscript>\n  <div style="background: #fef3c7; padding: 12px; text-align: center;">\n    Some features are unavailable with JavaScript disabled.\n  </div>\n</noscript>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use noscript to gracefully inform users rather than leaving them with a blank or broken page',
+            'Where practical, provide genuine fallback content or functionality, not just a warning message',
+            'Remember content inside noscript is only rendered when scripting is off — do not rely on it for anything that should also work normally',
+            'Test your site with JavaScript disabled occasionally to see what your users without it actually experience'
+        ]
+    },
+
+    {
+        id: 'output',
+        title: '<output>',
+        library: 'html',
+        category: 'forms',
+        description: 'The <output> element represents the result of a calculation performed by a script, often used within a form to show a live computed value — like the result of a slider-driven calculation. It can be associated with the form controls that influence its value via the for attribute.',
+        syntax: '<output name="result" for="a b">0</output>',
+        examples: [
+            {
+                title: 'Simple Calculation Display',
+                description: 'Showing the sum of two number inputs, updated live with JavaScript.',
+                code: '<form oninput="result.value = parseInt(a.value || 0) + parseInt(b.value || 0)">\n  <input type="number" id="a" name="a" value="0"> +\n  <input type="number" id="b" name="b" value="0"> =\n  <output name="result" for="a b">0</output>\n</form>'
+            },
+            {
+                title: 'Slider with Live Output',
+                description: 'A common pattern pairing a range input with output.',
+                code: '<input type="range" id="volume" min="0" max="100" value="50" oninput="vol.value = volume.value">\n<output id="vol" for="volume">50</output>'
+            },
+            {
+                title: 'Styled Output',
+                description: 'Styling the output like a result badge.',
+                code: '<output style="display: inline-block; background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 999px; font-weight: 600;">$42.50</output>'
+            }
+        ],
+        attributes: [
+            { name: 'for', type: 'string', description: 'A space-separated list of IDs of elements that contributed to the calculation' },
+            { name: 'name', type: 'string', description: 'Names the output for form submission' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use output for genuinely calculated or derived values, not as a generic text container',
+            'Set the for attribute to link the output back to the inputs it depends on, improving accessibility',
+            'Combine with the oninput event on the parent form for live updates without a submit step',
+            'Provide an initial value inside the tags so the output is not empty before any calculation runs'
+        ]
+    },
+
+    {
+        id: 'datalist',
+        title: '<datalist>',
+        library: 'html',
+        category: 'forms',
+        description: 'The <datalist> element provides a list of predefined autocomplete suggestions for an <input> element, without restricting the user to only those choices — unlike <select>, users can still type a custom value. It is connected to an input via a matching list attribute and id.',
+        syntax: '<input list="options" name="choice">\n<datalist id="options">\n  <option value="Option A">\n  <option value="Option B">\n</datalist>',
+        examples: [
+            {
+                title: 'Basic Autocomplete',
+                description: 'Suggesting common browser names while allowing free text.',
+                code: '<label for="browser">Choose a browser:</label>\n<input list="browsers" id="browser" name="browser">\n<datalist id="browsers">\n  <option value="Chrome">\n  <option value="Firefox">\n  <option value="Safari">\n  <option value="Edge">\n</datalist>'
+            },
+            {
+                title: 'Number Suggestions',
+                description: 'Using datalist to suggest common numeric values.',
+                code: '<label for="rating">Rating:</label>\n<input type="range" list="ratings" id="rating" min="0" max="10">\n<datalist id="ratings">\n  <option value="0"></option>\n  <option value="5"></option>\n  <option value="10"></option>\n</datalist>'
+            },
+            {
+                title: 'City Search Suggestions',
+                description: 'Suggesting cities while allowing any typed value.',
+                code: '<input list="cities" name="city" placeholder="Search for a city">\n<datalist id="cities">\n  <option value="Manchester">\n  <option value="London">\n  <option value="Leeds">\n</datalist>'
+            }
+        ],
+        attributes: [
+            { name: 'id', type: 'string', description: 'Referenced by the input\'s list attribute' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use datalist when you want to suggest common values without forcing the user to pick only from a fixed list — use select for that instead',
+            'Connect it to an input using matching list and id attributes',
+            'Keep the suggestion list reasonably short and relevant so it stays genuinely useful',
+            'Test the visual behavior across browsers, since datalist styling and interaction is less consistent than other form controls'
+        ]
+    },
+
+    {
+        id: 'html-sub-sup',
+        title: '<sub> and <sup>',
+        library: 'html',
+        category: 'text',
+        description: 'The <sub> element renders text as subscript (lowered and smaller), and <sup> renders text as superscript (raised and smaller). They are used for their actual typographic meaning — chemical formulas, mathematical exponents, ordinal indicators, and footnote references — not for general small text styling.',
+        syntax: 'H<sub>2</sub>O and E = mc<sup>2</sup>',
+        examples: [
+            {
+                title: 'Chemical Formula',
+                description: 'Using subscript for a chemical formula.',
+                code: '<p>Water is H<sub>2</sub>O, and carbon dioxide is CO<sub>2</sub>.</p>'
+            },
+            {
+                title: 'Mathematical Exponent',
+                description: 'Using superscript for an exponent.',
+                code: '<p>Einstein\'s famous equation is E = mc<sup>2</sup>.</p>'
+            },
+            {
+                title: 'Footnote Reference',
+                description: 'Using superscript to mark a footnote reference.',
+                code: '<p>This claim needs verification<sup><a href="#footnote1">[1]</a></sup>.</p>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use sub/sup only for their real typographic meaning, not simply to make text smaller',
+            'For ordinal suffixes like "1st" or "2nd", consider whether superscript styling is actually desired by your target audience — many style guides avoid it',
+            'Keep subscript/superscript text short — long passages become hard to read at reduced size',
+            'For footnote systems, pair sup with proper anchor links back and forth between reference and note'
+        ]
+    },
+
+    {
+        id: 'html-samp-var',
+        title: '<samp> and <var>',
+        library: 'html',
+        category: 'text',
+        description: 'The <samp> element represents sample output from a computer program, typically rendered in monospace. The <var> element represents a variable in a mathematical expression or programming context, typically rendered in italics. Both are semantic complements to <kbd> (keyboard input) and <code> (code itself) for accurately marking up technical writing.',
+        syntax: '<samp>Output text</samp> and <var>x</var>',
+        examples: [
+            {
+                title: 'Program Output',
+                description: 'Showing sample console output.',
+                code: '<p>Running the script prints: <samp>Build succeeded in 4.2s</samp></p>'
+            },
+            {
+                title: 'Mathematical Variable',
+                description: 'Marking up a variable in an equation.',
+                code: '<p>The formula for area is <var>A</var> = <var>π</var><var>r</var><sup>2</sup>.</p>'
+            },
+            {
+                title: 'Combining kbd, samp, and var',
+                description: 'Documenting a command-line interaction with proper semantic markup.',
+                code: '<p>Type <kbd>echo $PATH</kbd> and press Enter. The output will look like <samp>/usr/local/bin:/usr/bin</samp>, where <var>PATH</var> is your system\'s environment variable.</p>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use samp specifically for output a program actually produced, distinct from kbd (what the user types) and code (the code itself)',
+            'Use var for variable names in math or pseudocode, not for arbitrary emphasized words',
+            'Combine kbd, samp, code, and var together in technical documentation for precise, accessible meaning',
+            'Do not reach for these elements purely for their default monospace/italic styling on unrelated text'
+        ]
+    },
+
+    {
+        id: 'track',
+        title: '<track>',
+        library: 'html',
+        category: 'media',
+        description: 'The <track> element specifies timed text tracks for <video> or <audio> elements — most commonly subtitles or captions in WebVTT format. Multiple tracks can be provided for different languages, and the default attribute marks which one should be enabled automatically.',
+        syntax: '<track src="captions.vtt" kind="subtitles" srclang="en" label="English">',
+        examples: [
+            {
+                title: 'Basic Captions',
+                description: 'Adding English captions to a video.',
+                code: '<video controls>\n  <source src="tutorial.mp4" type="video/mp4">\n  <track src="captions-en.vtt" kind="captions" srclang="en" label="English" default>\n</video>'
+            },
+            {
+                title: 'Multiple Language Subtitles',
+                description: 'Offering subtitle tracks in more than one language.',
+                code: '<video controls>\n  <source src="movie.mp4" type="video/mp4">\n  <track src="subs-en.vtt" kind="subtitles" srclang="en" label="English" default>\n  <track src="subs-fr.vtt" kind="subtitles" srclang="fr" label="Français">\n</video>'
+            },
+            {
+                title: 'Chapter Markers',
+                description: 'Using track for chapter navigation instead of captions.',
+                code: '<video controls>\n  <source src="lecture.mp4" type="video/mp4">\n  <track src="chapters.vtt" kind="chapters" srclang="en" label="Chapters">\n</video>'
+            }
+        ],
+        attributes: [
+            { name: 'src', type: 'URL', description: 'The URL of the WebVTT track file' },
+            { name: 'kind', type: 'subtitles | captions | chapters | descriptions', description: 'The type of timed text' },
+            { name: 'srclang', type: 'string', description: 'The language of the track content, as a language code' },
+            { name: 'label', type: 'string', description: 'A human-readable label shown in the track selection menu' },
+            { name: 'default', type: 'boolean', description: 'Marks this track as enabled by default' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always provide captions for video content with spoken dialogue — it is one of the most impactful accessibility improvements you can make',
+            'Use kind="captions" (which includes non-speech sounds) rather than kind="subtitles" when the audience may be deaf or hard of hearing, not just non-native speakers',
+            'Mark exactly one track as default per kind to avoid ambiguity',
+            'Test that your WebVTT files are valid — malformed timing syntax will silently fail to display'
+        ]
+    },
+
+    {
+        id: 'style',
+        title: '<style>',
+        library: 'html',
+        category: 'meta',
+        description: 'The <style> element contains embedded CSS rules that apply directly to the current document, as an alternative to linking an external stylesheet with <link>. It normally lives inside <head>, though the scoped nature of modern CSS means it can technically appear in body content too.',
+        syntax: '<style>\n  body { font-family: sans-serif; }\n</style>',
+        examples: [
+            {
+                title: 'Basic Embedded Styles',
+                description: 'Adding page-specific CSS directly in the document.',
+                code: '<head>\n  <style>\n    body { margin: 0; font-family: system-ui; }\n    h1 { color: #1f2937; }\n  </style>\n</head>'
+            },
+            {
+                title: 'Media-Specific Styles',
+                description: 'Using the media attribute to apply styles conditionally.',
+                code: '<style media="print">\n  nav, footer { display: none; }\n</style>'
+            },
+            {
+                title: 'Component-Scoped Styles',
+                description: 'A style block for a specific reusable component.',
+                code: '<style>\n  .card { border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); padding: 16px; }\n</style>\n<div class="card">Card content</div>'
+            }
+        ],
+        attributes: [
+            { name: 'media', type: 'string', description: 'A media query specifying when the styles apply' },
+            { name: 'type', type: 'string', description: 'Defaults to text/css; rarely needs to be set explicitly' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Prefer external stylesheets via <link> for anything beyond a handful of page-specific rules, for better caching and maintainability',
+            'Use style blocks for critical above-the-fold CSS you want inlined for faster first paint',
+            'Avoid inline style attributes on individual elements for anything reusable — a style block or external file keeps things DRY',
+            'Keep embedded styles scoped and specific to avoid unexpectedly overriding global styles elsewhere on the site'
+        ]
+    },
+
+    {
+        id: 'title',
+        title: '<title>',
+        library: 'html',
+        category: 'meta',
+        description: 'The <title> element defines the title of the document, shown in the browser tab, bookmarks, and search engine results. Every HTML document should have exactly one <title>, placed inside <head>. It must contain only text — no nested elements.',
+        syntax: '<title>Page Title</title>',
+        examples: [
+            {
+                title: 'Basic Page Title',
+                description: 'A simple, descriptive page title.',
+                code: '<head>\n  <title>DevNexus - Learn to Code</title>\n</head>'
+            },
+            {
+                title: 'Dynamic Page Title Pattern',
+                description: 'A common convention for per-page titles with a site name suffix.',
+                code: '<title>HTML Documentation | DevNexus</title>'
+            },
+            {
+                title: 'Updating Title with JavaScript',
+                description: 'Changing the title dynamically, such as for unread notifications.',
+                code: '<script>\n  document.title = `(3) New Messages - DevNexus`;\n</script>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Every page needs a unique, descriptive title — it is one of the most important elements for both SEO and usability',
+            'Keep titles concise, roughly under 60 characters, so they do not get truncated in search results',
+            'Put the most important, distinguishing information first, since browser tabs truncate from the right',
+            'Never leave title empty or generic like "Untitled Document" — it directly affects how your page appears in search results and browser history'
+        ]
+    },
+
+    {
+        id: 'menu',
+        title: '<menu>',
+        library: 'html',
+        category: 'lists',
+        description: 'The <menu> element is a semantic alternative to <ul>, intended specifically for lists of commands or interactive items — like a toolbar or context menu — rather than plain content lists. Browsers currently render it identically to <ul>, but it signals different intent to assistive technology and future tooling.',
+        syntax: '<menu>\n  <li><button>Cut</button></li>\n  <li><button>Copy</button></li>\n</menu>',
+        examples: [
+            {
+                title: 'Toolbar of Actions',
+                description: 'Using menu for a group of command buttons.',
+                code: '<menu>\n  <li><button onclick="save()">Save</button></li>\n  <li><button onclick="undo()">Undo</button></li>\n  <li><button onclick="redo()">Redo</button></li>\n</menu>'
+            },
+            {
+                title: 'Styled Horizontal Menu',
+                description: 'Laying out a menu of actions horizontally.',
+                code: '<menu style="display: flex; gap: 8px; list-style: none; padding: 0;">\n  <li><button>Edit</button></li>\n  <li><button>Delete</button></li>\n  <li><button>Share</button></li>\n</menu>'
+            },
+            {
+                title: 'Context Menu Items',
+                description: 'A list of commands representing right-click style actions.',
+                code: '<menu>\n  <li><button>Rename</button></li>\n  <li><button>Duplicate</button></li>\n  <li><button>Move to Trash</button></li>\n</menu>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use menu specifically for lists of commands or actions, not general content — use ul for that',
+            'Wrap each command in a proper interactive element like button, not just plain text',
+            'Since visual rendering matches ul by default, do not rely on menu for any built-in styling — use CSS as you would for any list',
+            'Consider whether a native button toolbar without menu wrapping is simpler for straightforward cases'
+        ]
+    },
+
+    {
+        id: 'search',
+        title: '<search>',
+        library: 'html',
+        category: 'semantic',
+        description: 'The <search> element is a relatively new HTML5 semantic element that identifies a section of the page containing search or filtering controls — either for the site itself or for the current page\'s content. It gives assistive technology a reliable landmark to jump straight to search functionality.',
+        syntax: '<search>\n  <form role="search">\n    <input type="search" name="q">\n  </form>\n</search>',
+        examples: [
+            {
+                title: 'Site Search',
+                description: 'Wrapping a site-wide search form.',
+                code: '<search>\n  <form action="/search" method="get">\n    <label for="q">Search DevNexus</label>\n    <input type="search" id="q" name="q" placeholder="Search docs...">\n    <button type="submit">Search</button>\n  </form>\n</search>'
+            },
+            {
+                title: 'Filter Controls',
+                description: 'Using search to wrap filtering controls for a list of results.',
+                code: '<search>\n  <label for="filter">Filter by language:</label>\n  <select id="filter">\n    <option>All</option>\n    <option>HTML</option>\n    <option>CSS</option>\n  </select>\n</search>'
+            },
+            {
+                title: 'Header Search Bar',
+                description: 'A compact search bar placed in the site header.',
+                code: '<header>\n  <search>\n    <input type="search" placeholder="Quick search..." style="padding: 6px 12px; border-radius: 6px; border: 1px solid #d1d5db;">\n  </search>\n</header>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use search to wrap the form and controls for search/filter functionality, not the results themselves',
+            'It can be used for both site-wide search and in-page filtering — both are valid uses',
+            'Being a newer element, verify support in your target browsers; it degrades gracefully to an unstyled generic container in older ones',
+            'Continue using a real form inside it for the actual search input — search is a landmark wrapper, not a replacement for form semantics'
+        ]
+    },
+
+    {
+        id: 'svg',
+        title: '<svg>',
+        library: 'html',
+        category: 'media',
+        description: 'The <svg> element embeds Scalable Vector Graphics directly in HTML — vector-based images built from shapes, paths, and text rather than pixels, so they stay crisp at any size. Unlike canvas, SVG content is made of real DOM elements that can be styled with CSS and targeted with JavaScript individually, making it ideal for icons, logos, and interactive diagrams.',
+        syntax: '<svg width="100" height="100">\n  <circle cx="50" cy="50" r="40" fill="blue" />\n</svg>',
+        examples: [
+            {
+                title: 'Basic Shapes',
+                description: 'Drawing a circle and rectangle with SVG.',
+                code: '<svg width="200" height="100">\n  <rect x="10" y="10" width="80" height="80" fill="#3b82f6" />\n  <circle cx="150" cy="50" r="40" fill="#10b981" />\n</svg>'
+            },
+            {
+                title: 'Inline Icon',
+                description: 'A simple checkmark icon built with an SVG path.',
+                code: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">\n  <path d="M20 6L9 17l-5-5" />\n</svg>'
+            },
+            {
+                title: 'Styling SVG with CSS',
+                description: 'Applying CSS to individual SVG elements, including on hover.',
+                code: '<style>\n  .icon-circle { fill: #6b7280; transition: fill 0.2s; }\n  .icon-circle:hover { fill: #3b82f6; }\n</style>\n<svg width="60" height="60">\n  <circle class="icon-circle" cx="30" cy="30" r="25" />\n</svg>'
+            }
+        ],
+        attributes: [
+            { name: 'width', type: 'number', description: 'The rendered width of the SVG' },
+            { name: 'height', type: 'number', description: 'The rendered height of the SVG' },
+            { name: 'viewBox', type: 'string', description: 'Defines the internal coordinate system, enabling responsive scaling' },
+            { name: 'fill', type: 'color', description: 'The fill color for shapes within the SVG' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use viewBox so the SVG scales cleanly to any container size rather than being locked to fixed pixel dimensions',
+            'Prefer SVG over raster images (PNG/JPG) for icons and logos, since they stay sharp at any resolution and are typically smaller in file size',
+            'Add a title element inside the SVG and appropriate ARIA attributes for accessibility, especially for meaningful (non-decorative) graphics',
+            'Use CSS fill and stroke properties instead of hardcoding colors when the SVG needs to adapt to themes'
+        ]
+    },
+
+    {
+        id: 'html-strikethrough-underline',
+        title: '<s> and <u>',
+        library: 'html',
+        category: 'text',
+        description: 'The <s> element represents text that is no longer accurate or relevant — like an outdated price or a crossed-out item — rendered with strikethrough. The <u> element represents text with a non-textual annotation, such as marking a misspelled word or a proper name, rendered underlined. Neither implies emphasis or importance the way <strong>/<em> do.',
+        syntax: '<s>No longer valid</s> and <u>Underlined text</u>',
+        examples: [
+            {
+                title: 'Outdated Information',
+                description: 'Marking text that is no longer accurate.',
+                code: '<p><s>Store hours: 9am - 5pm</s> New hours: 8am - 6pm</p>'
+            },
+            {
+                title: 'Completed Checklist Items',
+                description: 'Using s for completed or crossed-off tasks.',
+                code: '<ul>\n  <li><s>Set up project repository</s></li>\n  <li><s>Configure build pipeline</s></li>\n  <li>Write documentation</li>\n</ul>'
+            },
+            {
+                title: 'Marking a Proper Name',
+                description: 'Using u for a non-emphasis annotation, like flagging a name in a spellcheck-style context.',
+                code: '<p>The book was written by <u>Fyodor Dostoevsky</u> in 1866.</p>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <s> for content that is genuinely outdated or no longer relevant, and <del> instead if you are specifically tracking a document edit',
+            'Avoid <u> purely for underline styling — since links are also underlined by default, it can confuse users into thinking underlined text is clickable',
+            'Neither element implies importance — use <strong> or <em> when that is actually the intent',
+            'Prefer CSS text-decoration for purely stylistic underline/strikethrough with no semantic meaning'
+        ]
+    },
+
+    {
+        id: 'body',
+        title: '<body>',
+        library: 'html',
+        category: 'structure',
+        description: 'The <body> element contains all the visible content of an HTML document — text, images, links, forms, and everything a user actually sees and interacts with in the browser. There can only be one <body> per document, and it must come after the <head> element. Unlike <head>, which holds metadata, everything inside <body> is rendered on the page.',
+        syntax: '<body>\n  <h1>Visible content goes here</h1>\n</body>',
+        examples: [
+            {
+                title: 'Basic Body Content',
+                description: 'A body containing typical page content.',
+                code: '<body>\n  <h1>Welcome</h1>\n  <p>This is the visible content of the page.</p>\n</body>'
+            },
+            {
+                title: 'Body with Event Attributes',
+                description: 'Attaching a page-load event directly to body (though addEventListener is generally preferred).',
+                code: '<body onload="console.log(\'Page loaded\')">\n  <p>Content...</p>\n</body>'
+            },
+            {
+                title: 'Full Document Structure',
+                description: 'Seeing body in context alongside head.',
+                code: '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <title>My Page</title>\n</head>\n<body>\n  <h1>My Page</h1>\n  <p>Content visible to the user.</p>\n</body>\n</html>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Only one <body> element is allowed per document',
+            'Keep metadata like <title>, <meta>, and <link> in <head>, not <body>',
+            'Prefer addEventListener in a script over inline event attributes like onload for cleaner separation of concerns',
+            'Everything a user can see or interact with belongs inside <body>'
+        ]
+    },
+
+    {
+        id: 'head',
+        title: '<head>',
+        library: 'html',
+        category: 'structure',
+        description: 'The <head> element contains metadata about the document — information that is not displayed directly on the page but is used by browsers, search engines, and other tools. This includes the page <title>, character encoding, linked stylesheets, scripts, and social media preview data. It must come before <body> and contains no visible content itself.',
+        syntax: '<head>\n  <title>Page Title</title>\n  <meta charset="UTF-8">\n</head>',
+        examples: [
+            {
+                title: 'Typical Head Contents',
+                description: 'A well-formed head with the essentials.',
+                code: '<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>DevNexus - Learn to Code</title>\n  <link rel="stylesheet" href="styles.css">\n</head>'
+            },
+            {
+                title: 'Head with a Script',
+                description: 'Linking an external script from the head, deferred so it does not block rendering.',
+                code: '<head>\n  <title>My App</title>\n  <script src="app.js" defer></script>\n</head>'
+            },
+            {
+                title: 'Head with Favicon and Description',
+                description: 'Additional common head metadata.',
+                code: '<head>\n  <title>My Blog</title>\n  <link rel="icon" href="/favicon.ico">\n  <meta name="description" content="Thoughts on web development.">\n</head>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always include a <title> and charset meta tag as early as possible in <head>',
+            'Use defer or async on <script> tags in the head so they do not block page rendering',
+            'Keep the head focused on metadata — no visible content belongs here',
+            'Charset and viewport meta tags are typically placed first for performance reasons'
+        ]
+    },
+
+    {
+        id: 'html-bidi',
+        title: '<bdi> and <bdo>',
+        library: 'html',
+        category: 'text',
+        description: 'These elements handle bidirectional text — content that mixes left-to-right languages (like English) with right-to-left languages (like Arabic or Hebrew). <bdi> isolates a piece of text so its directionality does not affect surrounding text, useful for user-generated content like usernames where the language is unknown ahead of time. <bdo> explicitly overrides the natural text direction for its content.',
+        syntax: '<bdi>Username</bdi>\n<bdo dir="rtl">Reversed direction text</bdo>',
+        examples: [
+            {
+                title: 'Isolating User-Generated Content',
+                description: 'Preventing an unknown-direction username from disrupting surrounding layout.',
+                code: '<ul>\n  <li><bdi>Ahmad</bdi>: 95 points</li>\n  <li><bdi>Fatima</bdi>: 88 points</li>\n</ul>'
+            },
+            {
+                title: 'Forcing Right-to-Left Direction',
+                description: 'Using bdo to override the natural rendering direction.',
+                code: '<p>Normal direction text.</p>\n<bdo dir="rtl">This text is forced right-to-left.</bdo>'
+            }
+        ],
+        attributes: [
+            { name: 'dir', type: 'ltr | rtl', description: 'Used on <bdo> to specify the forced text direction' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <bdi> when displaying user-generated text (like names) whose language direction is not known in advance',
+            'Use <bdo> sparingly, only when you genuinely need to override natural text direction, not for styling',
+            'Prefer the CSS unicode-bidi and direction properties for broader layout-level direction control',
+            'Test bidirectional content with real right-to-left text (Arabic, Hebrew) rather than assuming it works'
+        ]
+    },
+
+    {
+        id: 'html-colgroup',
+        title: '<col> and <colgroup>',
+        library: 'html',
+        category: 'tables',
+        description: 'The <colgroup> element groups one or more columns in a table for the purpose of applying styles, and <col> represents a single column within that group. This lets you style an entire column — like setting a background color or width — without adding a class to every individual cell in that column.',
+        syntax: '<table>\n  <colgroup>\n    <col style="background: #f3f4f6;">\n    <col span="2">\n  </colgroup>\n  <!-- table rows -->\n</table>',
+        examples: [
+            {
+                title: 'Styling a Single Column',
+                description: 'Highlighting one column across every row.',
+                code: '<table>\n  <colgroup>\n    <col style="background: #fef3c7;">\n    <col>\n    <col>\n  </colgroup>\n  <tr><th>Name</th><th>Role</th><th>Status</th></tr>\n  <tr><td>Alice</td><td>Dev</td><td>Active</td></tr>\n</table>'
+            },
+            {
+                title: 'Spanning Multiple Columns',
+                description: 'Using the span attribute to apply a style across several columns at once.',
+                code: '<table>\n  <colgroup>\n    <col span="2" style="background: #e0f2fe;">\n    <col>\n  </colgroup>\n  <tr><th>Q1</th><th>Q2</th><th>Q3</th></tr>\n</table>'
+            }
+        ],
+        attributes: [
+            { name: 'span', type: 'number', description: 'The number of columns the col/colgroup applies to' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use colgroup/col only for column-level styling like width or background, not for content',
+            'Place colgroup immediately after the opening table tag, before thead/tbody',
+            'For most styling needs, targeting cells directly with CSS (nth-child) is more flexible than col',
+            'col elements are void (self-closing) and take no content'
+        ]
+    },
+
+    {
+        id: 'dfn',
+        title: '<dfn>',
+        library: 'html',
+        category: 'text',
+        description: 'The <dfn> element marks the defining instance of a term — the specific place in the text where a term is first introduced and explained. Browsers typically render it in italics. It differs from <abbr> in that dfn is about introducing a concept or vocabulary word, not expanding an abbreviation.',
+        syntax: '<p><dfn>Hoisting</dfn> is JavaScript\'s behavior of moving declarations to the top of scope.</p>',
+        examples: [
+            {
+                title: 'Defining a Technical Term',
+                description: 'Introducing and defining a term the first time it appears.',
+                code: '<p>A <dfn>closure</dfn> is a function bundled together with references to its surrounding state.</p>'
+            },
+            {
+                title: 'Defining Term with a Title Attribute',
+                description: 'Adding a short definition as a tooltip.',
+                code: '<p><dfn title="A reusable block of code that performs a task">Function</dfn> declarations start with the function keyword.</p>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <dfn> only at the point where a term is actually being defined, not every time it is mentioned afterward',
+            'Combine with a title attribute or nearby explanation so the definition is genuinely available, not just implied by italics',
+            'Consider pairing with a glossary section using a definition list for a list of defined terms',
+            'Do not use dfn purely for italic styling on unrelated text'
+        ]
+    },
+
+    {
+        id: 'hgroup',
+        title: '<hgroup>',
+        library: 'html',
+        category: 'structure',
+        description: 'The <hgroup> element groups a heading with one or more subheadings or taglines, treating them as a single unit in the document outline. It is commonly used to pair a main title with a subtitle, so the subtitle does not get counted as its own separate heading level by accessibility tools.',
+        syntax: '<hgroup>\n  <h1>Main Title</h1>\n  <p>Subtitle or tagline</p>\n</hgroup>',
+        examples: [
+            {
+                title: 'Title with Subtitle',
+                description: 'Grouping a page title with a descriptive subtitle.',
+                code: '<hgroup>\n  <h1>DevNexus</h1>\n  <p>Learn to code, one tag at a time.</p>\n</hgroup>'
+            },
+            {
+                title: 'Article Title with Byline',
+                description: 'Using hgroup for an article heading and its byline together.',
+                code: '<article>\n  <hgroup>\n    <h2>Understanding the Event Loop</h2>\n    <p>A deep dive into how JavaScript handles async code</p>\n  </hgroup>\n  <p>Article content...</p>\n</article>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use hgroup specifically to pair a heading with a subtitle or tagline, not as a general wrapper for multiple headings',
+            'Keep the subtitle content as a paragraph or similar, not another heading level',
+            'Do not overuse hgroup — most headings do not need a subtitle wrapper',
+            'Test how assistive technology in your target browsers handles hgroup, since support has evolved over time'
+        ]
+    },
+
+    {
+        id: 'li',
+        title: '<li>',
+        library: 'html',
+        category: 'lists',
+        description: 'The <li> element represents an individual item within a list — <ul>, <ol>, or <menu>. Its rendering depends on its parent: inside <ol>, browsers add sequential numbering; inside <ul>, they add bullet points. The value attribute lets you override an item\'s number specifically within an ordered list.',
+        syntax: '<ul>\n  <li>List item content</li>\n</ul>',
+        examples: [
+            {
+                title: 'Basic List Items',
+                description: 'Simple items within an unordered list.',
+                code: '<ul>\n  <li>First item</li>\n  <li>Second item</li>\n  <li>Third item</li>\n</ul>'
+            },
+            {
+                title: 'List Item with Rich Content',
+                description: 'A list item can contain more than plain text.',
+                code: '<ul>\n  <li>\n    <strong>HTML</strong> — the structure of the web\n  </li>\n  <li>\n    <strong>CSS</strong> — the styling of the web\n  </li>\n</ul>'
+            },
+            {
+                title: 'Overriding a Specific Item Number',
+                description: 'Using the value attribute inside an ordered list.',
+                code: '<ol>\n  <li>Step one</li>\n  <li value="5">Jump to step five</li>\n  <li>Step six</li>\n</ol>'
+            }
+        ],
+        attributes: [
+            { name: 'value', type: 'number', description: 'Overrides the item\'s number when inside an <ol> (has no effect inside <ul>)' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Only use <li> as a direct child of <ul>, <ol>, or <menu>',
+            'A list item can contain block-level content like paragraphs or nested lists, not just plain text',
+            'Use the value attribute sparingly, only when you genuinely need to break the natural numbering sequence',
+            'Avoid using li outside of a list container just to get default spacing or bullet styling'
+        ]
+    },
+
+    {
+        id: 'html-optgroup-option',
+        title: '<optgroup> and <option>',
+        library: 'html',
+        category: 'forms',
+        description: 'The <option> element defines a single choice within a <select> dropdown or a <datalist>. The <optgroup> element groups related options together under a shared label, making long dropdowns easier to scan. Each option\'s value attribute is what actually gets submitted with the form, while its text content is what the user sees.',
+        syntax: '<select>\n  <optgroup label="Group Name">\n    <option value="1">Choice One</option>\n  </optgroup>\n</select>',
+        examples: [
+            {
+                title: 'Options Without Grouping',
+                description: 'A simple flat list of options.',
+                code: '<select name="size">\n  <option value="s">Small</option>\n  <option value="m">Medium</option>\n  <option value="l">Large</option>\n</select>'
+            },
+            {
+                title: 'Grouped Options',
+                description: 'Organizing related options into labeled groups.',
+                code: '<select name="framework">\n  <optgroup label="Frontend">\n    <option value="react">React</option>\n    <option value="vue">Vue</option>\n  </optgroup>\n  <optgroup label="Backend">\n    <option value="express">Express</option>\n    <option value="laravel">Laravel</option>\n  </optgroup>\n</select>'
+            },
+            {
+                title: 'Disabled Option',
+                description: 'Preventing a specific choice from being selected.',
+                code: '<select>\n  <option value="free">Free Plan</option>\n  <option value="pro" disabled>Pro Plan (coming soon)</option>\n</select>'
+            }
+        ],
+        attributes: [
+            { name: 'value', type: 'string', description: 'The value submitted with the form when this option is selected' },
+            { name: 'selected', type: 'boolean', description: 'Marks this option as selected by default' },
+            { name: 'disabled', type: 'boolean', description: 'Prevents this specific option from being selected' },
+            { name: 'label', type: 'string', description: 'Used on optgroup to set the group\'s visible heading' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always set a meaningful value attribute — without one, the option\'s text content is submitted instead, which is easy to forget',
+            'Use optgroup to organize dropdowns with more than roughly 8-10 options into logical categories',
+            'Use the disabled attribute on options that are not currently available rather than removing them entirely',
+            'Keep option text short enough to display fully in the dropdown without truncation'
+        ]
+    },
+
+    {
+        id: 'html-ruby',
+        title: '<ruby>, <rt>, <rp>',
+        library: 'html',
+        category: 'text',
+        description: 'Ruby annotations display small pronunciation or translation text above (or next to) East Asian characters, commonly used for showing furigana over Japanese kanji or pinyin over Chinese characters. The <ruby> element wraps the base text and its annotation, <rt> holds the annotation text itself, and <rp> provides fallback parentheses for browsers that do not support ruby rendering.',
+        syntax: '<ruby>\n  漢字<rt>かんじ</rt>\n</ruby>',
+        examples: [
+            {
+                title: 'Basic Ruby Annotation',
+                description: 'Showing pronunciation above a kanji character.',
+                code: '<ruby>\n  東京<rt>とうきょう</rt>\n</ruby>'
+            },
+            {
+                title: 'With Fallback Parentheses',
+                description: 'Using rp so browsers without ruby support show the reading in parentheses instead.',
+                code: '<ruby>\n  漢字<rp>(</rp><rt>かんじ</rt><rp>)</rp>\n</ruby>'
+            },
+            {
+                title: 'Multiple Annotated Characters',
+                description: 'Annotating several characters within a sentence.',
+                code: '<p>\n  <ruby>今日<rt>きょう</rt></ruby>は\n  <ruby>晴<rt>は</rt></ruby>れです。\n</p>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always include rp fallback parentheses so the pronunciation remains readable in browsers without ruby support',
+            'Use ruby specifically for pronunciation guides or short annotations above text, primarily for East Asian languages',
+            'Keep rt content short — it is meant to be a brief annotation, not a full translation',
+            'Test rendering across browsers, since ruby support and default styling can vary'
+        ]
+    },
+
+    {
+        id: 'wbr',
+        title: '<wbr>',
+        library: 'html',
+        category: 'text',
+        description: 'The <wbr> (word break opportunity) element tells the browser where it is allowed to insert a line break if needed, without forcing one. It is useful for long unbroken strings like URLs or compound words that would otherwise overflow their container without any natural spaces to break on.',
+        syntax: 'A<wbr>very<wbr>long<wbr>word',
+        examples: [
+            {
+                title: 'Breaking a Long URL',
+                description: 'Allowing a long URL to wrap gracefully instead of overflowing.',
+                code: '<p>Visit example.com/<wbr>a/<wbr>very/<wbr>long/<wbr>path/<wbr>that/<wbr>could/<wbr>overflow</p>'
+            },
+            {
+                title: 'Breaking a Compound Word',
+                description: 'Suggesting a break point in a long compound term.',
+                code: '<p>The word<br>super<wbr>cali<wbr>fragilistic<wbr>expialidocious is famously long.</p>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use wbr only for genuinely long, unbreakable strings that risk overflowing their container',
+            'Prefer CSS properties like overflow-wrap or word-break for general text wrapping behavior',
+            'wbr suggests a break point — it does not force one the way <br> does',
+            'Do not overuse wbr throughout regular prose; it is meant for edge cases like URLs and long identifiers'
+        ]
+    },
+
+    {
+        id: 'data',
+        title: '<data>',
+        library: 'html',
+        category: 'text',
+        description: 'The <data> element links a piece of content with a machine-readable value via its value attribute, similar in spirit to <time> but for values other than dates — like product IDs, prices, or measurements. This lets scripts and other tools programmatically access the underlying value while humans see the friendly, formatted text.',
+        syntax: '<data value="12345">Product #12345</data>',
+        examples: [
+            {
+                title: 'Product Listing',
+                description: 'Attaching a machine-readable product ID to its display name.',
+                code: '<ul>\n  <li><data value="SKU-001">Wireless Mouse</data> - $24.99</li>\n  <li><data value="SKU-002">Mechanical Keyboard</data> - $89.99</li>\n</ul>'
+            },
+            {
+                title: 'Formatted Measurement',
+                description: 'Showing a human-friendly value with a precise machine value behind it.',
+                code: '<p>Distance: <data value="42195">26.2 miles</data></p>'
+            }
+        ],
+        attributes: [
+            { name: 'value', type: 'string', description: 'The machine-readable value associated with the content' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use <time> instead of <data> specifically for dates and times — data is for everything else',
+            'Use data when a script elsewhere on the page needs to read the underlying value (e.g., for sorting or filtering)',
+            'Keep the visible content human-readable while the value attribute holds the precise machine value',
+            'Do not use data purely as a generic wrapper — only when there is a genuine machine-readable value to attach'
+        ]
+    },
+
+    {
+        id: 'template',
+        title: '<template>',
+        library: 'html',
+        category: 'scripting',
+        description: 'The <template> element holds HTML content that the browser parses but does not render or execute when the page loads. Its content is inert — scripts inside it will not run, and images inside it will not load — until it is cloned into the visible DOM via JavaScript. This makes it a clean way to define reusable markup fragments for dynamic UI without building HTML strings in JavaScript.',
+        syntax: '<template id="my-template">\n  <p>Reusable content</p>\n</template>',
+        examples: [
+            {
+                title: 'Basic Template Definition',
+                description: 'A template holding markup that stays hidden until cloned.',
+                code: '<template id="card-template">\n  <div class="card">\n    <h3></h3>\n    <p></p>\n  </div>\n</template>'
+            },
+            {
+                title: 'Cloning a Template with JavaScript',
+                description: 'Using the template to generate repeated list items dynamically.',
+                code: '<template id="item-template">\n  <li class="item"></li>\n</template>\n<ul id="list"></ul>\n\n<script>\n  const tpl = document.getElementById(\'item-template\');\n  const list = document.getElementById(\'list\');\n  [\'HTML\', \'CSS\', \'JS\'].forEach(text => {\n    const clone = tpl.content.cloneNode(true);\n    clone.querySelector(\'.item\').textContent = text;\n    list.appendChild(clone);\n  });\n</script>'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use template for markup that will be cloned and reused multiple times via JavaScript, like list items or cards',
+            'Remember that content inside a template is inert — access it via the element\'s .content property, not by querying it directly',
+            'Prefer template over building HTML strings with string concatenation or innerHTML for repeated UI patterns',
+            'Combine with document.importNode or cloneNode(true) to insert a copy without mutating the original template'
+        ]
+    },
+
     // ================= PYTHON (Enhanced) =================
     {
         id: 'py-true',
