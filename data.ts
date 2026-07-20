@@ -5531,6 +5531,583 @@ export const DOCS: DocItem[] = [
         ]
     },
 
+
+
+    {
+        id: 'js-proxy-reflect',
+        title: 'Proxy and Reflect',
+        library: 'js',
+        category: 'basics',
+        description: 'Proxy wraps an object and lets you intercept and customize fundamental operations on it - like getting, setting, or deleting a property - by defining "trap" functions in a handler object. Reflect provides methods that mirror those same fundamental operations, letting you forward the default behavior from inside a Proxy trap rather than reimplementing it manually.',
+        syntax: 'new Proxy(target, handler)\nReflect.get(target, key)',
+        examples: [
+            {
+                title: 'Basic Proxy with a get Trap',
+                description: 'Intercepting property access to add custom behavior, like logging or defaults.',
+                code: 'const user = { name: "Alice", age: 25 };\n\nconst loggedUser = new Proxy(user, {\n  get(target, prop) {\n    console.log(`Reading property: ${prop}`);\n    return Reflect.get(target, prop); // forwards to the default behavior\n  }\n});\n\nconsole.log(loggedUser.name);\n// "Reading property: name"\n// "Alice"'
+            },
+            {
+                title: 'Validation with a set Trap',
+                description: 'Using a Proxy to enforce rules whenever a property is assigned.',
+                code: 'const validatedUser = new Proxy({}, {\n  set(target, prop, value) {\n    if (prop === "age" && typeof value !== "number") {\n      throw new TypeError("age must be a number");\n    }\n    return Reflect.set(target, prop, value);\n  }\n});\n\nvalidatedUser.age = 30; // works fine\n// validatedUser.age = "old"; // throws TypeError'
+            },
+            {
+                title: 'Default Values with a has and get Trap',
+                description: 'Providing a fallback value for any property that does not exist.',
+                code: 'function withDefault(obj, defaultValue) {\n  return new Proxy(obj, {\n    get(target, prop) {\n      return prop in target ? target[prop] : defaultValue;\n    }\n  });\n}\n\nconst settings = withDefault({ theme: "dark" }, "not set");\nconsole.log(settings.theme);    // "dark"\nconsole.log(settings.fontSize); // "not set" - property does not exist, but no error'
+            }
+        ],
+        bestPractices: [
+            'Use Reflect methods inside Proxy traps to forward default behavior, rather than manually reimplementing property access logic',
+            'Reach for Proxy for cross-cutting concerns like validation, logging, or reactivity systems - not as a general-purpose object wrapper for everyday code',
+            'Be aware that Proxy adds a small performance overhead on every intercepted operation - avoid it in performance-critical hot paths',
+            'Document any Proxy-based behavior clearly, since intercepted objects can behave in ways that are surprising to someone reading the code without that context'
+        ]
+    },
+
+    {
+        id: 'js-typed-arrays',
+        title: 'Typed Arrays & ArrayBuffer',
+        library: 'js',
+        category: 'basics',
+        description: 'ArrayBuffer represents a fixed-length raw binary data buffer. Typed arrays (Int8Array, Uint8Array, Float32Array, and others) provide a structured, array-like view onto that buffer, where every element is the same fixed-size numeric type. They are used for binary data processing, working with files, WebGL, audio/video data, and network protocols.',
+        syntax: 'const buffer = new ArrayBuffer(bytes);\nconst view = new Uint8Array(buffer);',
+        examples: [
+            {
+                title: 'Creating a Typed Array',
+                description: 'The simplest way to work with typed arrays - directly, without manually managing the buffer.',
+                code: 'const numbers = new Uint8Array([10, 20, 30, 255]);\nconsole.log(numbers[0]);      // 10\nconsole.log(numbers.length);  // 4\n\nnumbers[0] = 300; // out of range for Uint8Array (0-255)\nconsole.log(numbers[0]); // 44 - silently wraps around (300 - 256)'
+            },
+            {
+                title: 'Working with ArrayBuffer Directly',
+                description: 'Creating a raw buffer and viewing it through different typed array lenses.',
+                code: 'const buffer = new ArrayBuffer(4); // 4 bytes of raw memory\n\nconst view8 = new Uint8Array(buffer);\nview8[0] = 255;\nview8[1] = 1;\n\nconst view32 = new Uint32Array(buffer); // same buffer, viewed as one 32-bit number\nconsole.log(view32[0]); // interprets those same 4 bytes differently'
+            },
+            {
+                title: 'Float32Array for Numeric Data',
+                description: 'A common use case: representing collections of floating-point numbers efficiently.',
+                code: 'const positions = new Float32Array([1.5, 2.25, 3.75, 4.0]);\n\nfor (const value of positions) {\n  console.log(value);\n}\n\n// Typed arrays support familiar array methods too\nconsole.log(positions.map(v => v * 2));'
+            }
+        ],
+        bestPractices: [
+            'Use typed arrays instead of regular arrays when working with binary data, files, or performance-critical numeric computation - they use less memory and are faster for these cases',
+            'Pick the specific typed array (Int8, Uint16, Float64, etc.) that matches your actual data range and precision needs',
+            'Remember typed array values silently wrap or truncate when out of range, rather than throwing an error - validate input if that matters',
+            'Reach for regular arrays for everyday application code - typed arrays are a specialized tool for binary/numeric-heavy scenarios'
+        ]
+    },
+
+    {
+        id: 'js-weakmap-weakset',
+        title: 'WeakMap and WeakSet',
+        library: 'js',
+        category: 'basics',
+        description: 'WeakMap and WeakSet are like Map and Set, but their keys (WeakMap) or values (WeakSet) must be objects, and those references are "weak" - meaning they do not prevent the object from being garbage collected if nothing else references it. This makes them ideal for attaching metadata to objects without causing memory leaks.',
+        syntax: 'const wm = new WeakMap();\nwm.set(objectKey, value);',
+        examples: [
+            {
+                title: 'WeakMap for Private Object Metadata',
+                description: 'Associating extra data with an object without modifying the object itself or leaking memory.',
+                code: 'const privateData = new WeakMap();\n\nclass User {\n  constructor(name) {\n    privateData.set(this, { loginAttempts: 0 });\n    this.name = name;\n  }\n\n  recordLoginAttempt() {\n    const data = privateData.get(this);\n    data.loginAttempts++;\n    return data.loginAttempts;\n  }\n}\n\nconst user = new User("Alice");\nconsole.log(user.recordLoginAttempt()); // 1\n// If "user" is later garbage collected, its entry in privateData is automatically cleaned up too'
+            },
+            {
+                title: 'WeakSet for Tracking Object Membership',
+                description: 'Tracking which objects have been "seen" or processed, without preventing cleanup.',
+                code: 'const processedItems = new WeakSet();\n\nfunction processItem(item) {\n  if (processedItems.has(item)) {\n    console.log("Already processed, skipping");\n    return;\n  }\n  processedItems.add(item);\n  console.log("Processing item...");\n}\n\nconst obj = { id: 1 };\nprocessItem(obj); // "Processing item..."\nprocessItem(obj); // "Already processed, skipping"'
+            }
+        ],
+        bestPractices: [
+            'Use WeakMap when attaching metadata to objects you do not own or control the lifecycle of, so it does not prevent garbage collection',
+            'Remember WeakMap/WeakSet are not iterable and have no size property - they intentionally hide their contents since entries can disappear at any time via garbage collection',
+            'Only use object references as keys (WeakMap) or values (WeakSet) - primitives like strings or numbers are not allowed',
+            'Reach for a regular Map when you need to iterate over entries or know how many there are - WeakMap is specifically for the memory-safe metadata use case'
+        ]
+    },
+
+    {
+        id: 'js-web-workers',
+        title: 'Web Workers',
+        library: 'js',
+        category: 'async',
+        description: 'Web Workers run JavaScript on a separate background thread, away from the main UI thread, so expensive computations do not freeze the page. Communication between the main script and a worker happens through message passing with postMessage() and the onmessage event handler, rather than shared memory - workers cannot directly access the DOM.',
+        syntax: 'const worker = new Worker("worker.js");\nworker.postMessage(data);',
+        examples: [
+            {
+                title: 'Creating and Communicating with a Worker',
+                description: 'Offloading a heavy computation to a background thread.',
+                code: '// main.js\nconst worker = new Worker("worker.js");\n\nworker.postMessage({ command: "calculate", number: 40 });\n\nworker.onmessage = (event) => {\n  console.log("Result from worker:", event.data);\n};\n\nworker.onerror = (error) => {\n  console.log("Worker error:", error.message);\n};'
+            },
+            {
+                title: 'The Worker Script Itself',
+                description: 'The code running inside the separate worker thread.',
+                code: '// worker.js\nself.onmessage = (event) => {\n  const { command, number } = event.data;\n\n  if (command === "calculate") {\n    const result = fibonacci(number); // expensive, would freeze the UI if run on the main thread\n    self.postMessage(result);\n  }\n};\n\nfunction fibonacci(n) {\n  return n <= 1 ? n : fibonacci(n - 1) + fibonacci(n - 2);\n}'
+            },
+            {
+                title: 'Terminating a Worker',
+                description: 'Cleaning up a worker once it is no longer needed.',
+                code: 'const worker = new Worker("worker.js");\n\n// ... use the worker ...\n\nworker.terminate(); // immediately stops the worker and frees its resources'
+            }
+        ],
+        bestPractices: [
+            'Use Web Workers for genuinely expensive, CPU-bound tasks (heavy computation, large data processing) that would otherwise freeze the UI',
+            'Remember workers cannot access the DOM, window, or parent objects directly - all communication happens via postMessage()',
+            'Terminate workers with terminate() once they are no longer needed, to free up system resources',
+            'Keep messages passed to/from workers simple and serializable - complex objects with functions or circular references cannot be passed directly'
+        ]
+    },
+
+    {
+        id: 'js-temporal-api',
+        title: 'Temporal API',
+        library: 'js',
+        category: 'date',
+        description: 'Temporal is the modern, immutable replacement for the long-criticized Date object, reaching TC39 Stage 4 and becoming part of the ECMAScript 2026 specification. It fixes Date\'s biggest pain points: no built-in time zone support, confusing zero-indexed months, and mutable objects that are easy to accidentally modify. Temporal provides distinct types for different use cases - PlainDate, PlainTime, ZonedDateTime, Duration, and more.',
+        syntax: 'Temporal.Now.plainDateISO()\nTemporal.ZonedDateTime.from(...)',
+        examples: [
+            {
+                title: 'Getting the Current Date and Time',
+                description: 'Temporal separates "what date is it" from "what time is it" into distinct, purpose-built types.',
+                code: 'const today = Temporal.Now.plainDateISO();\nconsole.log(today.toString()); // e.g. "2026-07-20"\n\nconst now = Temporal.Now.zonedDateTimeISO("Europe/London");\nconsole.log(now.toString()); // includes an explicit, real IANA time zone'
+            },
+            {
+                title: 'Immutable Date Arithmetic',
+                description: 'Every operation returns a new object - the original is never mutated, unlike Date.',
+                code: 'const date = Temporal.PlainDate.from("2026-01-15");\nconst nextMonth = date.add({ months: 1 });\n\nconsole.log(date.toString());      // "2026-01-15" - unchanged\nconsole.log(nextMonth.toString());  // "2026-02-15" - a brand new object'
+            },
+            {
+                title: 'Real Time Zone Support',
+                description: 'Working correctly across time zones, something the legacy Date object could never do natively.',
+                code: 'const meeting = Temporal.ZonedDateTime.from({\n  timeZone: "America/New_York",\n  year: 2026, month: 8, day: 10,\n  hour: 14, minute: 0\n});\n\nconst londonTime = meeting.withTimeZone("Europe/London");\nconsole.log(meeting.toString());\nconsole.log(londonTime.toString()); // same instant, correctly converted'
+            }
+        ],
+        bestPractices: [
+            'Use Temporal for new projects going forward - it directly solves the time zone and mutability problems that made Date libraries like moment.js and date-fns necessary',
+            'Check current browser/runtime support before relying on it in production without a polyfill - as of mid-2026 it ships natively in Chrome and Firefox, with Edge experimental and Safari still in Technical Preview',
+            'Choose the most specific Temporal type for your use case - PlainDate for a calendar date with no time/zone, ZonedDateTime when time zone matters, Duration for elapsed time',
+            'Use a polyfill (like @js-temporal/polyfill) for cross-browser compatibility until support is universal'
+        ]
+    },
+
+    {
+        id: 'js-getters-setters',
+        title: 'Getters and Setters',
+        library: 'js',
+        category: 'basics',
+        description: 'Getters and setters let you define object or class properties that run custom logic when read or assigned, while still being accessed with normal property syntax (no parentheses). They are useful for computed properties, validation on assignment, or controlling access to internal state.',
+        syntax: 'get propName() { return value; }\nset propName(value) { }',
+        examples: [
+            {
+                title: 'Getters and Setters in a Class',
+                description: 'Computing a value on read, and validating on write.',
+                code: 'class Rectangle {\n  constructor(width, height) {\n    this.width = width;\n    this.height = height;\n  }\n\n  get area() {\n    return this.width * this.height; // computed, not stored\n  }\n\n  set width(value) {\n    if (value <= 0) throw new Error("Width must be positive");\n    this._width = value;\n  }\n\n  get width() {\n    return this._width;\n  }\n}\n\nconst rect = new Rectangle(5, 10);\nconsole.log(rect.area); // 50 - accessed like a property, no parentheses\nrect.width = 8;\nconsole.log(rect.area); // 80 - automatically recalculated'
+            },
+            {
+                title: 'Getters and Setters in a Plain Object',
+                description: 'The same pattern applied to a regular object literal.',
+                code: 'const user = {\n  firstName: "Alice",\n  lastName: "Smith",\n  get fullName() {\n    return `${this.firstName} ${this.lastName}`;\n  },\n  set fullName(value) {\n    [this.firstName, this.lastName] = value.split(" ");\n  }\n};\n\nconsole.log(user.fullName); // "Alice Smith"\nuser.fullName = "Bob Jones";\nconsole.log(user.firstName); // "Bob"'
+            }
+        ],
+        bestPractices: [
+            'Use getters for values that are computed from other properties, rather than storing and manually keeping a duplicate value in sync',
+            'Use setters to validate or transform incoming values before they are stored',
+            'Avoid heavy computation or side effects inside getters - since they look like simple property access, callers do not expect them to be expensive or to change state',
+            'Prefix the underlying storage property with an underscore (like _width) by convention when a getter/setter shares a similar public name'
+        ]
+    },
+
+    {
+        id: 'js-custom-errors',
+        title: 'Custom Error Classes',
+        library: 'js',
+        category: 'basics',
+        description: 'You can create your own error types by extending the built-in Error class, giving you custom error names and additional properties while still working correctly with try/catch, instanceof checks, and stack traces. This makes error handling more precise than checking error.message strings.',
+        syntax: 'class MyError extends Error {\n  constructor(message) {\n    super(message);\n    this.name = "MyError";\n  }\n}',
+        examples: [
+            {
+                title: 'Defining a Custom Error',
+                description: 'Extending Error to create a specific, identifiable error type.',
+                code: 'class ValidationError extends Error {\n  constructor(message, field) {\n    super(message); // sets this.message\n    this.name = "ValidationError";\n    this.field = field; // custom extra property\n  }\n}\n\nfunction validateAge(age) {\n  if (age < 0) {\n    throw new ValidationError("Age cannot be negative", "age");\n  }\n  return age;\n}'
+            },
+            {
+                title: 'Catching and Distinguishing Error Types',
+                description: 'Using instanceof to handle different error types differently.',
+                code: 'try {\n  validateAge(-5);\n} catch (error) {\n  if (error instanceof ValidationError) {\n    console.log(`Validation failed on field "${error.field}": ${error.message}`);\n  } else {\n    console.log("Unexpected error:", error.message);\n  }\n}'
+            }
+        ],
+        bestPractices: [
+            'Always call super(message) first in a custom error\'s constructor before setting additional properties',
+            'Set this.name to match the class name, so console output and logging clearly identify the specific error type',
+            'Use instanceof checks in catch blocks to handle different, known error types differently, rather than parsing error.message strings',
+            'Attach relevant context (like a field name or status code) as extra properties on the custom error, rather than cramming everything into the message string'
+        ]
+    },
+
+    {
+        id: 'js-object-define-property',
+        title: 'Object.defineProperty() & Property Descriptors',
+        library: 'js',
+        category: 'basics',
+        description: 'Object.defineProperty() gives fine-grained control over a single property\'s behavior via a descriptor object, letting you control whether it is writable, enumerable (shows up in loops/Object.keys), and configurable (can be redefined or deleted) - none of which is possible with normal property assignment.',
+        syntax: 'Object.defineProperty(obj, "prop", { value, writable, enumerable, configurable });',
+        examples: [
+            {
+                title: 'Creating a Read-Only Property',
+                description: 'Making a property that cannot be reassigned.',
+                code: 'const config = {};\n\nObject.defineProperty(config, "version", {\n  value: "1.0.0",\n  writable: false,\n  enumerable: true,\n  configurable: false\n});\n\nconfig.version = "2.0.0"; // silently fails (or throws in strict mode)\nconsole.log(config.version); // still "1.0.0"'
+            },
+            {
+                title: 'Hiding a Property from Enumeration',
+                description: 'Creating a property that exists but does not show up in Object.keys() or for...in.',
+                code: 'const user = { name: "Alice" };\n\nObject.defineProperty(user, "id", {\n  value: 12345,\n  enumerable: false // hidden from normal enumeration\n});\n\nconsole.log(user.id);          // 12345 - still directly accessible\nconsole.log(Object.keys(user)); // ["name"] - "id" is hidden'
+            },
+            {
+                title: 'Reading Existing Descriptors',
+                description: 'Inspecting a property\'s current descriptor.',
+                code: 'const obj = { greeting: "hello" };\nconsole.log(Object.getOwnPropertyDescriptor(obj, "greeting"));\n// { value: "hello", writable: true, enumerable: true, configurable: true }\n// Normal property assignment defaults to all three flags being true'
+            }
+        ],
+        bestPractices: [
+            'Use Object.defineProperty() when you need precise control over a property\'s behavior - for everyday object properties, normal assignment is simpler and sufficient',
+            'Set enumerable: false for internal/implementation-detail properties that should not appear in loops or JSON serialization',
+            'Remember get/set can also be defined via descriptors, as an alternative to the get/set literal syntax',
+            'Use this sparingly in application code - it is more commonly seen inside libraries, polyfills, and framework internals'
+        ]
+    },
+
+    {
+        id: 'js-intl-api',
+        title: 'Intl API: Number & Date Formatting',
+        library: 'js',
+        category: 'basics',
+        description: 'The Intl object provides language-sensitive formatting for numbers, currencies, dates, and more, correctly following the conventions of a specified locale. Intl.NumberFormat handles numbers and currency, and Intl.DateTimeFormat handles dates - both far more robust than manually formatting strings.',
+        syntax: 'new Intl.NumberFormat(locale, options).format(value)',
+        examples: [
+            {
+                title: 'Formatting Numbers and Currency',
+                description: 'Correctly formatted numbers respecting locale conventions.',
+                code: 'const number = 1234567.891;\n\nconsole.log(new Intl.NumberFormat("en-US").format(number));\n// "1,234,567.891"\nconsole.log(new Intl.NumberFormat("de-DE").format(number));\n// "1.234.567,891" - different separators for German locale\n\nconst price = new Intl.NumberFormat("en-GB", {\n  style: "currency", currency: "GBP"\n});\nconsole.log(price.format(49.99)); // "£49.99"'
+            },
+            {
+                title: 'Formatting Dates',
+                description: 'Locale-aware date formatting without manual string building.',
+                code: 'const date = new Date(2026, 6, 20); // July 20, 2026\n\nconsole.log(new Intl.DateTimeFormat("en-US").format(date));\n// "7/20/2026"\nconsole.log(new Intl.DateTimeFormat("en-GB").format(date));\n// "20/07/2026"\n\nconst formatter = new Intl.DateTimeFormat("en-US", {\n  weekday: "long", year: "numeric", month: "long", day: "numeric"\n});\nconsole.log(formatter.format(date)); // "Monday, July 20, 2026"'
+            }
+        ],
+        bestPractices: [
+            'Use Intl.NumberFormat/DateTimeFormat instead of manually building formatted strings - locale conventions (separators, currency symbols, date order) vary in ways that are easy to get wrong by hand',
+            'Reuse a single formatter instance for repeated formatting calls rather than creating a new one every time, for better performance',
+            'Detect the user\'s locale with navigator.language rather than hardcoding one, for genuinely internationalized applications',
+            'Use the currency and style options for money values rather than manually prepending a currency symbol'
+        ]
+    },
+
+    {
+        id: 'js-structured-clone',
+        title: 'structuredClone()',
+        library: 'js',
+        category: 'basics',
+        description: 'structuredClone() creates a true deep copy of a value, correctly handling nested objects, arrays, Maps, Sets, dates, and even circular references - something JSON.parse(JSON.stringify(obj)) cannot do reliably. It is a built-in global function, available without any import.',
+        syntax: 'const copy = structuredClone(original);',
+        examples: [
+            {
+                title: 'Deep Cloning Nested Data',
+                description: 'A genuine deep copy, unlike a shallow spread or Object.assign().',
+                code: 'const original = {\n  name: "Alice",\n  address: { city: "London", zip: "SW1A" },\n  tags: ["admin", "verified"]\n};\n\nconst clone = structuredClone(original);\nclone.address.city = "Manchester";\n\nconsole.log(original.address.city); // "London" - unaffected\nconsole.log(clone.address.city);    // "Manchester"'
+            },
+            {
+                title: 'Handling Types JSON Cannot',
+                description: 'structuredClone() correctly clones Dates, Maps, and Sets, unlike JSON-based approaches.',
+                code: 'const data = {\n  createdAt: new Date(),\n  tags: new Set(["a", "b"]),\n  scores: new Map([["math", 90]])\n};\n\nconst clone = structuredClone(data);\nconsole.log(clone.createdAt instanceof Date); // true - stays a real Date\nconsole.log(clone.tags instanceof Set);        // true - stays a real Set\n\n// JSON.parse(JSON.stringify(data)) would turn createdAt into a string,\n// and silently lose the Set and Map entirely'
+            }
+        ],
+        bestPractices: [
+            'Use structuredClone() instead of JSON.parse(JSON.stringify(obj)) for deep copies - it is faster, handles more types, and supports circular references',
+            'Remember it cannot clone functions, DOM nodes, or objects with prototype chains beyond plain data (like class instances lose their class)',
+            'Use it for genuinely deep copies - for shallow copies, spread syntax ({...obj}) is simpler and sufficient',
+            'Check runtime support if targeting very old browsers, though it is now broadly available in all modern environments'
+        ]
+    },
+
+    {
+        id: 'js-url-urlsearchparams',
+        title: 'URL and URLSearchParams',
+        library: 'js',
+        category: 'basics',
+        description: 'The URL object parses and constructs URLs, giving structured access to their parts (protocol, host, pathname, etc.) without manual string manipulation. URLSearchParams specifically handles query string parameters - reading, adding, and removing them correctly, including proper encoding.',
+        syntax: 'new URL(urlString)\nnew URLSearchParams(queryString)',
+        examples: [
+            {
+                title: 'Parsing a URL',
+                description: 'Breaking a URL into its structured parts.',
+                code: 'const url = new URL("https://example.com:8080/products?category=shoes&sort=price#reviews");\n\nconsole.log(url.protocol); // "https:"\nconsole.log(url.hostname); // "example.com"\nconsole.log(url.port);     // "8080"\nconsole.log(url.pathname); // "/products"\nconsole.log(url.search);   // "?category=shoes&sort=price"\nconsole.log(url.hash);     // "#reviews"'
+            },
+            {
+                title: 'Reading and Modifying Query Parameters',
+                description: 'Working with query strings without manual parsing or string concatenation.',
+                code: 'const url = new URL("https://example.com/search?q=javascript&page=1");\n\nconsole.log(url.searchParams.get("q"));    // "javascript"\nconsole.log(url.searchParams.get("page")); // "1"\n\nurl.searchParams.set("page", "2");\nurl.searchParams.append("sort", "recent");\n\nconsole.log(url.toString());\n// "https://example.com/search?q=javascript&page=2&sort=recent"'
+            },
+            {
+                title: 'Building Query Strings from Scratch',
+                description: 'Using URLSearchParams standalone, without a full URL.',
+                code: 'const params = new URLSearchParams();\nparams.set("name", "Alice Smith"); // spaces are correctly encoded\nparams.set("role", "admin");\n\nconsole.log(params.toString()); // "name=Alice+Smith&role=admin"\n\nfetch(`/api/users?${params.toString()}`);'
+            }
+        ],
+        bestPractices: [
+            'Use the URL and URLSearchParams objects instead of manually splitting and concatenating query strings - they correctly handle encoding edge cases',
+            'Use searchParams.set() to overwrite a parameter and searchParams.append() to add an additional value for the same key',
+            'Always construct URLs this way when building requests with dynamic query parameters, to avoid manual encoding bugs',
+            'Remember getAll() (not get()) is needed to retrieve multiple values for the same parameter key'
+        ]
+    },
+
+    {
+        id: 'js-formdata',
+        title: 'FormData',
+        library: 'js',
+        category: 'basics',
+        description: 'FormData represents a set of key-value pairs, mirroring an HTML form\'s data, and is commonly used to send form submissions (including file uploads) via fetch() without manually constructing multipart request bodies. It can be created from an existing <form> element or built up manually.',
+        syntax: 'const formData = new FormData(formElement);\nformData.append(key, value);',
+        examples: [
+            {
+                title: 'Creating FormData from a Form Element',
+                description: 'Automatically capturing all fields from an existing HTML form.',
+                code: '// <form id="signupForm">\n//   <input name="email" value="user@example.com">\n//   <input name="password" value="secret123">\n// </form>\n\nconst form = document.querySelector("#signupForm");\nconst formData = new FormData(form);\n\nconsole.log(formData.get("email")); // "user@example.com"'
+            },
+            {
+                title: 'Building FormData Manually',
+                description: 'Constructing form data from scratch, including a file upload.',
+                code: 'const formData = new FormData();\nformData.append("username", "alice");\nformData.append("avatar", fileInput.files[0]); // a File object from an <input type="file">\n\nfetch("/api/upload", {\n  method: "POST",\n  body: formData // no need to set Content-Type manually - the browser sets it correctly\n});'
+            }
+        ],
+        bestPractices: [
+            'Use FormData instead of JSON when a request includes file uploads - it correctly handles multipart/form-data encoding',
+            'Do not manually set the Content-Type header when sending FormData with fetch() - the browser sets the correct boundary automatically',
+            'Use formData.getAll() rather than get() when a form has multiple inputs sharing the same name (like checkboxes)',
+            'Construct FormData directly from a form element with new FormData(formElement) rather than manually appending every field, when the form already exists in the DOM'
+        ]
+    },
+
+    {
+        id: 'js-intersection-observer',
+        title: 'IntersectionObserver',
+        library: 'js',
+        category: 'dom',
+        description: 'IntersectionObserver efficiently detects when an element enters or exits the viewport (or another container), without the performance cost of manually listening to scroll events and calculating positions. It is the standard tool for lazy-loading images, infinite scroll, and scroll-triggered animations.',
+        syntax: 'new IntersectionObserver(callback, options).observe(element)',
+        examples: [
+            {
+                title: 'Lazy-Loading Images',
+                description: 'Loading an image only once it scrolls into view.',
+                code: 'const observer = new IntersectionObserver((entries) => {\n  entries.forEach(entry => {\n    if (entry.isIntersecting) {\n      const img = entry.target;\n      img.src = img.dataset.src; // load the real image\n      observer.unobserve(img);    // stop watching once loaded\n    }\n  });\n});\n\ndocument.querySelectorAll("img[data-src]").forEach(img => {\n  observer.observe(img);\n});'
+            },
+            {
+                title: 'Triggering Animations on Scroll',
+                description: 'Adding a class when an element becomes visible, with a threshold option.',
+                code: 'const observer = new IntersectionObserver((entries) => {\n  entries.forEach(entry => {\n    if (entry.isIntersecting) {\n      entry.target.classList.add("fade-in");\n    }\n  });\n}, { threshold: 0.5 }); // fires when 50% of the element is visible\n\ndocument.querySelectorAll(".animate-on-scroll").forEach(el => {\n  observer.observe(el);\n});'
+            }
+        ],
+        bestPractices: [
+            'Use IntersectionObserver instead of scroll event listeners for visibility detection - it is far more performant since the browser handles the calculation efficiently',
+            'Call unobserve() once an element no longer needs watching (like after a lazy-loaded image has loaded), to free up resources',
+            'Use the threshold option to control exactly what percentage of visibility should trigger the callback',
+            'Use rootMargin to trigger the callback slightly before an element actually enters the viewport, for smoother lazy-loading'
+        ]
+    },
+
+    {
+        id: 'js-mutation-observer',
+        title: 'MutationObserver',
+        library: 'js',
+        category: 'dom',
+        description: 'MutationObserver watches for changes to the DOM tree - added/removed elements, attribute changes, or text content changes - and runs a callback in response. It is useful for reacting to DOM changes made by other scripts or third-party widgets that you do not directly control.',
+        syntax: 'new MutationObserver(callback).observe(target, options)',
+        examples: [
+            {
+                title: 'Watching for Added Child Elements',
+                description: 'Reacting whenever new elements are added to a container.',
+                code: 'const container = document.querySelector("#chatMessages");\n\nconst observer = new MutationObserver((mutations) => {\n  mutations.forEach(mutation => {\n    if (mutation.addedNodes.length > 0) {\n      console.log("New message added, scrolling to bottom");\n      container.scrollTop = container.scrollHeight;\n    }\n  });\n});\n\nobserver.observe(container, { childList: true });'
+            },
+            {
+                title: 'Watching for Attribute Changes',
+                description: 'Reacting when a specific attribute changes on an element.',
+                code: 'const target = document.querySelector("#statusBadge");\n\nconst observer = new MutationObserver((mutations) => {\n  mutations.forEach(mutation => {\n    if (mutation.attributeName === "class") {\n      console.log("Class changed to:", target.className);\n    }\n  });\n});\n\nobserver.observe(target, { attributes: true });\n\n// Stop watching when no longer needed\n// observer.disconnect();'
+            }
+        ],
+        bestPractices: [
+            'Use MutationObserver only when you genuinely need to react to DOM changes you do not control directly - if you control the code making the change, call your reaction logic directly instead',
+            'Always call disconnect() when done observing, to avoid unnecessary background processing',
+            'Be specific with the options object (childList, attributes, subtree) rather than observing everything, for better performance',
+            'Avoid triggering more DOM mutations synchronously inside the callback in a way that could create an infinite mutation loop'
+        ]
+    },
+
+    {
+        id: 'js-console-methods',
+        title: 'Console Methods Beyond log()',
+        library: 'js',
+        category: 'basics',
+        description: 'The console object offers several methods beyond the familiar console.log() for more effective debugging: console.table() for tabular data, console.group() for nested/collapsible logs, console.time()/timeEnd() for measuring performance, console.warn()/error() for severity-styled messages, and console.assert() for conditional logging.',
+        syntax: 'console.table(data)\nconsole.group(label)\nconsole.time(label)',
+        examples: [
+            {
+                title: 'console.table() for Structured Data',
+                description: 'Displaying arrays of objects in a readable table format.',
+                code: 'const users = [\n  { name: "Alice", age: 25 },\n  { name: "Bob", age: 30 }\n];\n\nconsole.table(users);\n// Renders a formatted table with columns for name and age'
+            },
+            {
+                title: 'console.group() for Organized Logs',
+                description: 'Grouping related log messages together, collapsible in the DevTools console.',
+                code: 'console.group("User Validation");\nconsole.log("Checking email...");\nconsole.log("Checking password...");\nconsole.log("All checks passed");\nconsole.groupEnd();'
+            },
+            {
+                title: 'console.time() for Performance Measurement',
+                description: 'Measuring how long a block of code takes to run.',
+                code: 'console.time("dataProcessing");\n\n// some expensive operation\nfor (let i = 0; i < 1000000; i++) { /* ... */ }\n\nconsole.timeEnd("dataProcessing");\n// "dataProcessing: 12.34ms"'
+            }
+        ],
+        bestPractices: [
+            'Use console.table() instead of console.log() when inspecting arrays of objects - it is dramatically easier to read',
+            'Use console.group()/groupEnd() to organize related log output during debugging of complex flows',
+            'Use console.warn() and console.error() instead of console.log() for messages that genuinely need visual distinction and severity',
+            'Remove or guard debug console statements before shipping to production, or use a proper logging library with configurable levels'
+        ]
+    },
+
+    {
+        id: 'js-tagged-templates',
+        title: 'Tagged Template Literals & String.raw',
+        library: 'js',
+        category: 'strings',
+        description: 'A tagged template literal calls a function ("tag") with the template\'s string parts and interpolated values passed separately, letting you fully customize how the final string is built - useful for sanitization, internationalization, or styling libraries. String.raw is a built-in tag that returns the literal string with escape sequences left un-processed.',
+        syntax: 'function tag(strings, ...values) { }\ntag`text ${value} more text`',
+        examples: [
+            {
+                title: 'A Basic Custom Tag Function',
+                description: 'Intercepting a template literal to control the output.',
+                code: 'function upperTag(strings, ...values) {\n  return strings.reduce((result, str, i) => {\n    return result + str + (values[i] !== undefined ? String(values[i]).toUpperCase() : "");\n  }, "");\n}\n\nconst name = "alice";\nconsole.log(upperTag`Hello, ${name}!`); // "Hello, ALICE!"'
+            },
+            {
+                title: 'String.raw - Ignoring Escape Sequences',
+                description: 'Getting the literal, unprocessed string instead of the interpreted version.',
+                code: 'console.log(`Line1\\nLine2`);      // actual newline between "Line1" and "Line2"\nconsole.log(String.raw`Line1\\nLine2`); // "Line1\\nLine2" - the backslash-n is kept literal\n\n// Useful for things like regex patterns or Windows file paths\nconsole.log(String.raw`C:\\Users\\name`); // "C:\\Users\\name" - not interpreted as escapes'
+            }
+        ],
+        bestPractices: [
+            'Use tagged templates when building a small domain-specific transformation, like escaping HTML or CSS-in-JS libraries',
+            'Use String.raw when a literal string with backslashes (like file paths or regex source) should not have its escape sequences processed',
+            'Remember the tag function receives the literal string segments and interpolated values as two separate arguments - not a pre-combined string',
+            'Prefer plain template literals for everyday string building - tagged templates are a specialized tool, not a default choice'
+        ]
+    },
+
+    {
+        id: 'js-async-generators',
+        title: 'Async Generators & for await...of',
+        library: 'js',
+        category: 'async',
+        description: 'Async generators combine generators and async functions, defined with async function*, yielding values that may themselves be promises. for await...of consumes an async iterable, automatically awaiting each yielded value - useful for processing streamed data or paginated API results one chunk at a time.',
+        syntax: 'async function* name() {\n  yield await value;\n}\nfor await (const val of asyncIterable) { }',
+        examples: [
+            {
+                title: 'Basic Async Generator',
+                description: 'Yielding values that resolve asynchronously, one at a time.',
+                code: 'async function* fetchPages(baseUrl, totalPages) {\n  for (let page = 1; page <= totalPages; page++) {\n    const response = await fetch(`${baseUrl}?page=${page}`);\n    const data = await response.json();\n    yield data;\n  }\n}\n\nasync function processAllPages() {\n  for await (const pageData of fetchPages("/api/items", 3)) {\n    console.log("Received page:", pageData);\n  }\n}'
+            },
+            {
+                title: 'Simulating a Delayed Stream',
+                description: 'A simplified example showing values arriving over time.',
+                code: 'async function* countWithDelay(max) {\n  for (let i = 1; i <= max; i++) {\n    await new Promise(resolve => setTimeout(resolve, 500));\n    yield i;\n  }\n}\n\nasync function run() {\n  for await (const num of countWithDelay(3)) {\n    console.log(num); // 1, 2, 3 - each one arriving 500ms apart\n  }\n}\nrun();'
+            }
+        ],
+        bestPractices: [
+            'Use async generators for processing data that naturally arrives in chunks over time, like paginated APIs or streaming responses',
+            'Use for await...of instead of manually calling .next() and awaiting each result - it handles the iteration protocol for you',
+            'Remember an async generator function always returns an async iterable, regardless of what individual yields resolve to',
+            'Combine with try/catch inside the for await...of loop to handle errors from individual chunks without stopping the entire stream'
+        ]
+    },
+
+    {
+        id: 'js-getcomputedstyle',
+        title: 'getComputedStyle() and element.style',
+        library: 'js',
+        category: 'dom',
+        description: 'element.style gives direct read/write access to an element\'s inline styles only - not styles applied via CSS classes or stylesheets. getComputedStyle() returns the actual final, computed value of any CSS property after all stylesheets, inheritance, and browser defaults are applied, regardless of where that style came from.',
+        syntax: 'element.style.propertyName = value;\ngetComputedStyle(element).propertyName',
+        examples: [
+            {
+                title: 'Setting Inline Styles Directly',
+                description: 'Reading and writing an element\'s own inline style properties.',
+                code: 'const box = document.querySelector("#box");\n\nbox.style.backgroundColor = "blue";\nbox.style.width = "200px";\nbox.style.fontSize = "1.5rem"; // camelCase for hyphenated CSS properties\n\nconsole.log(box.style.backgroundColor); // "blue" - only reflects inline styles set this way'
+            },
+            {
+                title: 'getComputedStyle() - The Real Rendered Value',
+                description: 'Getting the actual applied style, regardless of where it came from (CSS file, class, or inline).',
+                code: '// Even if color is set via an external CSS class, not inline:\nconst box = document.querySelector("#box");\nconst styles = getComputedStyle(box);\n\nconsole.log(styles.color);      // the actual rendered color, from any source\nconsole.log(styles.fontSize);   // always returns a computed pixel value, like "16px"\nconsole.log(box.style.color);   // "" - empty, since color was not set inline'
+            }
+        ],
+        bestPractices: [
+            'Use element.style for styles your own script sets directly - use CSS classes with classList for styles that come from a stylesheet',
+            'Use getComputedStyle() when you need to read the actual current visual value of a property, no matter its source',
+            'Remember getComputedStyle() returns resolved values (like pixels), not the original units used in the stylesheet (like rem or %)',
+            'Prefer toggling CSS classes over directly setting element.style in application code, for cleaner separation between structure/behavior and presentation'
+        ]
+    },
+
+    {
+        id: 'js-history-api',
+        title: 'History API: pushState() and popState',
+        library: 'js',
+        category: 'basics',
+        description: 'The History API lets JavaScript manipulate the browser\'s session history and URL without triggering a full page reload - the foundation of client-side routing in single-page applications. pushState() adds a new entry to the history stack, and the popstate event fires when the user navigates back/forward.',
+        syntax: 'history.pushState(state, title, url)\nwindow.addEventListener("popstate", callback)',
+        examples: [
+            {
+                title: 'Changing the URL Without a Page Reload',
+                description: 'Updating the address bar and history stack for client-side navigation.',
+                code: 'function navigateTo(path) {\n  history.pushState({ path }, "", path);\n  renderPage(path); // your own function to update the visible content\n}\n\nnavigateTo("/about"); // URL changes to /about, no reload happens'
+            },
+            {
+                title: 'Handling Back/Forward Navigation',
+                description: 'Responding when the user clicks the browser\'s back or forward button.',
+                code: 'window.addEventListener("popstate", (event) => {\n  const path = event.state ? event.state.path : "/";\n  renderPage(path); // re-render based on the restored state\n});\n\n// Note: pushState() itself does NOT trigger popstate -\n// only actual browser back/forward navigation does'
+            }
+        ],
+        bestPractices: [
+            'Use pushState() for genuine navigation events that should be added to history - use replaceState() instead when updating the URL without adding a new back-button entry',
+            'Always store enough state in pushState()\'s first argument to correctly restore the view on popstate, rather than only relying on parsing the URL',
+            'Remember popstate only fires on actual browser navigation (back/forward buttons) - calling pushState() yourself does not trigger it',
+            'Consider a routing library for anything beyond simple navigation - hand-rolled routers can miss edge cases like nested routes or query parameters'
+        ]
+    },
+
+    {
+        id: 'js-clipboard-api',
+        title: 'Clipboard API',
+        library: 'js',
+        category: 'basics',
+        description: 'The Clipboard API provides a modern, promise-based way to read from and write to the system clipboard, replacing the older, more limited document.execCommand("copy"). Both reading and writing typically require a secure context (HTTPS) and, for reading, explicit user permission.',
+        syntax: 'navigator.clipboard.writeText(text)\nnavigator.clipboard.readText()',
+        examples: [
+            {
+                title: 'Copying Text to the Clipboard',
+                description: 'A common "copy to clipboard" button implementation.',
+                code: 'async function copyToClipboard(text) {\n  try {\n    await navigator.clipboard.writeText(text);\n    console.log("Copied to clipboard!");\n  } catch (error) {\n    console.log("Failed to copy:", error.message);\n  }\n}\n\ndocument.querySelector("#copyButton").addEventListener("click", () => {\n  copyToClipboard("https://example.com/share-link");\n});'
+            },
+            {
+                title: 'Reading from the Clipboard',
+                description: 'Pasting programmatically, which requires explicit user permission.',
+                code: 'async function pasteFromClipboard() {\n  try {\n    const text = await navigator.clipboard.readText();\n    console.log("Clipboard contains:", text);\n  } catch (error) {\n    console.log("Clipboard access denied or unavailable");\n  }\n}'
+            }
+        ],
+        bestPractices: [
+            'Always wrap Clipboard API calls in try/catch - both permissions and browser support can cause them to fail',
+            'Trigger clipboard writes directly from a user gesture (like a click handler) - browsers block clipboard access outside of direct user interaction',
+            'Remember the API requires a secure context (HTTPS or localhost) - it will not work on plain HTTP',
+            'Provide clear visual feedback (like a "Copied!" tooltip) after a successful copy, since there is no built-in browser indication'
+        ]
+    },
+
     // ================= TYPESCRIPT =================
     {
         id: 'ts-interfaces',

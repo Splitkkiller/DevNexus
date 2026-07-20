@@ -21,19 +21,31 @@ const FAQ_DATA: FAQItem[] = [
   { id: 'g1', category: 'general', question: "Is DevNexus free to use?", answer: "Yes, DevNexus offers a comprehensive free tier that includes access to documentation, basic quizzes, and the playground. Some advanced features like personalized stats and the AI assistant require a free account." },
   { id: 'g2', category: 'general', question: "Do I need to create an account?", answer: "You can browse the documentation and use the basic playground as a guest. However, to save your progress, track quiz streaks, save videos, and use the AI Tutor, you'll need to sign up." },
   { id: 'g3', category: 'general', question: "How do I reset my password?", answer: "Currently, since this is a demo environment, account management features like password reset are mocked. In a production version, you would find this in your Profile settings." },
-  
+  { id: 'g4', category: 'general', question: "What programming languages can I learn here?", answer: "DevNexus focuses on essential web and software engineering languages: HTML, CSS, JavaScript, TypeScript, Python, and Java." },
+
   // Website Features
   { id: 'w1', category: 'website', question: "How does the IDE Playground work?", answer: "The Playground runs your HTML, CSS, and JavaScript code locally in your browser within a sandboxed iframe. No data is sent to a server, ensuring fast performance and privacy." },
   { id: 'w2', category: 'website', question: "Why is the AI Assistant locked?", answer: "The AI Assistant consumes API resources (Google Gemini), so we require users to be logged in to prevent abuse and manage usage quotas." },
   { id: 'w3', category: 'website', question: "Can I save my code snippets?", answer: "Yes! In the IDE Playground, you can download your project as a .zip file. We are also working on a cloud save feature for logged-in users." },
   { id: 'w4', category: 'website', question: "How is the 'Skill Quiz' score calculated?", answer: "Your score is based on accuracy and speed. You earn XP for every correct answer, and bonus XP for maintaining a streak of correct answers." },
-  
-  // Technical
-  { id: 't1', category: 'tech', question: "What is the difference between Java and JavaScript?", answer: "They are completely different languages. Java is a compiled, object-oriented language used for backend and Android development. JavaScript is an interpreted language primarily used for making web pages interactive." },
-  { id: 't2', category: 'tech', question: "Why isn't my CSS showing in the preview?", answer: "Make sure you are linking your CSS file correctly if using external files, or check for syntax errors. In our Playground, 'style.css' is automatically linked to 'index.html'." },
-  { id: 't3', category: 'tech', question: "Does DevNexus support libraries like React or Vue?", answer: "Currently, the Playground natively supports vanilla HTML/CSS/JS. You can use CDN links to import libraries like React, Vue, or Tailwind CSS within your HTML file." },
-];
+  { id: 'w5', category: 'website', question: "Can I run Python or Java code in the browser playground?", answer: "Web languages (HTML/CSS/JS/TS) run directly in your browser. Python and Java execution in the playground uses client-side WebAssembly / lightweight execution runners for instant feedback." },
 
+  // Technical - General & Comparisons
+  { id: 't1', category: 'tech', question: "What is the difference between Java and JavaScript?", answer: "Despite the similar names, they are completely different languages. Java is a compiled, strongly-typed language running on the JVM, commonly used for backend systems and mobile apps. JavaScript is a dynamically-typed scripting language that powers web interactive behavior." },
+  { id: 't2', category: 'tech', question: "What is TypeScript and why use it over JavaScript?", answer: "TypeScript is a typed superset of JavaScript that compiles down to plain JS. It adds static type checking, catching bugs early during development and making large codebases much easier to refactor and maintain." },
+  { id: 't3', category: 'tech', question: "When should I use Python vs Java?", answer: "Python excels at data science, AI, machine learning, and rapid prototyping due to its concise syntax. Java is heavily favored for high-performance enterprise applications, Android development, and systems where strict typing and structure are critical." },
+
+  // Technical - Web Development (HTML / CSS / JS)
+  { id: 't4', category: 'tech', question: "Why isn't my CSS showing in the preview?", answer: "Make sure you are linking your stylesheet correctly (e.g., <link rel=\"stylesheet\" href=\"style.css\">), check for missing closing brackets, or inspect elements to confirm class names match your HTML tags." },
+  { id: 't5', category: 'tech', question: "What is the difference between CSS Flexbox and CSS Grid?", answer: "Flexbox is designed for 1-dimensional layouts (a single row OR column), making it great for alignment inside components. Grid is designed for 2-dimensional layouts (rows AND columns simultaneously), perfect for overall page layouts." },
+  { id: 't6', category: 'tech', question: "What is the difference between 'let', 'const', and 'var' in JavaScript?", answer: "'const' creates variables that cannot be reassigned. 'let' creates block-scoped variables that can be reassigned. 'var' is an older function-scoped keyword that supports hoisting, but 'let' and 'const' are preferred in modern code." },
+  { id: 't7', category: 'tech', question: "How do Promises and async/await work in JavaScript?", answer: "Promises represent values that will be resolved in the future (like an API fetch). `async/await` is syntactic sugar on top of Promises that allows you to write asynchronous code that reads like synchronous step-by-step logic." },
+
+  // Technical - Python & Java Specifics
+  { id: 't8', category: 'tech', question: "What is the difference between lists and tuples in Python?", answer: "Lists are mutable (their items can be changed or added after creation) and defined with brackets `[]`. Tuples are immutable (cannot be modified after creation) and defined with parentheses `()`." },
+  { id: 't9', category: 'tech', question: "What is 'virtual environment' (venv) in Python?", answer: "A virtual environment isolates project dependencies so package updates for one project won't break packages used in another project on your machine." },
+  { id: 't10', category: 'tech', question: "What are JDK, JRE, and JVM in Java?", answer: "The JVM (Java Virtual Machine) executes Java bytecode. The JRE (Java Runtime Environment) includes the JVM plus libraries to run apps. The JDK (Java Development Kit) includes the JRE plus compiler tools needed to write and compile Java code." }
+];
 export const FAQ: React.FC<FAQProps> = ({ themeColors }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [openItems, setOpenItems] = useState<Set<string>>(new Set(['g1']));
