@@ -3375,6 +3375,2162 @@ export const DOCS: DocItem[] = [
         ]
     },
 
+
+
+    {
+        id: 'js-variables',
+        title: 'Variables: var, let, const',
+        library: 'js',
+        category: 'basics',
+        description: 'JavaScript has three ways to declare variables. var is the original way, function-scoped and hoisted with a default value of undefined. let, introduced in ES6, is block-scoped and can be reassigned. const is also block-scoped but cannot be reassigned after its initial value is set. Modern JavaScript strongly favors let and const over var.',
+        syntax: 'let name = value;\nconst name = value;\nvar name = value;',
+        examples: [
+            {
+                title: 'let vs const',
+                description: 'Choosing between let and const based on whether reassignment is needed.',
+                code: 'let score = 0;\nscore = score + 10; // reassignment is fine\n\nconst maxPlayers = 4;\n// maxPlayers = 5; // TypeError: Assignment to constant variable\n\n// const objects/arrays can still be mutated internally\nconst user = { name: "Alice" };\nuser.name = "Bob"; // allowed - the reference itself did not change'
+            },
+            {
+                title: 'Block Scope vs Function Scope',
+                description: 'The key difference between var and let/const.',
+                code: 'if (true) {\n  var x = 1;\n  let y = 2;\n}\nconsole.log(x); // 1 - var leaked out of the block\nconsole.log(y); // ReferenceError: y is not defined\n\nfor (let i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);\n}\n// Prints 0, 1, 2 - each loop iteration gets its own \'i\' with let'
+            }
+        ],
+        bestPractices: [
+            'Default to const, and only use let when you know the variable needs to be reassigned',
+            'Avoid var in modern code - its function scoping and hoisting behavior are common sources of bugs',
+            'Declare variables as close as possible to where they are first used',
+            'Remember that const prevents reassignment, not mutation - objects and arrays declared with const can still have their contents changed'
+        ]
+    },
+
+    {
+        id: 'js-data-types',
+        title: 'Data Types',
+        library: 'js',
+        category: 'basics',
+        description: 'JavaScript has seven primitive data types - string, number, boolean, undefined, null, bigint, and symbol - plus the object type, which includes arrays, functions, and plain objects. JavaScript is dynamically typed, meaning a variable can hold any type and that type can change. The typeof operator reports a value\'s type at runtime.',
+        syntax: 'let value = "text"; // string, number, boolean, etc.\ntypeof value; // "string"',
+        examples: [
+            {
+                title: 'The Primitive Types',
+                description: 'Examples of each primitive type and what typeof reports for it.',
+                code: 'typeof "hello";        // "string"\ntypeof 42;              // "number"\ntypeof 3.14;            // "number" - no separate float type\ntypeof true;            // "boolean"\ntypeof undefined;       // "undefined"\ntypeof null;            // "object" - a famous long-standing JS quirk\ntypeof 10n;             // "bigint"\ntypeof Symbol("id");    // "symbol"\ntypeof { a: 1 };        // "object"\ntypeof [1, 2, 3];       // "object" - arrays are objects too\ntypeof function(){};    // "function"'
+            },
+            {
+                title: 'Dynamic Typing',
+                description: 'A variable\'s type can change as new values are assigned to it.',
+                code: 'let value = "hello"; // string\nvalue = 42;           // now a number\nvalue = true;         // now a boolean\nvalue = { a: 1 };     // now an object\n// No errors - JavaScript allows this by design'
+            }
+        ],
+        bestPractices: [
+            'Use typeof to check a value\'s type at runtime, but remember typeof null is "object" due to a long-standing language quirk',
+            'Use Array.isArray() rather than typeof to check specifically for arrays, since typeof reports both as "object"',
+            'Prefer === over == to avoid unexpected type coercion during comparisons',
+            'Consider TypeScript if your project would benefit from catching type mismatches before runtime'
+        ]
+    },
+
+    {
+        id: 'js-operators-arithmetic',
+        title: 'Arithmetic Operators',
+        library: 'js',
+        category: 'basics',
+        description: 'Arithmetic operators perform mathematical calculations on numbers: addition (+), subtraction (-), multiplication (*), division (/), remainder/modulo (%), and exponentiation (**). The + operator also performs string concatenation when either operand is a string. Increment (++) and decrement (--) adjust a variable by one.',
+        syntax: 'a + b, a - b, a * b, a / b, a % b, a ** b',
+        examples: [
+            {
+                title: 'Basic Arithmetic',
+                description: 'The core arithmetic operators in action.',
+                code: 'console.log(10 + 5);  // 15\nconsole.log(10 - 5);  // 5\nconsole.log(10 * 5);  // 50\nconsole.log(10 / 5);  // 2\nconsole.log(10 % 3);  // 1 (remainder)\nconsole.log(2 ** 3);  // 8 (2 to the power of 3)'
+            },
+            {
+                title: 'Increment, Decrement, and String Concatenation',
+                description: 'Common gotchas with + and the increment/decrement operators.',
+                code: 'let count = 5;\ncount++; // count is now 6\ncount--; // count is now 5 again\n\nconsole.log(1 + 1);     // 2 (numeric addition)\nconsole.log("1" + 1);   // "11" (string concatenation)\nconsole.log("5" - 1);   // 4 (- forces numeric conversion)'
+            }
+        ],
+        bestPractices: [
+            'Be careful with + when mixing strings and numbers - it concatenates rather than adds if either side is a string',
+            'Use Number() or parseInt()/parseFloat() to explicitly convert strings to numbers before arithmetic when the source is uncertain',
+            'Prefer x += 1 or x++ consistently within a codebase for readability',
+            'Watch for floating-point precision issues (e.g., 0.1 + 0.2 !== 0.3) when comparing decimal results directly'
+        ]
+    },
+
+    {
+        id: 'js-operators-assignment',
+        title: 'Assignment Operators',
+        library: 'js',
+        category: 'basics',
+        description: 'Assignment operators assign values to variables. Beyond the basic = operator, compound assignment operators combine an operation with assignment in one step, like += to add and assign. Logical assignment operators (&&=, ||=, ??=), introduced more recently, combine a logical check with assignment.',
+        syntax: 'x = y, x += y, x -= y, x *= y, x /= y, x ??= y',
+        examples: [
+            {
+                title: 'Compound Arithmetic Assignment',
+                description: 'Combining an operation and assignment in one step.',
+                code: 'let total = 10;\ntotal += 5;  // total = total + 5 -> 15\ntotal -= 3;  // total = total - 3 -> 12\ntotal *= 2;  // total = total * 2 -> 24\ntotal /= 4;  // total = total / 4 -> 6'
+            },
+            {
+                title: 'Logical Assignment Operators',
+                description: 'Assigning a value only under certain conditions.',
+                code: 'let config = { theme: null };\n\n// Only assigns if the current value is null/undefined\nconfig.theme ??= "dark";\nconsole.log(config.theme); // "dark"\n\nconfig.theme ??= "light"; // no-op, theme is already set\nconsole.log(config.theme); // still "dark"\n\nlet isActive = true;\nisActive &&= false; // only assigns if isActive was truthy\nconsole.log(isActive); // false'
+            }
+        ],
+        bestPractices: [
+            'Use ??= specifically for "assign a default if null or undefined", since it will not overwrite legitimate falsy values like 0 or ""',
+            'Prefer compound operators (+=, -=) over spelling out x = x + y for cleaner, more readable code',
+            'Reach for &&= and ||= sparingly - they can make control flow less obvious to readers unfamiliar with them',
+            'Avoid chaining too many assignment operators in a single line, as it hurts readability'
+        ]
+    },
+
+    {
+        id: 'js-operators-comparison',
+        title: 'Comparison Operators',
+        library: 'js',
+        category: 'basics',
+        description: 'Comparison operators compare two values and return a boolean. == and != perform type coercion before comparing (loose equality), while === and !== compare both value and type without coercion (strict equality). Relational operators (<, >, <=, >=) compare numeric or string ordering.',
+        syntax: 'a === b, a !== b, a > b, a <= b',
+        examples: [
+            {
+                title: 'Strict vs Loose Equality',
+                description: 'The critical difference between == and ===.',
+                code: 'console.log(5 == "5");   // true - "5" is coerced to a number\nconsole.log(5 === "5");  // false - different types\nconsole.log(0 == false); // true - false is coerced to 0\nconsole.log(null == undefined);  // true\nconsole.log(null === undefined); // false'
+            },
+            {
+                title: 'Relational Comparisons',
+                description: 'Comparing numbers and strings for ordering.',
+                code: 'console.log(10 > 5);   // true\nconsole.log(10 <= 10); // true\nconsole.log("apple" < "banana"); // true - lexicographic (alphabetical) comparison\nconsole.log("10" < "9"); // true - compared as strings, not numbers!'
+            }
+        ],
+        bestPractices: [
+            'Always prefer === and !== over == and != to avoid unpredictable type coercion bugs',
+            'Be aware that comparing strings uses lexicographic (dictionary) order, which can surprise you with numeric-looking strings',
+            'Use Object.is() for the rare edge cases where even === behaves unexpectedly (like NaN and -0)',
+            'Explicitly convert types with Number() or String() before comparing rather than relying on implicit coercion'
+        ]
+    },
+
+    {
+        id: 'js-operators-logical',
+        title: 'Logical Operators',
+        library: 'js',
+        category: 'basics',
+        description: 'Logical operators combine or invert boolean expressions. && (AND) returns the first falsy value or the last value if all are truthy. || (OR) returns the first truthy value or the last value if all are falsy. ! (NOT) inverts a boolean. The nullish coalescing operator (??) returns the right side only when the left is null or undefined.',
+        syntax: 'a && b, a || b, !a, a ?? b',
+        examples: [
+            {
+                title: 'AND, OR, and NOT',
+                description: 'Basic logical operator behavior, including short-circuiting.',
+                code: 'console.log(true && false);  // false\nconsole.log(true || false);  // true\nconsole.log(!true);          // false\n\n// Short-circuit evaluation for default values\nconst name = "" || "Guest";\nconsole.log(name); // "Guest" - "" is falsy\n\n// && for conditional execution\nconst isLoggedIn = true;\nisLoggedIn && console.log("Welcome back!");'
+            },
+            {
+                title: 'Nullish Coalescing vs OR',
+                description: 'Why ?? is often safer than || for default values.',
+                code: 'const count = 0;\nconsole.log(count || 10); // 10 - 0 is falsy, so || moves on\nconsole.log(count ?? 10); // 0 - 0 is not null/undefined, so ?? keeps it\n\nconst config = { retries: 0 };\nconst retries = config.retries ?? 3; // correctly keeps 0, not 3'
+            }
+        ],
+        bestPractices: [
+            'Use ?? instead of || when 0, "", or false should be treated as valid values rather than replaced with a default',
+            'Take advantage of && for concise conditional execution, but avoid it when the intent would be clearer as a full if statement',
+            'Remember that && and || return one of their operand values, not necessarily a boolean',
+            'Combine logical operators with optional chaining (?.) for safe, readable conditional access'
+        ]
+    },
+
+    {
+        id: 'js-operators-bitwise',
+        title: 'Bitwise Operators',
+        library: 'js',
+        category: 'basics',
+        description: 'Bitwise operators treat numbers as 32-bit binary sequences and operate on them bit by bit. They include AND (&), OR (|), XOR (^), NOT (~), left shift (<<), right shift (>>), and unsigned right shift (>>>). These are rarely needed in typical web development but appear in performance-sensitive code, flags/permissions systems, and low-level algorithms.',
+        syntax: 'a & b, a | b, a ^ b, ~a, a << b, a >> b',
+        examples: [
+            {
+                title: 'Basic Bitwise Operations',
+                description: 'How bitwise operators manipulate binary representations of numbers.',
+                code: 'console.log(5 & 1);  // 1  (0101 & 0001 = 0001)\nconsole.log(5 | 1);  // 5  (0101 | 0001 = 0101)\nconsole.log(5 ^ 1);  // 4  (0101 ^ 0001 = 0100)\nconsole.log(~5);     // -6 (bitwise NOT inverts all bits)\nconsole.log(5 << 1); // 10 (shifts bits left, doubling the value)\nconsole.log(5 >> 1); // 2  (shifts bits right, halving and flooring)'
+            },
+            {
+                title: 'Using Bitwise Flags',
+                description: 'A common real-world use case: combining permission flags into a single number.',
+                code: 'const READ = 1;   // 001\nconst WRITE = 2;  // 010\nconst EXECUTE = 4; // 100\n\nconst userPermissions = READ | WRITE; // 011 (3)\n\nconst canWrite = (userPermissions & WRITE) !== 0;\nconsole.log(canWrite); // true'
+            }
+        ],
+        bestPractices: [
+            'Reach for bitwise operators only when you have a genuine binary/flag-based use case - they hurt readability otherwise',
+            'Do not confuse & and | with the logical && and || operators - they behave very differently',
+            'Use Number.isInteger() checks before bitwise operations, since they implicitly convert operands to 32-bit integers',
+            'Document flag-based bitwise code clearly, since it is one of the least intuitive parts of JavaScript for most readers'
+        ]
+    },
+
+    {
+        id: 'js-ternary-operator',
+        title: 'Ternary Operator',
+        library: 'js',
+        category: 'basics',
+        description: 'The ternary (conditional) operator is a compact one-line alternative to an if...else statement. It takes the form condition ? valueIfTrue : valueIfFalse, and evaluates to whichever value matches the condition. It is an expression, meaning it produces a value that can be assigned or used directly, unlike an if statement.',
+        syntax: 'condition ? valueIfTrue : valueIfFalse',
+        examples: [
+            {
+                title: 'Basic Ternary',
+                description: 'Assigning a value based on a condition in a single line.',
+                code: 'const age = 20;\nconst status = age >= 18 ? "adult" : "minor";\nconsole.log(status); // "adult"'
+            },
+            {
+                title: 'Ternary in JSX-style Rendering',
+                description: 'A common pattern for conditional rendering in template-like code.',
+                code: 'const isLoggedIn = true;\nconst message = isLoggedIn\n  ? `Welcome back!`\n  : `Please log in.`;\n\nconsole.log(message);\n\n// Nested ternaries are possible but hurt readability - use sparingly\nconst grade = 85;\nconst letter = grade >= 90 ? "A" : grade >= 80 ? "B" : grade >= 70 ? "C" : "F";'
+            }
+        ],
+        bestPractices: [
+            'Use the ternary operator for simple, single-condition value assignments - reach for if...else when logic gets more complex',
+            'Avoid deeply nested ternaries, as they quickly become hard to read - a switch or if/else chain is often clearer',
+            'Wrap ternaries in parentheses when used inside template literals or JSX for clarity',
+            'Remember it is an expression (produces a value), unlike if/else which is a statement'
+        ]
+    },
+
+    {
+        id: 'js-template-literals',
+        title: 'Template Literals',
+        library: 'js',
+        category: 'basics',
+        description: 'Template literals, introduced in ES6, use backticks (`) instead of quotes and allow embedded expressions via ${expression} syntax, along with genuine multi-line strings without needing escape characters. They largely replace manual string concatenation with + for building dynamic strings.',
+        syntax: '`text ${expression} more text`',
+        examples: [
+            {
+                title: 'String Interpolation',
+                description: 'Embedding variables and expressions directly inside a string.',
+                code: 'const name = "Alice";\nconst age = 25;\n\n// Old way\nconsole.log("Hello, " + name + "! You are " + age + " years old.");\n\n// Template literal way\nconsole.log(`Hello, ${name}! You are ${age} years old.`);\n\n// Expressions work too, not just variables\nconsole.log(`Next year you will be ${age + 1}.`);'
+            },
+            {
+                title: 'Multi-line Strings',
+                description: 'Writing strings that span multiple lines without escape characters.',
+                code: 'const message = `This is line one.\nThis is line two.\nThis is line three.`;\n\nconsole.log(message);\n\n// Useful for building small HTML snippets too\nconst html = `<div class="card">\n  <h2>${name}</h2>\n  <p>Age: ${age}</p>\n</div>`;'
+            }
+        ],
+        bestPractices: [
+            'Prefer template literals over string concatenation with + for anything involving variables',
+            'Use them for multi-line strings instead of manually inserting \\n characters',
+            'Keep embedded expressions simple - move complex logic out into a variable before interpolating it',
+            'Remember template literals are still just strings - they do not automatically escape HTML, which matters for security when inserting user input into the DOM'
+        ]
+    },
+
+    {
+        id: 'js-functions',
+        title: 'Functions: Declarations & Expressions',
+        library: 'js',
+        category: 'basics',
+        description: 'Functions are reusable blocks of code. A function declaration (using the function keyword with a name) is hoisted, meaning it can be called before its definition in the code. A function expression assigns a function to a variable and is not hoisted the same way - it must be defined before it is called.',
+        syntax: 'function name(params) { /* body */ }\nconst name = function(params) { /* body */ };',
+        examples: [
+            {
+                title: 'Function Declaration',
+                description: 'A named function that can be called before its definition due to hoisting.',
+                code: 'greet("Alice"); // works even though called before the definition below\n\nfunction greet(name) {\n  console.log(`Hello, ${name}!`);\n}'
+            },
+            {
+                title: 'Function Expression',
+                description: 'Assigning an anonymous function to a variable - not hoisted.',
+                code: 'const add = function(a, b) {\n  return a + b;\n};\n\nconsole.log(add(3, 4)); // 7\n\n// Named function expressions are also possible, useful for stack traces\nconst multiply = function multiply(a, b) {\n  return a * b;\n};'
+            },
+            {
+                title: 'Default and Return Values',
+                description: 'Giving parameters default values and returning results.',
+                code: 'function calculateTotal(price, taxRate = 0.1) {\n  return price + price * taxRate;\n}\n\nconsole.log(calculateTotal(100));       // 110 - uses default tax rate\nconsole.log(calculateTotal(100, 0.2));  // 120 - overrides default'
+            }
+        ],
+        bestPractices: [
+            'Use function declarations for top-level, reusable functions you want available throughout a file regardless of definition order',
+            'Use function expressions or arrow functions when defining a function inline (like a callback)',
+            'Give parameters default values instead of manually checking for undefined inside the function body',
+            'Keep functions focused on a single responsibility for easier testing and reuse'
+        ]
+    },
+
+    {
+        id: 'js-function-parameters',
+        title: 'Function Parameters: Default & Rest',
+        library: 'js',
+        category: 'basics',
+        description: 'Default parameters let you specify a fallback value used when an argument is omitted or undefined. Rest parameters, written with ...name, collect any remaining arguments into a real array, letting a function accept a variable number of arguments cleanly.',
+        syntax: 'function name(param = defaultValue, ...rest) { }',
+        examples: [
+            {
+                title: 'Default Parameters',
+                description: 'Providing fallback values for missing arguments.',
+                code: 'function greet(name = "Guest", greeting = "Hello") {\n  console.log(`${greeting}, ${name}!`);\n}\n\ngreet();                    // "Hello, Guest!"\ngreet("Alice");             // "Hello, Alice!"\ngreet("Bob", "Hi");         // "Hi, Bob!"'
+            },
+            {
+                title: 'Rest Parameters',
+                description: 'Collecting a variable number of arguments into an array.',
+                code: 'function sum(...numbers) {\n  return numbers.reduce((total, n) => total + n, 0);\n}\n\nconsole.log(sum(1, 2, 3));       // 6\nconsole.log(sum(1, 2, 3, 4, 5)); // 15\n\nfunction logDetails(name, ...tags) {\n  console.log(name, "->", tags);\n}\nlogDetails("Article", "js", "tutorial", "web"); // "Article -> [js, tutorial, web]"'
+            }
+        ],
+        bestPractices: [
+            'Place rest parameters last in the parameter list - they must be, since they collect everything remaining',
+            'Prefer default parameters over manually checking `if (param === undefined)` inside the function body',
+            'Use rest parameters instead of the old `arguments` object for a real array with all standard array methods available',
+            'Keep the number of parameters manageable - beyond 3-4, consider accepting a single options object instead'
+        ]
+    },
+
+    {
+        id: 'js-destructuring',
+        title: 'Destructuring',
+        library: 'js',
+        category: 'basics',
+        description: 'Destructuring lets you unpack values from arrays or properties from objects into distinct variables in a single concise statement, instead of accessing each one individually. It works with arrays (by position) and objects (by property name), and can be nested for deeply structured data.',
+        syntax: 'const { prop } = object;\nconst [first, second] = array;',
+        examples: [
+            {
+                title: 'Object Destructuring',
+                description: 'Extracting object properties into variables, including renaming and defaults.',
+                code: 'const user = { name: "Alice", age: 25, city: "London" };\n\nconst { name, age } = user;\nconsole.log(name, age); // "Alice" 25\n\n// Renaming while destructuring\nconst { name: userName } = user;\nconsole.log(userName); // "Alice"\n\n// Default values for missing properties\nconst { country = "Unknown" } = user;\nconsole.log(country); // "Unknown"'
+            },
+            {
+                title: 'Array Destructuring',
+                description: 'Extracting array elements by position.',
+                code: 'const colors = ["red", "green", "blue"];\nconst [first, second] = colors;\nconsole.log(first, second); // "red" "green"\n\n// Skipping elements\nconst [, , third] = colors;\nconsole.log(third); // "blue"\n\n// Swapping variables in one line\nlet a = 1, b = 2;\n[a, b] = [b, a];\nconsole.log(a, b); // 2 1'
+            },
+            {
+                title: 'Destructuring Function Parameters',
+                description: 'A very common pattern - destructuring directly in a function signature.',
+                code: 'function displayUser({ name, age }) {\n  console.log(`${name} is ${age} years old`);\n}\n\ndisplayUser({ name: "Bob", age: 30, city: "Leeds" });\n// city is ignored - only name and age are pulled out'
+            }
+        ],
+        bestPractices: [
+            'Use destructuring for function parameters that are objects - it documents exactly what properties the function relies on',
+            'Provide default values during destructuring instead of separate fallback checks afterward',
+            'Use nested destructuring sparingly - beyond two levels it often becomes harder to read than explicit access',
+            'Combine with rest syntax (const { a, ...rest } = obj) to pull out specific properties and keep the remainder together'
+        ]
+    },
+
+    {
+        id: 'js-spread-operator',
+        title: 'Spread Operator',
+        library: 'js',
+        category: 'basics',
+        description: 'The spread operator (...) expands an iterable (like an array) or an object\'s own enumerable properties into individual elements. It is commonly used to copy arrays/objects, merge them together, or pass array elements as individual function arguments.',
+        syntax: '[...array], { ...object }, func(...args)',
+        examples: [
+            {
+                title: 'Spreading Arrays',
+                description: 'Copying and merging arrays without mutating the originals.',
+                code: 'const nums = [1, 2, 3];\nconst copy = [...nums]; // a new, independent array\n\nconst moreNums = [...nums, 4, 5];\nconsole.log(moreNums); // [1, 2, 3, 4, 5]\n\nconst a = [1, 2];\nconst b = [3, 4];\nconst combined = [...a, ...b];\nconsole.log(combined); // [1, 2, 3, 4]'
+            },
+            {
+                title: 'Spreading Objects',
+                description: 'Copying and merging objects, useful for immutable state updates.',
+                code: 'const user = { name: "Alice", age: 25 };\nconst updatedUser = { ...user, age: 26 }; // overrides age, keeps the rest\nconsole.log(updatedUser); // { name: "Alice", age: 26 }\n\nconst defaults = { theme: "light", fontSize: 14 };\nconst userPrefs = { fontSize: 18 };\nconst settings = { ...defaults, ...userPrefs }; // later spreads override earlier ones\nconsole.log(settings); // { theme: "light", fontSize: 18 }'
+            },
+            {
+                title: 'Spreading into Function Arguments',
+                description: 'Passing array elements as separate arguments.',
+                code: 'function sum(a, b, c) {\n  return a + b + c;\n}\n\nconst numbers = [1, 2, 3];\nconsole.log(sum(...numbers)); // 6, equivalent to sum(1, 2, 3)\n\nconsole.log(Math.max(...[4, 8, 2, 9])); // 9'
+            }
+        ],
+        bestPractices: [
+            'Use spread for immutable updates in state management (like React) instead of mutating objects/arrays directly',
+            'Remember spread only creates a shallow copy - nested objects/arrays are still shared by reference',
+            'When merging objects, later spreads override earlier ones for matching keys - order matters',
+            'Prefer spread over Object.assign() or Array.prototype.concat() for most modern merging needs, as it is more concise'
+        ]
+    },
+
+    {
+        id: 'js-if-else-switch',
+        title: 'if...else and switch',
+        library: 'js',
+        category: 'basics',
+        description: 'if...else executes code blocks based on boolean conditions, with else if for additional conditions and a final else as a catch-all. switch compares a single value against multiple possible cases, useful when checking one variable against many discrete values - each case needs a break to prevent falling through to the next.',
+        syntax: 'if (condition) { } else if (condition) { } else { }\nswitch (value) { case x: break; default: }',
+        examples: [
+            {
+                title: 'if...else if...else',
+                description: 'Handling multiple conditions in sequence.',
+                code: 'function getGrade(score) {\n  if (score >= 90) {\n    return "A";\n  } else if (score >= 80) {\n    return "B";\n  } else if (score >= 70) {\n    return "C";\n  } else {\n    return "F";\n  }\n}\n\nconsole.log(getGrade(85)); // "B"'
+            },
+            {
+                title: 'switch Statement',
+                description: 'Checking one value against several discrete cases.',
+                code: 'function getDayName(day) {\n  switch (day) {\n    case 0:\n      return "Sunday";\n    case 1:\n      return "Monday";\n    case 2:\n      return "Tuesday";\n    default:\n      return "Unknown";\n  }\n}\n\nconsole.log(getDayName(1)); // "Monday"\n\n// Fall-through: cases without break share the same code\nfunction isWeekend(day) {\n  switch (day) {\n    case 0:\n    case 6:\n      return true;\n    default:\n      return false;\n  }\n}'
+            }
+        ],
+        bestPractices: [
+            'Use switch when comparing one value against many discrete options - it is more readable than a long if/else if chain in that case',
+            'Never forget the break statement in each switch case, or execution will fall through into the next case unintentionally',
+            'Always include a default case in a switch to handle unexpected values',
+            'For simple boolean conditions, prefer if/else or a ternary over switch'
+        ]
+    },
+
+    {
+        id: 'js-loops',
+        title: 'Loops: for, while, do...while',
+        library: 'js',
+        category: 'basics',
+        description: 'JavaScript offers several loop types. The classic for loop is ideal when you know the number of iterations, using an initializer, condition, and increment. while loops run as long as a condition remains true, checking before each iteration. do...while is similar but always runs at least once, checking the condition after the first iteration.',
+        syntax: 'for (init; condition; step) { }\nwhile (condition) { }\ndo { } while (condition);',
+        examples: [
+            {
+                title: 'for Loop',
+                description: 'The classic counting loop.',
+                code: 'for (let i = 0; i < 5; i++) {\n  console.log(i); // 0, 1, 2, 3, 4\n}\n\n// Looping over an array by index\nconst fruits = ["apple", "banana", "cherry"];\nfor (let i = 0; i < fruits.length; i++) {\n  console.log(fruits[i]);\n}'
+            },
+            {
+                title: 'while Loop',
+                description: 'Looping based on a condition, checked before each pass.',
+                code: 'let count = 0;\nwhile (count < 3) {\n  console.log(count);\n  count++;\n}\n// 0, 1, 2'
+            },
+            {
+                title: 'do...while Loop',
+                description: 'A loop that always executes at least once, since the condition is checked after.',
+                code: 'let attempts = 0;\ndo {\n  console.log(`Attempt ${attempts + 1}`);\n  attempts++;\n} while (attempts < 3);\n\n// Runs at least once even if the condition starts false\nlet x = 10;\ndo {\n  console.log("This runs once even though x is not < 5");\n} while (x < 5);'
+            }
+        ],
+        bestPractices: [
+            'Use for...of instead of a classic for loop when you just need each value, not the index',
+            'Use while when the number of iterations is not known ahead of time and depends on a changing condition',
+            'Use do...while specifically when the loop body must run at least once regardless of the condition',
+            'Always ensure the loop condition will eventually become false, to avoid accidental infinite loops'
+        ]
+    },
+
+    {
+        id: 'js-for-in-for-of',
+        title: 'for...in vs for...of',
+        library: 'js',
+        category: 'basics',
+        description: 'for...in iterates over the enumerable property keys of an object (or the indices of an array, though this is discouraged). for...of iterates over the values of an iterable, like arrays, strings, Maps, and Sets - it is generally the better choice when working with arrays.',
+        syntax: 'for (const key in object) { }\nfor (const value of iterable) { }',
+        examples: [
+            {
+                title: 'for...in with Objects',
+                description: 'Iterating over an object\'s property keys.',
+                code: 'const user = { name: "Alice", age: 25, city: "London" };\n\nfor (const key in user) {\n  console.log(`${key}: ${user[key]}`);\n}\n// name: Alice\n// age: 25\n// city: London'
+            },
+            {
+                title: 'for...of with Arrays',
+                description: 'Iterating over array values directly - the preferred way to loop over arrays.',
+                code: 'const colors = ["red", "green", "blue"];\n\nfor (const color of colors) {\n  console.log(color);\n}\n// red, green, blue\n\n// Also works with strings, Maps, and Sets\nfor (const char of "abc") {\n  console.log(char); // a, b, c\n}'
+            }
+        ],
+        bestPractices: [
+            'Use for...of for arrays and other iterables - it gives you values directly without needing an index',
+            'Use for...in only for plain objects, and be aware it also picks up inherited enumerable properties unless filtered',
+            'Avoid for...in on arrays - it iterates over string keys (including inherited ones) and does not guarantee order the way for...of does',
+            'Prefer Object.keys()/values()/entries() combined with for...of or forEach() as an often clearer alternative to for...in'
+        ]
+    },
+
+    {
+        id: 'js-break-continue',
+        title: 'break and continue',
+        library: 'js',
+        category: 'basics',
+        description: 'break immediately exits the nearest enclosing loop (or switch statement), skipping any remaining iterations. continue skips the rest of the current iteration and moves on to the next one, without exiting the loop entirely. Labeled statements let break/continue target an outer loop from within a nested one.',
+        syntax: 'break;\ncontinue;',
+        examples: [
+            {
+                title: 'break',
+                description: 'Exiting a loop early once a condition is met.',
+                code: 'for (let i = 0; i < 10; i++) {\n  if (i === 5) {\n    break; // stop the loop entirely\n  }\n  console.log(i);\n}\n// 0, 1, 2, 3, 4'
+            },
+            {
+                title: 'continue',
+                description: 'Skipping specific iterations without stopping the whole loop.',
+                code: 'for (let i = 0; i < 10; i++) {\n  if (i % 2 === 0) {\n    continue; // skip even numbers\n  }\n  console.log(i);\n}\n// 1, 3, 5, 7, 9'
+            },
+            {
+                title: 'Labeled break in Nested Loops',
+                description: 'Breaking out of an outer loop from within a nested one.',
+                code: 'outer: for (let i = 0; i < 3; i++) {\n  for (let j = 0; j < 3; j++) {\n    if (j === 1) {\n      break outer; // exits the OUTER loop, not just the inner one\n    }\n    console.log(i, j);\n  }\n}\n// 0 0'
+            }
+        ],
+        bestPractices: [
+            'Use break to exit a loop as soon as further iteration is pointless, like finding a match',
+            'Use continue to skip irrelevant iterations while keeping the loop running',
+            'Reach for labeled break/continue sparingly - they can make nested loop logic harder to follow',
+            'Consider whether array methods like find() or some() might express the same intent more clearly than a manual loop with break'
+        ]
+    },
+
+    {
+        id: 'js-objects-basics',
+        title: 'Objects: Basics',
+        library: 'js',
+        category: 'basics',
+        description: 'Objects store collections of related data as key-value pairs, where keys are strings (or Symbols) and values can be any type, including functions (called methods). Properties can be accessed with dot notation or bracket notation, and objects can be created with object literals, the Object() constructor, or classes.',
+        syntax: 'const obj = { key: value, method() { } };',
+        examples: [
+            {
+                title: 'Creating and Accessing Objects',
+                description: 'Basic object creation and property access.',
+                code: 'const person = {\n  name: "Alice",\n  age: 25,\n  greet() {\n    console.log(`Hi, I am ${this.name}`);\n  }\n};\n\nconsole.log(person.name);     // dot notation - "Alice"\nconsole.log(person["age"]);   // bracket notation - 25\nperson.greet();               // "Hi, I am Alice"'
+            },
+            {
+                title: 'Modifying and Deleting Properties',
+                description: 'Adding, updating, and removing object properties.',
+                code: 'const car = { make: "Toyota", model: "Corolla" };\n\ncar.year = 2024;          // adding a new property\ncar.model = "Camry";      // updating an existing property\ndelete car.make;          // removing a property\n\nconsole.log(car); // { model: "Camry", year: 2024 }'
+            },
+            {
+                title: 'Bracket Notation for Dynamic Keys',
+                description: 'Using bracket notation when the property name is stored in a variable.',
+                code: 'const user = { name: "Bob", email: "bob@example.com" };\nconst field = "email";\n\nconsole.log(user[field]); // "bob@example.com"\n// user.field would look for a literal property named "field" - wrong!'
+            }
+        ],
+        bestPractices: [
+            'Use dot notation when the property name is a fixed, known identifier; use bracket notation when it is dynamic or stored in a variable',
+            'Prefer object shorthand syntax ({ name, age } instead of { name: name, age: age }) when variable names match property names',
+            'Use methods shorthand (greet() { } instead of greet: function() { }) for cleaner object method definitions',
+            'Be careful with delete - it is relatively slow and often better replaced by restructuring data or using Map for frequently changing key sets'
+        ]
+    },
+
+    {
+        id: 'js-this-keyword',
+        title: 'The this Keyword',
+        library: 'js',
+        category: 'basics',
+        description: 'this refers to the object that is currently executing a function, but its value depends entirely on how the function is called, not where it is defined. In a regular method call, this is the object before the dot. In a standalone function call, this is undefined in strict mode. Arrow functions do not have their own this - they inherit it from the enclosing scope.',
+        syntax: 'this.property',
+        examples: [
+            {
+                title: 'this in Object Methods',
+                description: 'this refers to the object the method is called on.',
+                code: 'const person = {\n  name: "Alice",\n  greet() {\n    console.log(`Hi, I am ${this.name}`);\n  }\n};\n\nperson.greet(); // "Hi, I am Alice" - this === person'
+            },
+            {
+                title: 'The Common this Pitfall',
+                description: 'Losing the correct this when a method is detached from its object.',
+                code: 'const person = {\n  name: "Alice",\n  greet() {\n    console.log(this.name);\n  }\n};\n\nconst greetFn = person.greet;\n// greetFn(); // undefined - this is no longer bound to person\n\n// Arrow functions solve this in callbacks, since they inherit this\nconst timer = {\n  seconds: 0,\n  start() {\n    setInterval(() => {\n      this.seconds++; // "this" correctly refers to timer\n    }, 1000);\n  }\n};'
+            },
+            {
+                title: 'Explicitly Setting this',
+                description: 'Using call, apply, and bind to control what this refers to.',
+                code: 'function introduce() {\n  console.log(`I am ${this.name}`);\n}\n\nconst user = { name: "Charlie" };\n\nintroduce.call(user);   // "I am Charlie" - calls immediately with this = user\nintroduce.apply(user);  // same as call, but takes args as an array\n\nconst boundIntroduce = introduce.bind(user);\nboundIntroduce(); // "I am Charlie" - permanently bound, callable later'
+            }
+        ],
+        bestPractices: [
+            'Use regular functions for object methods where you need this to refer to the calling object',
+            'Use arrow functions for callbacks inside methods where you want this to stay bound to the outer context',
+            'Use .bind() when passing a method as a callback and you need to preserve its original this',
+            'Avoid relying on this in top-level standalone functions - it is undefined in strict mode and easy to misuse'
+        ]
+    },
+
+    {
+        id: 'js-classes',
+        title: 'Classes',
+        library: 'js',
+        category: 'basics',
+        description: 'Classes provide syntax for creating objects with shared structure and behavior, built on top of JavaScript\'s existing prototype-based inheritance. A class has a constructor for initialization, methods shared across instances, and can extend another class to inherit its behavior via the extends and super keywords.',
+        syntax: 'class Name {\n  constructor(params) { }\n  method() { }\n}',
+        examples: [
+            {
+                title: 'Basic Class',
+                description: 'Defining a class with a constructor and methods.',
+                code: 'class Person {\n  constructor(name, age) {\n    this.name = name;\n    this.age = age;\n  }\n\n  greet() {\n    console.log(`Hi, I am ${this.name}, age ${this.age}`);\n  }\n}\n\nconst alice = new Person("Alice", 25);\nalice.greet(); // "Hi, I am Alice, age 25"'
+            },
+            {
+                title: 'Inheritance with extends and super',
+                description: 'Creating a subclass that builds on a parent class.',
+                code: 'class Animal {\n  constructor(name) {\n    this.name = name;\n  }\n  speak() {\n    console.log(`${this.name} makes a sound`);\n  }\n}\n\nclass Dog extends Animal {\n  constructor(name, breed) {\n    super(name); // calls the parent constructor\n    this.breed = breed;\n  }\n  speak() {\n    console.log(`${this.name} barks`); // overrides the parent method\n  }\n}\n\nconst dog = new Dog("Rex", "Labrador");\ndog.speak(); // "Rex barks"'
+            },
+            {
+                title: 'Static Methods and Private Fields',
+                description: 'Class-level methods and truly private instance fields (using #).',
+                code: 'class Counter {\n  #count = 0; // private field, inaccessible from outside the class\n\n  increment() {\n    this.#count++;\n    return this.#count;\n  }\n\n  static describe() {\n    return "A simple counter class";\n  }\n}\n\nconst counter = new Counter();\nconsole.log(counter.increment()); // 1\nconsole.log(counter.increment()); // 2\n// console.log(counter.#count); // SyntaxError - private field\n\nconsole.log(Counter.describe()); // called on the class itself, not an instance'
+            }
+        ],
+        bestPractices: [
+            'Always call super() in a subclass constructor before accessing this',
+            'Use private fields (#field) for internal state that should not be accessed or modified from outside the class',
+            'Prefer composition over deep inheritance chains - favor small, focused classes over sprawling hierarchies',
+            'Use static methods for functionality related to the class itself rather than any particular instance'
+        ]
+    },
+
+    {
+        id: 'js-closures',
+        title: 'Closures',
+        library: 'js',
+        category: 'basics',
+        description: 'A closure is a function that remembers and can access variables from its outer (enclosing) scope, even after that outer function has finished executing. Closures happen automatically whenever a function is defined inside another function. They are the mechanism behind private state, function factories, and many common JavaScript patterns.',
+        syntax: 'function outer() {\n  let value = 0;\n  return function inner() { return value; };\n}',
+        examples: [
+            {
+                title: 'Basic Closure',
+                description: 'An inner function retaining access to its outer function\'s variable.',
+                code: 'function makeCounter() {\n  let count = 0;\n  return function() {\n    count++;\n    return count;\n  };\n}\n\nconst counter = makeCounter();\nconsole.log(counter()); // 1\nconsole.log(counter()); // 2\nconsole.log(counter()); // 3 - count persists between calls'
+            },
+            {
+                title: 'Private State with Closures',
+                description: 'Using a closure to create genuinely private variables before class private fields existed.',
+                code: 'function createBankAccount(initialBalance) {\n  let balance = initialBalance; // not accessible from outside\n\n  return {\n    deposit(amount) {\n      balance += amount;\n      return balance;\n    },\n    withdraw(amount) {\n      if (amount > balance) {\n        console.log("Insufficient funds");\n        return balance;\n      }\n      balance -= amount;\n      return balance;\n    },\n    getBalance() {\n      return balance;\n    }\n  };\n}\n\nconst account = createBankAccount(100);\nconsole.log(account.deposit(50));  // 150\nconsole.log(account.withdraw(30)); // 120\n// balance itself cannot be accessed or modified directly from outside'
+            },
+            {
+                title: 'Function Factories',
+                description: 'Using closures to generate specialized functions.',
+                code: 'function multiplyBy(factor) {\n  return function(number) {\n    return number * factor;\n  };\n}\n\nconst double = multiplyBy(2);\nconst triple = multiplyBy(3);\n\nconsole.log(double(5)); // 10\nconsole.log(triple(5)); // 15'
+            }
+        ],
+        bestPractices: [
+            'Use closures to create private state that cannot be accessed or mutated from outside a function',
+            'Be aware that closures keep their referenced variables alive in memory - avoid creating unnecessary closures in hot code paths or long-lived loops',
+            'Use closures for function factories and configurable, reusable function generators',
+            'Remember that each call to an outer function creates a new, independent closure - they do not share state with each other'
+        ]
+    },
+
+    {
+        id: 'js-hoisting',
+        title: 'Hoisting',
+        library: 'js',
+        category: 'basics',
+        description: 'Hoisting is JavaScript\'s behavior of moving declarations (not initializations) to the top of their scope before code executes. Function declarations are fully hoisted, including their body, so they can be called before their definition. var declarations are hoisted but initialized as undefined. let and const are hoisted but remain in a "temporal dead zone" - accessing them before their declaration throws an error.',
+        syntax: '// Declarations are processed before code runs',
+        examples: [
+            {
+                title: 'Function Declaration Hoisting',
+                description: 'Function declarations can be called before they appear in the code.',
+                code: 'sayHello(); // works! "Hello!"\n\nfunction sayHello() {\n  console.log("Hello!");\n}'
+            },
+            {
+                title: 'var vs let/const Hoisting',
+                description: 'The key difference in how var and let/const behave when accessed early.',
+                code: 'console.log(x); // undefined - var is hoisted with a default value\nvar x = 5;\n\ntry {\n  console.log(y); // ReferenceError - in the temporal dead zone\n  let y = 10;\n} catch (e) {\n  console.log(e.message);\n}'
+            },
+            {
+                title: 'Function Expressions Are Not Hoisted the Same Way',
+                description: 'A common source of confusion between declarations and expressions.',
+                code: 'try {\n  sayHi(); // TypeError - sayHi is undefined at this point, not a function yet\n  var sayHi = function() {\n    console.log("Hi!");\n  };\n} catch (e) {\n  console.log(e.message);\n}'
+            }
+        ],
+        bestPractices: [
+            'Do not rely on hoisting to call functions before their definition, even though it works for declarations - write code in logical, top-to-bottom order for readability',
+            'Use let and const instead of var to avoid the confusing undefined-hoisting behavior entirely',
+            'Understand the temporal dead zone as the reason `ReferenceError` sometimes appears for variables that are technically declared later in the same scope',
+            'Declare all variables at the point where they are actually needed rather than depending on hoisting behavior'
+        ]
+    },
+
+    {
+        id: 'js-scope',
+        title: 'Scope',
+        library: 'js',
+        category: 'basics',
+        description: 'Scope determines where variables are accessible in your code. JavaScript has global scope (accessible everywhere), function scope (var-declared variables inside a function), and block scope (let/const-declared variables inside any { } block, including if statements and loops). Inner scopes can access outer scope variables, but not vice versa.',
+        syntax: '{ /* block scope */ }\nfunction() { /* function scope */ }',
+        examples: [
+            {
+                title: 'Global vs Function Scope',
+                description: 'Variables declared at the top level vs inside a function.',
+                code: 'const globalVar = "I am global";\n\nfunction myFunction() {\n  const localVar = "I am local";\n  console.log(globalVar); // accessible - inner scope sees outer scope\n  console.log(localVar);\n}\n\nmyFunction();\n// console.log(localVar); // ReferenceError - not accessible outside the function'
+            },
+            {
+                title: 'Block Scope with let/const',
+                description: 'let and const respect block boundaries, unlike var.',
+                code: 'if (true) {\n  let blockScoped = "only visible in this block";\n  var functionScoped = "visible outside the block";\n}\n\n// console.log(blockScoped);  // ReferenceError\nconsole.log(functionScoped); // works - var ignores block boundaries'
+            },
+            {
+                title: 'Scope Chain',
+                description: 'Nested functions can access variables from every enclosing scope.',
+                code: 'const outer = "outer value";\n\nfunction level1() {\n  const middle = "middle value";\n  function level2() {\n    const inner = "inner value";\n    console.log(outer, middle, inner); // all accessible via the scope chain\n  }\n  level2();\n}\n\nlevel1();'
+            }
+        ],
+        bestPractices: [
+            'Keep variables scoped as narrowly as possible - declare them inside the block or function where they are actually used',
+            'Avoid polluting the global scope - wrap code in functions or modules rather than declaring everything globally',
+            'Use let/const for predictable block scoping instead of var\'s looser function scoping',
+            'Understand the scope chain when debugging "variable is not defined" errors - the variable may simply be out of reach from where you are trying to access it'
+        ]
+    },
+
+    {
+        id: 'js-strict-mode',
+        title: 'Strict Mode',
+        library: 'js',
+        category: 'basics',
+        description: '"use strict" opts your code into a restricted variant of JavaScript that catches common mistakes by turning them into errors - like accidentally creating a global variable by forgetting to declare it. ES6 modules and classes are automatically in strict mode, so most modern code benefits from it without explicitly writing the directive.',
+        syntax: '"use strict";',
+        examples: [
+            {
+                title: 'Catching Accidental Globals',
+                description: 'Strict mode throws an error instead of silently creating a global variable.',
+                code: '"use strict";\n\ntry {\n  undeclaredVariable = 5; // ReferenceError in strict mode\n} catch (e) {\n  console.log(e.message);\n}\n\n// Without strict mode, this would silently create a global variable - a common bug source'
+            },
+            {
+                title: 'Strict Mode is Automatic in Modules and Classes',
+                description: 'You often get strict mode benefits without writing the directive at all.',
+                code: '// In an ES module file, this is automatic:\nexport function myFunction() {\n  // strict mode is already active here\n}\n\nclass MyClass {\n  // class bodies are always strict mode, even outside modules\n}'
+            }
+        ],
+        bestPractices: [
+            'If writing plain scripts (not modules), add "use strict" at the top of the file or function to catch silent errors',
+            'Remember ES6 modules (using import/export) and class bodies are strict mode by default - no directive needed',
+            'Treat strict mode errors as bugs to fix, not obstacles to work around, since they usually reveal a genuine mistake',
+            'Avoid mixing strict and non-strict code within the same file where possible, for consistent behavior'
+        ]
+    },
+
+    {
+        id: 'js-error-handling',
+        title: 'Error Handling: try/catch/finally',
+        library: 'js',
+        category: 'basics',
+        description: 'try...catch lets you handle errors gracefully instead of letting them crash your program. Code that might fail goes in the try block; if an error occurs, control jumps to the catch block. finally runs regardless of whether an error occurred, useful for cleanup. The throw statement lets you raise your own custom errors.',
+        syntax: 'try {\n} catch (error) {\n} finally {\n}',
+        examples: [
+            {
+                title: 'Basic try...catch',
+                description: 'Catching an error and handling it instead of crashing.',
+                code: 'try {\n  const data = JSON.parse("{ invalid json");\n} catch (error) {\n  console.log("Failed to parse:", error.message);\n}\n\nconsole.log("Program continues running");'
+            },
+            {
+                title: 'finally for Cleanup',
+                description: 'finally always runs, whether or not an error occurred.',
+                code: 'function processData() {\n  console.log("Starting...");\n  try {\n    throw new Error("Something went wrong");\n  } catch (error) {\n    console.log("Caught:", error.message);\n  } finally {\n    console.log("Cleanup runs regardless"); // always executes\n  }\n}\n\nprocessData();'
+            },
+            {
+                title: 'Throwing Custom Errors',
+                description: 'Creating and throwing your own errors with meaningful messages.',
+                code: 'function withdraw(balance, amount) {\n  if (amount > balance) {\n    throw new Error("Insufficient funds");\n  }\n  return balance - amount;\n}\n\ntry {\n  withdraw(100, 150);\n} catch (error) {\n  console.log(error.message); // "Insufficient funds"\n  console.log(error.name);    // "Error"\n}'
+            }
+        ],
+        bestPractices: [
+            'Only wrap code that can genuinely fail in try/catch - wrapping too much makes it harder to know what actually went wrong',
+            'Always throw Error objects (or subclasses) rather than plain strings, so the stack trace and error.message are available',
+            'Use finally for cleanup that must happen either way, like closing a connection or hiding a loading spinner',
+            'Avoid using try/catch for normal control flow - reserve it for genuinely exceptional, unexpected situations'
+        ]
+    },
+
+    {
+        id: 'js-modules',
+        title: 'Modules: import/export',
+        library: 'js',
+        category: 'basics',
+        description: 'ES modules let you split code across multiple files and share functionality between them using export and import. A named export can export multiple values from one file, each imported individually by name. A default export represents the file\'s primary value, imported without curly braces and under any name you choose.',
+        syntax: 'export const value = ...;\nimport { value } from "./file.js";',
+        examples: [
+            {
+                title: 'Named Exports and Imports',
+                description: 'Exporting and importing multiple named values from a module.',
+                code: '// math.js\nexport const PI = 3.14159;\nexport function add(a, b) {\n  return a + b;\n}\nexport function subtract(a, b) {\n  return a - b;\n}\n\n// main.js\nimport { PI, add, subtract } from "./math.js";\nconsole.log(add(2, 3)); // 5'
+            },
+            {
+                title: 'Default Export',
+                description: 'A module\'s single primary export, imported without curly braces.',
+                code: '// user.js\nexport default class User {\n  constructor(name) {\n    this.name = name;\n  }\n}\n\n// main.js\nimport User from "./user.js"; // any name works for a default import\nconst alice = new User("Alice");'
+            },
+            {
+                title: 'Combining Named and Default, Renaming, and Namespace Imports',
+                description: 'More advanced import/export patterns.',
+                code: '// utils.js\nexport default function formatDate(date) { /* ... */ }\nexport function formatCurrency(amount) { /* ... */ }\n\n// main.js\nimport formatDate, { formatCurrency as money } from "./utils.js";\n\n// Importing everything as a namespace object\nimport * as Utils from "./utils.js";\nUtils.formatCurrency(100);'
+            }
+        ],
+        bestPractices: [
+            'Use named exports for utility modules with several related exports, and default exports for a file with one clear primary export (like a single class or component)',
+            'Keep import paths relative and explicit (./file.js) for clarity, following your build tool\'s conventions',
+            'Avoid circular imports (module A imports B, which imports A back) - they can cause subtle bugs and are usually a sign the code needs restructuring',
+            'Use named imports (import { specific } from) rather than namespace imports (import * as) when you only need a few things, for clearer dependencies and better tree-shaking'
+        ]
+    },
+
+    {
+        id: 'js-optional-chaining-nullish',
+        title: 'Optional Chaining & Nullish Coalescing',
+        library: 'js',
+        category: 'basics',
+        description: 'Optional chaining (?.) safely accesses deeply nested properties without throwing an error if an intermediate value is null or undefined - it short-circuits and returns undefined instead of crashing. Nullish coalescing (??) provides a default value only when the left side is specifically null or undefined, not for other falsy values like 0 or "".',
+        syntax: 'obj?.prop?.nested\narr?.[index]\nfunc?.()\nvalue ?? defaultValue',
+        examples: [
+            {
+                title: 'Optional Chaining for Nested Properties',
+                description: 'Safely accessing deeply nested data that might not exist.',
+                code: 'const user = {\n  name: "Alice",\n  address: {\n    city: "London"\n  }\n};\n\nconsole.log(user?.address?.city);    // "London"\nconsole.log(user?.address?.zipCode); // undefined - no error thrown\nconsole.log(user?.contact?.email);   // undefined - "contact" does not exist, but no crash\n\n// Without optional chaining, the line above would throw:\n// TypeError: Cannot read properties of undefined'
+            },
+            {
+                title: 'Optional Chaining with Methods and Arrays',
+                description: 'Using ?. to safely call functions and access array indices that might not exist.',
+                code: 'const user = { greet: null };\nuser.greet?.(); // does nothing - safely skips the call since greet is null\n\nconst data = { items: null };\nconsole.log(data.items?.[0]); // undefined - safely handles the null array'
+            },
+            {
+                title: 'Combining with Nullish Coalescing',
+                description: 'Providing a fallback value for safely-accessed data.',
+                code: 'const user = { address: null };\n\nconst city = user?.address?.city ?? "Unknown city";\nconsole.log(city); // "Unknown city"\n\n// Contrast with ||, which would also replace legitimate falsy values\nconst settings = { volume: 0 };\nconsole.log(settings?.volume ?? 50); // 0 - correctly kept, since 0 is not null/undefined'
+            }
+        ],
+        bestPractices: [
+            'Use optional chaining when accessing properties that might not exist, instead of manually checking each level with && chains',
+            'Combine ?. with ?? to safely access a value and supply a sensible default in one expression',
+            'Do not overuse optional chaining to mask bugs - if a property should always exist, a missing value might indicate a real problem worth investigating rather than silencing',
+            'Remember ?. short-circuits the entire chain - if any part is null/undefined, the whole expression evaluates to undefined without evaluating further'
+        ]
+    },
+
+    {
+        id: 'js-typeof-instanceof',
+        title: 'typeof and instanceof',
+        library: 'js',
+        category: 'basics',
+        description: 'typeof returns a string indicating the general type of a value (like "string", "number", "object"). instanceof checks whether an object is an instance of a specific class or constructor function by walking its prototype chain, useful for distinguishing between different object types like Array, Date, or custom classes.',
+        syntax: 'typeof value\nobject instanceof Constructor',
+        examples: [
+            {
+                title: 'typeof for Primitive Types',
+                description: 'Checking the type of simple values.',
+                code: 'console.log(typeof "hello");  // "string"\nconsole.log(typeof 42);       // "number"\nconsole.log(typeof true);     // "boolean"\nconsole.log(typeof undefined);// "undefined"\nconsole.log(typeof function(){}); // "function"\nconsole.log(typeof {});       // "object"\nconsole.log(typeof []);       // "object" - arrays are objects too, typeof cannot distinguish them'
+            },
+            {
+                title: 'instanceof for Object Types',
+                description: 'Distinguishing between different kinds of objects.',
+                code: 'const arr = [1, 2, 3];\nconst date = new Date();\n\nconsole.log(arr instanceof Array);  // true\nconsole.log(arr instanceof Object); // true - arrays are also objects\nconsole.log(date instanceof Date);  // true\nconsole.log(date instanceof Array); // false\n\nclass Dog {}\nconst rex = new Dog();\nconsole.log(rex instanceof Dog); // true'
+            }
+        ],
+        bestPractices: [
+            'Use typeof for primitives (string, number, boolean, etc.) and Array.isArray() specifically for arrays, since typeof cannot tell arrays apart from plain objects',
+            'Use instanceof to check if an object was created by a specific class or constructor, especially useful in error handling (error instanceof TypeError)',
+            'Remember instanceof checks the prototype chain, so it can behave unexpectedly across different execution contexts (like iframes) - it is not foolproof for all edge cases',
+            'Combine typeof checks with early returns to validate function inputs before processing them'
+        ]
+    },
+
+    {
+        id: 'js-type-conversion',
+        title: 'Type Conversion',
+        library: 'js',
+        category: 'basics',
+        description: 'JavaScript converts values between types both explicitly (when you deliberately call a conversion function like Number() or String()) and implicitly (when the language automatically coerces types during operations, like using + with a string and a number). Understanding both is essential for avoiding subtle bugs.',
+        syntax: 'String(value), Number(value), Boolean(value)',
+        examples: [
+            {
+                title: 'Explicit Conversion',
+                description: 'Deliberately converting between types.',
+                code: 'console.log(String(42));      // "42"\nconsole.log(String(true));    // "true"\nconsole.log(Number("42"));    // 42\nconsole.log(Number("abc"));   // NaN\nconsole.log(Number(""));      // 0\nconsole.log(Boolean(0));      // false\nconsole.log(Boolean(""));     // false\nconsole.log(Boolean("hello"));// true'
+            },
+            {
+                title: 'Implicit Coercion Gotchas',
+                description: 'Common surprises from automatic type conversion.',
+                code: 'console.log("5" + 3);   // "53" - + triggers string concatenation\nconsole.log("5" - 3);   // 2   - - forces numeric conversion\nconsole.log("5" * "2"); // 10  - * forces numeric conversion\nconsole.log(1 + true);  // 2   - true becomes 1\nconsole.log([] + []);   // ""  - both arrays become empty strings\nconsole.log([] + {});   // "[object Object]" - surprising but consistent with the rules'
+            },
+            {
+                title: 'Falsy Values',
+                description: 'The specific set of values that convert to false in a boolean context.',
+                code: '// The complete list of falsy values in JavaScript:\nBoolean(false);      // false\nBoolean(0);          // false\nBoolean("");         // false\nBoolean(null);       // false\nBoolean(undefined);  // false\nBoolean(NaN);        // false\n// Everything else, including "0", "false", [], and {}, is truthy'
+            }
+        ],
+        bestPractices: [
+            'Use explicit conversion (Number(), String(), Boolean()) rather than relying on implicit coercion, for clearer and more predictable code',
+            'Memorize the falsy values list - it explains most "why is this if statement not working" bugs',
+            'Be especially cautious with + since it behaves completely differently depending on whether either operand is a string',
+            'Use === instead of == to sidestep most implicit coercion surprises during comparisons entirely'
+        ]
+    },
+
+    {
+        id: 'js-regexp',
+        title: 'Regular Expressions',
+        library: 'js',
+        category: 'basics',
+        description: 'Regular expressions (RegExp) describe patterns for matching text, used for validation, searching, and replacing. They can be created with literal syntax (/pattern/flags) or the RegExp constructor. Common methods include test() to check for a match, and string methods like match(), replace(), and split() that accept a regex pattern.',
+        syntax: '/pattern/flags\nnew RegExp("pattern", "flags")',
+        examples: [
+            {
+                title: 'Basic Pattern Matching',
+                description: 'Testing whether a string matches a pattern.',
+                code: 'const hasNumber = /\\d/;\nconsole.log(hasNumber.test("abc123")); // true\nconsole.log(hasNumber.test("abcdef")); // false\n\nconst emailPattern = /^[\\w.-]+@[\\w.-]+\\.\\w+$/;\nconsole.log(emailPattern.test("user@example.com")); // true\nconsole.log(emailPattern.test("not-an-email"));      // false'
+            },
+            {
+                title: 'Common Flags',
+                description: 'Using flags to modify matching behavior.',
+                code: 'const text = "Cat cat CAT";\n\nconsole.log(/cat/.test(text));  // true - matches only lowercase "cat"\nconsole.log(/cat/i.test(text)); // true - i flag makes it case-insensitive\n\nconst matches = text.match(/cat/gi); // g = global (all matches), i = case-insensitive\nconsole.log(matches); // ["Cat", "cat", "CAT"]'
+            },
+            {
+                title: 'Using RegExp with String Methods',
+                description: 'Searching, replacing, and splitting strings using patterns.',
+                code: 'const sentence = "The rain in Spain";\n\nconsole.log(sentence.replace(/ain/g, "XXX"));\n// "The rXXX in SpXXX"\n\nconsole.log("2024-01-15".split(/-/));\n// ["2024", "01", "15"]\n\nconsole.log("Hello World".match(/[A-Z]\\w+/g));\n// ["Hello", "World"] - words starting with a capital letter'
+            }
+        ],
+        bestPractices: [
+            'Use the g flag when you need all matches in a string, not just the first',
+            'Test regular expressions thoroughly with edge cases - they are powerful but easy to get subtly wrong',
+            'For simple string checks (like "does this contain X"), plain string methods like includes() are often clearer than a regex',
+            'Keep complex patterns commented or broken down, since dense regex syntax is notoriously hard to read later'
+        ]
+    },
+
+    {
+        id: 'js-iterables-generators',
+        title: 'Iterables and Generators',
+        library: 'js',
+        category: 'basics',
+        description: 'An iterable is any object that implements the Symbol.iterator method, allowing it to be used with for...of and the spread operator - arrays, strings, Maps, and Sets are all built-in iterables. Generator functions, defined with function*, provide an easy way to create custom iterables by using yield to produce a sequence of values one at a time, pausing execution between each.',
+        syntax: 'function* generatorName() {\n  yield value;\n}',
+        examples: [
+            {
+                title: 'Basic Generator Function',
+                description: 'A generator that produces values lazily, one at a time.',
+                code: 'function* countUpTo(max) {\n  for (let i = 1; i <= max; i++) {\n    yield i;\n  }\n}\n\nconst counter = countUpTo(3);\nconsole.log(counter.next()); // { value: 1, done: false }\nconsole.log(counter.next()); // { value: 2, done: false }\nconsole.log(counter.next()); // { value: 3, done: false }\nconsole.log(counter.next()); // { value: undefined, done: true }'
+            },
+            {
+                title: 'Using Generators with for...of',
+                description: 'Generators are iterable, so they work directly with for...of and spread.',
+                code: 'function* fruits() {\n  yield "apple";\n  yield "banana";\n  yield "cherry";\n}\n\nfor (const fruit of fruits()) {\n  console.log(fruit);\n}\n// apple, banana, cherry\n\nconsole.log([...fruits()]); // ["apple", "banana", "cherry"]'
+            },
+            {
+                title: 'Custom Iterable Object',
+                description: 'Making any object work with for...of by implementing Symbol.iterator.',
+                code: 'const range = {\n  from: 1,\n  to: 5,\n  [Symbol.iterator]() {\n    let current = this.from;\n    const last = this.to;\n    return {\n      next() {\n        if (current <= last) {\n          return { value: current++, done: false };\n        }\n        return { value: undefined, done: true };\n      }\n    };\n  }\n};\n\nfor (const num of range) {\n  console.log(num); // 1, 2, 3, 4, 5\n}'
+            }
+        ],
+        bestPractices: [
+            'Use generators for lazily-computed sequences, especially large or potentially infinite ones, since values are only produced as they are requested',
+            'Prefer generators over manually managing iterator state objects - the syntax is far more readable',
+            'Remember a generator function returns an iterator when called - it does not run its body immediately',
+            'Reach for this pattern when building custom data structures (like a tree or linked list) that should support for...of'
+        ]
+    },
+
+    {
+        id: 'js-symbols',
+        title: 'Symbols',
+        library: 'js',
+        category: 'basics',
+        description: 'Symbol is a primitive type that creates unique, immutable identifiers. Every Symbol() call produces a completely unique value, even with the same description, which makes them useful as object property keys that are guaranteed not to collide with other keys - including string keys or other symbols. They are also used internally by JavaScript for things like Symbol.iterator.',
+        syntax: 'const sym = Symbol("description");',
+        examples: [
+            {
+                title: 'Creating Unique Symbols',
+                description: 'Every symbol is unique, even with an identical description.',
+                code: 'const sym1 = Symbol("id");\nconst sym2 = Symbol("id");\n\nconsole.log(sym1 === sym2); // false - always unique\nconsole.log(sym1.description); // "id"'
+            },
+            {
+                title: 'Symbols as Object Keys',
+                description: 'Using a symbol to create a property that will not collide with string keys or be picked up by normal enumeration.',
+                code: 'const id = Symbol("id");\n\nconst user = {\n  name: "Alice",\n  [id]: 12345 // a symbol-keyed property\n};\n\nconsole.log(user[id]); // 12345\nconsole.log(Object.keys(user)); // ["name"] - the symbol key is skipped\nconsole.log(JSON.stringify(user)); // {"name":"Alice"} - symbols are also skipped here'
+            }
+        ],
+        bestPractices: [
+            'Use symbols when you need a guaranteed-unique property key that will not accidentally collide with other properties',
+            'Remember symbol-keyed properties are hidden from Object.keys(), for...in, and JSON.stringify() - useful for "metadata" style properties',
+            'Do not overuse symbols for everyday object keys - plain string keys are simpler and sufficient for the vast majority of cases',
+            'Use well-known symbols like Symbol.iterator when you specifically need to customize how an object behaves with built-in language features'
+        ]
+    },
+
+    {
+        id: 'js-sets',
+        title: 'Sets',
+        library: 'js',
+        category: 'basics',
+        description: 'A Set is a collection of unique values of any type - unlike an array, it automatically prevents duplicates. Sets maintain insertion order and provide efficient add, delete, and lookup operations. They are ideal for deduplicating data or tracking membership without caring about order or indexed access.',
+        syntax: 'const mySet = new Set([values]);\nmySet.add(value);\nmySet.has(value);',
+        examples: [
+            {
+                title: 'Basic Set Operations',
+                description: 'Creating a Set and using its core methods.',
+                code: 'const mySet = new Set();\n\nmySet.add(1);\nmySet.add(2);\nmySet.add(2); // ignored - 2 is already in the set\nmySet.add(3);\n\nconsole.log(mySet.size);      // 3\nconsole.log(mySet.has(2));    // true\nmySet.delete(2);\nconsole.log(mySet.has(2));    // false'
+            },
+            {
+                title: 'Deduplicating an Array',
+                description: 'One of the most common uses of Set - removing duplicates.',
+                code: 'const numbers = [1, 2, 2, 3, 4, 4, 5];\nconst unique = [...new Set(numbers)];\nconsole.log(unique); // [1, 2, 3, 4, 5]'
+            },
+            {
+                title: 'Iterating a Set',
+                description: 'Sets are iterable and work with for...of.',
+                code: 'const tags = new Set(["js", "web", "css"]);\n\nfor (const tag of tags) {\n  console.log(tag);\n}\n// js, web, css - in insertion order\n\ntags.forEach(tag => console.log(tag)); // also works'
+            }
+        ],
+        bestPractices: [
+            'Use Set instead of an array when you need to guarantee uniqueness and do not need indexed access',
+            'Use the [...new Set(array)] pattern as the concise standard way to deduplicate an array',
+            'Remember Set uses the same equality as ===, with the one exception that NaN is treated as equal to itself',
+            'Use has() for membership checks instead of array includes() - Set lookups are generally faster for large collections'
+        ]
+    },
+
+    {
+        id: 'js-maps',
+        title: 'Maps',
+        library: 'js',
+        category: 'basics',
+        description: 'A Map is a collection of key-value pairs, similar to a plain object, but with important differences: keys can be any type (not just strings), it maintains insertion order, and it provides a direct size property. Maps are generally the better choice over plain objects when keys are dynamic, non-string, or when you need reliable size and iteration.',
+        syntax: 'const myMap = new Map();\nmyMap.set(key, value);\nmyMap.get(key);',
+        examples: [
+            {
+                title: 'Basic Map Operations',
+                description: 'Creating a Map and using its core methods.',
+                code: 'const userRoles = new Map();\n\nuserRoles.set("alice", "admin");\nuserRoles.set("bob", "editor");\n\nconsole.log(userRoles.get("alice")); // "admin"\nconsole.log(userRoles.has("bob"));   // true\nconsole.log(userRoles.size);         // 2\n\nuserRoles.delete("bob");\nconsole.log(userRoles.size); // 1'
+            },
+            {
+                title: 'Object Keys, Not Just Strings',
+                description: 'Unlike plain objects, Map keys can be any value, including objects and functions.',
+                code: 'const objKey = { id: 1 };\nconst map = new Map();\n\nmap.set(objKey, "some value");\nmap.set("stringKey", "another value");\nmap.set(42, "number key value");\n\nconsole.log(map.get(objKey)); // "some value"\nconsole.log(map.get({ id: 1 })); // undefined - a different object reference!'
+            },
+            {
+                title: 'Iterating a Map',
+                description: 'Maps are iterable, yielding [key, value] pairs in insertion order.',
+                code: 'const inventory = new Map([\n  ["apples", 50],\n  ["bananas", 30]\n]);\n\nfor (const [item, count] of inventory) {\n  console.log(`${item}: ${count}`);\n}\n// apples: 50\n// bananas: 30\n\nconsole.log([...inventory.keys()]);   // ["apples", "bananas"]\nconsole.log([...inventory.values()]); // [50, 30]'
+            }
+        ],
+        bestPractices: [
+            'Use Map when keys are not simple strings, when key order matters, or when you need frequent additions/removals with reliable size tracking',
+            'Use plain objects for simple, fixed-shape records (like a single user\'s data) where you know the property names ahead of time',
+            'Remember Map keys are compared by reference for objects - two different object literals with identical content are treated as different keys',
+            'Use Map.prototype.entries()/keys()/values() to iterate in a specific way when the default [key, value] iteration is not what you need'
+        ]
+    },
+
+    {
+        id: 'js-json',
+        title: 'JSON: stringify() and parse()',
+        library: 'js',
+        category: 'json',
+        description: 'JSON (JavaScript Object Notation) is a text format for representing structured data, widely used for APIs and configuration. JSON.stringify() converts a JavaScript value into a JSON string, and JSON.parse() converts a JSON string back into a JavaScript value. Functions, undefined, and symbols are silently dropped or converted during stringification.',
+        syntax: 'JSON.stringify(value)\nJSON.parse(jsonString)',
+        examples: [
+            {
+                title: 'Basic Stringify and Parse',
+                description: 'Converting between JavaScript objects and JSON strings.',
+                code: 'const user = { name: "Alice", age: 25, active: true };\n\nconst jsonString = JSON.stringify(user);\nconsole.log(jsonString); // \'{"name":"Alice","age":25,"active":true}\'\n\nconst parsedBack = JSON.parse(jsonString);\nconsole.log(parsedBack.name); // "Alice"\nconsole.log(typeof parsedBack); // "object"'
+            },
+            {
+                title: 'Pretty-Printing with Indentation',
+                description: 'Formatting JSON output for readability using the third argument.',
+                code: 'const data = { name: "Bob", roles: ["admin", "editor"] };\n\nconsole.log(JSON.stringify(data, null, 2));\n// {\n//   "name": "Bob",\n//   "roles": [\n//     "admin",\n//     "editor"\n//   ]\n// }'
+            },
+            {
+                title: 'What Gets Dropped or Converted',
+                description: 'JSON.stringify() cannot represent every JavaScript value.',
+                code: 'const data = {\n  name: "Alice",\n  greet: function() { console.log("hi"); }, // dropped entirely\n  unset: undefined,                          // dropped entirely\n  missing: null,                             // kept as null\n  when: new Date()                           // converted to an ISO string\n};\n\nconsole.log(JSON.stringify(data));\n// functions and undefined values disappear from the output'
+            }
+        ],
+        bestPractices: [
+            'Always wrap JSON.parse() in a try/catch, since it throws an error on invalid or malformed JSON',
+            'Use the third argument of JSON.stringify() (a number of spaces) for human-readable, indented output during debugging',
+            'Remember functions, undefined, and symbols are silently omitted during stringification - do not rely on them surviving a round trip',
+            'Be aware that Dates become strings after JSON.stringify(), and will need to be manually converted back with new Date() after parsing'
+        ]
+    },
+
+    {
+        id: 'js-array-basics',
+        title: 'Array Basics',
+        library: 'js',
+        category: 'arrays',
+        description: 'Arrays are ordered, zero-indexed collections that can hold values of any type, including a mix of types. They can be created with array literal syntax [] or the Array constructor. The length property reflects the number of elements, and static methods like Array.isArray(), Array.from(), and Array.of() help create or check arrays.',
+        syntax: 'const arr = [item1, item2, item3];\narr[index];\narr.length;',
+        examples: [
+            {
+                title: 'Creating and Accessing Arrays',
+                description: 'Basic array creation, indexing, and length.',
+                code: 'const fruits = ["apple", "banana", "cherry"];\n\nconsole.log(fruits[0]);      // "apple" - first element\nconsole.log(fruits[fruits.length - 1]); // "cherry" - last element\nconsole.log(fruits.length);  // 3\n\nfruits[1] = "blueberry"; // arrays are mutable\nconsole.log(fruits); // ["apple", "blueberry", "cherry"]'
+            },
+            {
+                title: 'Array.isArray() and Array.from()',
+                description: 'Checking for arrays and creating them from other iterables.',
+                code: 'console.log(Array.isArray([1, 2, 3])); // true\nconsole.log(Array.isArray("hello"));    // false\n\nconst fromString = Array.from("abc");\nconsole.log(fromString); // ["a", "b", "c"]\n\nconst fromMap = Array.from({ length: 5 }, (_, i) => i * 2);\nconsole.log(fromMap); // [0, 2, 4, 6, 8]'
+            }
+        ],
+        bestPractices: [
+            'Use array literal syntax [] rather than new Array() for creating arrays - it is more concise and avoids a quirky single-number-argument edge case',
+            'Use Array.isArray() rather than typeof to correctly identify arrays, since typeof reports "object" for both',
+            'Use Array.from() to convert array-like or iterable values (like NodeLists or strings) into real arrays with full method support',
+            'Remember that arrays are objects, so assigning one array variable to another copies the reference, not the contents'
+        ]
+    },
+
+    {
+        id: 'js-array-add-remove',
+        title: 'push(), pop(), shift(), unshift()',
+        library: 'js',
+        category: 'arrays',
+        description: 'These four methods add or remove elements from the ends of an array, all mutating the original array in place. push() and pop() work on the end of the array (fast). shift() and unshift() work on the beginning (slower, since remaining elements must be re-indexed).',
+        syntax: 'arr.push(item); arr.pop();\narr.unshift(item); arr.shift();',
+        examples: [
+            {
+                title: 'push() and pop() - End of Array',
+                description: 'Adding and removing elements from the end.',
+                code: 'const stack = [1, 2, 3];\n\nstack.push(4);        // adds to the end\nconsole.log(stack);   // [1, 2, 3, 4]\n\nconst removed = stack.pop(); // removes and returns the last element\nconsole.log(removed);  // 4\nconsole.log(stack);    // [1, 2, 3]'
+            },
+            {
+                title: 'unshift() and shift() - Start of Array',
+                description: 'Adding and removing elements from the beginning.',
+                code: 'const queue = [2, 3, 4];\n\nqueue.unshift(1);     // adds to the start\nconsole.log(queue);   // [1, 2, 3, 4]\n\nconst first = queue.shift(); // removes and returns the first element\nconsole.log(first);    // 1\nconsole.log(queue);    // [2, 3, 4]'
+            },
+            {
+                title: 'Adding Multiple Elements at Once',
+                description: 'Each method accepts multiple arguments.',
+                code: 'const arr = [3];\narr.push(4, 5, 6);\nconsole.log(arr); // [3, 4, 5, 6]\n\narr.unshift(1, 2);\nconsole.log(arr); // [1, 2, 3, 4, 5, 6]'
+            }
+        ],
+        bestPractices: [
+            'Prefer push()/pop() over unshift()/shift() when performance matters - operating on the end of an array is significantly faster',
+            'Remember all four methods mutate the original array - use spread syntax ([...arr, newItem]) instead if you need an immutable update',
+            'Use push() to build up an array in a loop rather than repeatedly using concat(), which creates a new array each time',
+            'Check array length before calling pop()/shift() on a potentially empty array, since they return undefined rather than throwing'
+        ]
+    },
+
+    {
+        id: 'js-array-slice-splice',
+        title: 'slice() and splice()',
+        library: 'js',
+        category: 'arrays',
+        description: 'slice() returns a shallow copy of a portion of an array as a new array, without modifying the original - useful for extracting a section. splice() modifies the original array in place by removing, replacing, or inserting elements at a specific position, and returns the removed elements.',
+        syntax: 'arr.slice(start, end)\narr.splice(start, deleteCount, ...items)',
+        examples: [
+            {
+                title: 'slice() - Non-Mutating Extraction',
+                description: 'Extracting a portion of an array without changing the original.',
+                code: 'const fruits = ["apple", "banana", "cherry", "date", "elderberry"];\n\nconsole.log(fruits.slice(1, 3));  // ["banana", "cherry"] - end index excluded\nconsole.log(fruits.slice(2));      // ["cherry", "date", "elderberry"] - to the end\nconsole.log(fruits.slice(-2));     // ["date", "elderberry"] - last 2 elements\nconsole.log(fruits);               // original array is unchanged'
+            },
+            {
+                title: 'splice() - Mutating Removal',
+                description: 'Removing elements from an array, modifying it in place.',
+                code: 'const numbers = [1, 2, 3, 4, 5];\nconst removed = numbers.splice(1, 2); // start at index 1, remove 2 elements\n\nconsole.log(removed);  // [2, 3] - the removed elements\nconsole.log(numbers);  // [1, 4, 5] - original array is mutated'
+            },
+            {
+                title: 'splice() - Inserting and Replacing',
+                description: 'Using splice() to insert new elements or replace existing ones.',
+                code: 'const colors = ["red", "green", "blue"];\n\n// Insert without removing (deleteCount = 0)\ncolors.splice(1, 0, "yellow");\nconsole.log(colors); // ["red", "yellow", "green", "blue"]\n\n// Replace an element\ncolors.splice(2, 1, "purple");\nconsole.log(colors); // ["red", "yellow", "purple", "blue"]'
+            }
+        ],
+        bestPractices: [
+            'Use slice() whenever you want a new array without mutating the original - it is the safer, more predictable choice',
+            'Use splice() specifically when you need to remove or insert elements at a specific position in place',
+            'Remember slice()\'s end argument is exclusive - slice(1, 3) returns indices 1 and 2, not 3',
+            'Save splice()\'s return value if you need the removed elements - it returns them as a new array'
+        ]
+    },
+
+    {
+        id: 'js-array-concat-join',
+        title: 'concat() and join()',
+        library: 'js',
+        category: 'arrays',
+        description: 'concat() merges two or more arrays into a new array, without modifying the originals. join() converts all array elements into a single string, separated by a specified delimiter (comma by default) - the reverse operation of String.prototype.split().',
+        syntax: 'arr.concat(otherArr)\narr.join(separator)',
+        examples: [
+            {
+                title: 'concat() - Merging Arrays',
+                description: 'Combining arrays without mutating the originals.',
+                code: 'const arr1 = [1, 2, 3];\nconst arr2 = [4, 5, 6];\n\nconst merged = arr1.concat(arr2);\nconsole.log(merged); // [1, 2, 3, 4, 5, 6]\nconsole.log(arr1);   // [1, 2, 3] - unchanged\n\n// concat() can also merge multiple arrays and add individual values\nconst combined = arr1.concat(arr2, [7, 8], 9);\nconsole.log(combined); // [1, 2, 3, 4, 5, 6, 7, 8, 9]'
+            },
+            {
+                title: 'join() - Array to String',
+                description: 'Converting array elements into a formatted string.',
+                code: 'const words = ["Hello", "World", "!"];\n\nconsole.log(words.join(" ")); // "Hello World !"\nconsole.log(words.join());    // "Hello,World,!" - default separator is a comma\nconsole.log(words.join(""));  // "HelloWorld!" - no separator\n\nconst path = ["usr", "local", "bin"];\nconsole.log(path.join("/")); // "usr/local/bin"'
+            }
+        ],
+        bestPractices: [
+            'Prefer the spread operator ([...arr1, ...arr2]) over concat() in modern code - it reads more clearly, though both achieve the same result',
+            'Use join() instead of manually looping and building a string when converting an array to display text',
+            'Choose a join() separator that matches your output format - commas for CSV-like data, spaces for sentences, "/" for paths',
+            'Remember join() converts non-string elements using their default string representation, which may need formatting first for numbers or objects'
+        ]
+    },
+
+    {
+        id: 'js-array-search',
+        title: 'indexOf(), includes(), lastIndexOf()',
+        library: 'js',
+        category: 'arrays',
+        description: 'These methods search an array for a specific value. indexOf() returns the first matching index (or -1 if not found), lastIndexOf() searches from the end, and includes() simply returns true or false. All use strict equality (===) for comparison, so they cannot find objects by content, only by exact reference.',
+        syntax: 'arr.indexOf(value)\narr.includes(value)\narr.lastIndexOf(value)',
+        examples: [
+            {
+                title: 'indexOf() and includes()',
+                description: 'Finding whether and where a value exists in an array.',
+                code: 'const fruits = ["apple", "banana", "cherry", "banana"];\n\nconsole.log(fruits.indexOf("banana"));   // 1 - first match\nconsole.log(fruits.indexOf("grape"));    // -1 - not found\nconsole.log(fruits.includes("cherry"));  // true\nconsole.log(fruits.includes("grape"));   // false'
+            },
+            {
+                title: 'lastIndexOf()',
+                description: 'Searching for the last occurrence of a value.',
+                code: 'const fruits = ["apple", "banana", "cherry", "banana"];\nconsole.log(fruits.lastIndexOf("banana")); // 3 - the last match'
+            },
+            {
+                title: 'Why includes() Cannot Find Objects by Content',
+                description: 'A common gotcha - these methods compare by reference, not deep equality.',
+                code: 'const users = [{ name: "Alice" }, { name: "Bob" }];\n\nconsole.log(users.includes({ name: "Alice" })); // false - different object reference!\n\n// Use .some() with a custom comparison instead\nconsole.log(users.some(u => u.name === "Alice")); // true'
+            }
+        ],
+        bestPractices: [
+            'Use includes() when you only need a true/false answer - it is more readable than checking indexOf() !== -1',
+            'Use indexOf() when you actually need the position of the match, such as for use with splice()',
+            'Remember these methods use strict equality, so they cannot find objects/arrays by their content - use find() or some() with a custom comparison for that',
+            'includes() correctly finds NaN (unlike indexOf(), which cannot) - a subtle but useful difference'
+        ]
+    },
+
+    {
+        id: 'js-array-find',
+        title: 'find(), findIndex(), findLast()',
+        library: 'js',
+        category: 'arrays',
+        description: 'These methods search an array using a test function rather than an exact value, making them ideal for finding objects by a property. find() returns the first matching element (or undefined), findIndex() returns its index (or -1), and findLast()/findLastIndex() search from the end instead.',
+        syntax: 'arr.find(item => condition)\narr.findIndex(item => condition)',
+        examples: [
+            {
+                title: 'find() - Locating an Object by Property',
+                description: 'The most common use case: finding a specific object in an array.',
+                code: 'const users = [\n  { id: 1, name: "Alice" },\n  { id: 2, name: "Bob" },\n  { id: 3, name: "Charlie" }\n];\n\nconst user = users.find(u => u.id === 2);\nconsole.log(user); // { id: 2, name: "Bob" }\n\nconst notFound = users.find(u => u.id === 99);\nconsole.log(notFound); // undefined'
+            },
+            {
+                title: 'findIndex() - Locating a Position',
+                description: 'Getting the index of a match, useful before splice() or update operations.',
+                code: 'const numbers = [4, 9, 16, 25, 36];\nconst index = numbers.findIndex(n => n > 15);\nconsole.log(index); // 2 (the index of 16)\n\nconst notFoundIndex = numbers.findIndex(n => n > 100);\nconsole.log(notFoundIndex); // -1'
+            },
+            {
+                title: 'findLast() and findLastIndex()',
+                description: 'Searching from the end of the array instead of the beginning.',
+                code: 'const numbers = [1, 5, 8, 5, 2];\n\nconsole.log(numbers.findLast(n => n === 5));      // 5 (the last matching value)\nconsole.log(numbers.findLastIndex(n => n === 5)); // 3 (its index)'
+            }
+        ],
+        bestPractices: [
+            'Use find() instead of filter()[0] when you only need the first match - it stops searching as soon as it finds one, which is more efficient',
+            'Use findIndex() when you need the position for a subsequent operation like splice() or array update',
+            'Prefer find()/findIndex() over indexOf() when searching by object property rather than exact primitive value',
+            'Remember find() returns undefined (not -1) when nothing matches - check with a truthy check or === undefined, not === -1'
+        ]
+    },
+
+    {
+        id: 'js-array-filter',
+        title: 'filter()',
+        library: 'js',
+        category: 'arrays',
+        description: 'filter() creates a new array containing only the elements that pass a test function, without modifying the original array. It is one of the most commonly used array methods, ideal for narrowing down a collection based on some condition.',
+        syntax: 'arr.filter(item => condition)',
+        examples: [
+            {
+                title: 'Basic Filtering',
+                description: 'Selecting elements that meet a condition.',
+                code: 'const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];\n\nconst evens = numbers.filter(n => n % 2 === 0);\nconsole.log(evens); // [2, 4, 6, 8, 10]\n\nconst greaterThan5 = numbers.filter(n => n > 5);\nconsole.log(greaterThan5); // [6, 7, 8, 9, 10]'
+            },
+            {
+                title: 'Filtering Objects by Property',
+                description: 'A very common real-world use case.',
+                code: 'const products = [\n  { name: "Laptop", price: 999, inStock: true },\n  { name: "Mouse", price: 25, inStock: false },\n  { name: "Keyboard", price: 75, inStock: true }\n];\n\nconst available = products.filter(p => p.inStock);\nconsole.log(available.map(p => p.name)); // ["Laptop", "Keyboard"]\n\nconst affordable = products.filter(p => p.price < 100);\nconsole.log(affordable.map(p => p.name)); // ["Mouse", "Keyboard"]'
+            },
+            {
+                title: 'Chaining with map()',
+                description: 'Combining filter() and map() to select and transform in sequence.',
+                code: 'const numbers = [1, 2, 3, 4, 5, 6];\n\nconst result = numbers\n  .filter(n => n % 2 === 0)  // [2, 4, 6]\n  .map(n => n * n);          // [4, 16, 36]\n\nconsole.log(result); // [4, 16, 36]'
+            }
+        ],
+        bestPractices: [
+            'Use filter() to select a subset of an array based on a condition - it always returns a new array, even if empty',
+            'Chain filter() with map() for a clean, readable pipeline of narrowing then transforming data',
+            'Remember filter() always returns an array (possibly empty), unlike find() which returns a single element or undefined',
+            'Avoid mutating the original array or its elements inside the filter callback - keep the test function pure'
+        ]
+    },
+
+    {
+        id: 'js-array-map',
+        title: 'map()',
+        library: 'js',
+        category: 'arrays',
+        description: 'map() creates a new array by applying a transformation function to every element of the original array, without modifying it. The new array always has the same length as the original. It is one of the most fundamental tools for transforming data in JavaScript.',
+        syntax: 'arr.map(item => transformedItem)',
+        examples: [
+            {
+                title: 'Basic Transformation',
+                description: 'Transforming each element of an array.',
+                code: 'const numbers = [1, 2, 3, 4, 5];\n\nconst doubled = numbers.map(n => n * 2);\nconsole.log(doubled); // [2, 4, 6, 8, 10]\n\nconst squared = numbers.map(n => n ** 2);\nconsole.log(squared); // [1, 4, 9, 16, 25]'
+            },
+            {
+                title: 'Transforming Objects',
+                description: 'Extracting or reshaping data from an array of objects.',
+                code: 'const users = [\n  { firstName: "Alice", lastName: "Smith" },\n  { firstName: "Bob", lastName: "Jones" }\n];\n\nconst fullNames = users.map(u => `${u.firstName} ${u.lastName}`);\nconsole.log(fullNames); // ["Alice Smith", "Bob Jones"]\n\n// Creating new shaped objects\nconst summaries = users.map(u => ({ name: u.firstName, initial: u.lastName[0] }));\nconsole.log(summaries); // [{ name: "Alice", initial: "S" }, { name: "Bob", initial: "J" }]'
+            },
+            {
+                title: 'map() with Index',
+                description: 'Using the optional index parameter passed to the callback.',
+                code: 'const items = ["apple", "banana", "cherry"];\n\nconst numbered = items.map((item, index) => `${index + 1}. ${item}`);\nconsole.log(numbered);\n// ["1. apple", "2. banana", "3. cherry"]'
+            }
+        ],
+        bestPractices: [
+            'Use map() only when you need the resulting array - if you just need to run side effects for each item, use forEach() instead',
+            'Remember map() always returns a new array of the same length, one output for every input - use filter() first if you need to remove elements too',
+            'Keep the mapping function pure (no side effects) for predictable, easy-to-reason-about code',
+            'Wrap object literal returns in parentheses when using arrow functions: item => ({ key: value })'
+        ]
+    },
+
+    {
+        id: 'js-array-reduce',
+        title: 'reduce() and reduceRight()',
+        library: 'js',
+        category: 'arrays',
+        description: 'reduce() executes a reducer function on each element, accumulating a single result value - useful for sums, grouping, flattening, or building up any kind of aggregate. It takes an accumulator and the current value, along with an optional initial value for the accumulator. reduceRight() does the same but processes elements from right to left.',
+        syntax: 'arr.reduce((accumulator, current) => newAccumulator, initialValue)',
+        examples: [
+            {
+                title: 'Summing Values',
+                description: 'The classic reduce() example - accumulating a total.',
+                code: 'const numbers = [1, 2, 3, 4, 5];\n\nconst sum = numbers.reduce((total, n) => total + n, 0);\nconsole.log(sum); // 15\n\n// Without an initial value, the first element becomes the starting accumulator\nconst sumNoInitial = numbers.reduce((total, n) => total + n);\nconsole.log(sumNoInitial); // 15 - same result here, but riskier on empty arrays'
+            },
+            {
+                title: 'Grouping Data',
+                description: 'Using reduce() to transform an array into a grouped object.',
+                code: 'const people = [\n  { name: "Alice", dept: "Engineering" },\n  { name: "Bob", dept: "Sales" },\n  { name: "Charlie", dept: "Engineering" }\n];\n\nconst byDept = people.reduce((groups, person) => {\n  const key = person.dept;\n  if (!groups[key]) groups[key] = [];\n  groups[key].push(person.name);\n  return groups;\n}, {});\n\nconsole.log(byDept);\n// { Engineering: ["Alice", "Charlie"], Sales: ["Bob"] }'
+            },
+            {
+                title: 'Counting Occurrences',
+                description: 'Another common reduce() pattern - tallying values.',
+                code: 'const votes = ["yes", "no", "yes", "yes", "no"];\n\nconst tally = votes.reduce((counts, vote) => {\n  counts[vote] = (counts[vote] || 0) + 1;\n  return counts;\n}, {});\n\nconsole.log(tally); // { yes: 3, no: 2 }'
+            }
+        ],
+        bestPractices: [
+            'Always provide an initial value as the second argument - it avoids errors on empty arrays and makes the starting state explicit',
+            'Remember to return the accumulator from the callback every time - forgetting this is the single most common reduce() bug',
+            'Use reduce() for genuinely aggregate operations (sums, grouping, flattening) - for simple transformations, map()/filter() are usually clearer',
+            'Consider breaking a very complex reduce() into a named function passed as the callback, for readability'
+        ]
+    },
+
+    {
+        id: 'js-array-foreach',
+        title: 'forEach()',
+        library: 'js',
+        category: 'arrays',
+        description: 'forEach() executes a function once for each array element, used purely for side effects like logging or updating external state - it always returns undefined and cannot be chained. Unlike map()/filter(), it does not produce a new array, and unlike a for loop, it cannot be stopped early with break.',
+        syntax: 'arr.forEach((item, index, array) => { });',
+        examples: [
+            {
+                title: 'Basic forEach()',
+                description: 'Running a function for each element, purely for its side effects.',
+                code: 'const fruits = ["apple", "banana", "cherry"];\n\nfruits.forEach(fruit => {\n  console.log(fruit);\n});\n// apple, banana, cherry'
+            },
+            {
+                title: 'Using Index and Array Parameters',
+                description: 'The callback also receives the current index and the full array.',
+                code: 'const scores = [85, 92, 78];\n\nscores.forEach((score, index, array) => {\n  console.log(`Score ${index + 1} of ${array.length}: ${score}`);\n});\n// Score 1 of 3: 85\n// Score 2 of 3: 92\n// Score 3 of 3: 78'
+            },
+            {
+                title: 'forEach() vs map() - Choosing the Right Tool',
+                description: 'A common mistake: using forEach() when you actually need a new array.',
+                code: '// Wrong intent - forEach() returns undefined, this does nothing useful\nconst numbers = [1, 2, 3];\nconst result = numbers.forEach(n => n * 2);\nconsole.log(result); // undefined\n\n// Correct - use map() when you need the transformed values back\nconst doubled = numbers.map(n => n * 2);\nconsole.log(doubled); // [2, 4, 6]'
+            }
+        ],
+        bestPractices: [
+            'Use forEach() only for side effects (logging, DOM updates, pushing to an external array) - never expect a return value from it',
+            'Use map() instead of forEach() whenever you actually need a transformed array back',
+            'Remember you cannot break or continue out of a forEach() loop - use a regular for or for...of loop if you need that control',
+            'Avoid using forEach() with async/await callbacks expecting sequential execution - it does not wait for promises between iterations'
+        ]
+    },
+
+    {
+        id: 'js-array-some-every',
+        title: 'some() and every()',
+        library: 'js',
+        category: 'arrays',
+        description: 'some() tests whether at least one array element passes a condition, returning true as soon as it finds a match (or false if none do). every() tests whether all elements pass a condition, returning false as soon as it finds one that fails (or true if all pass). Both short-circuit for efficiency.',
+        syntax: 'arr.some(item => condition)\narr.every(item => condition)',
+        examples: [
+            {
+                title: 'some() - At Least One Match',
+                description: 'Checking whether any element satisfies a condition.',
+                code: 'const numbers = [1, 3, 5, 8, 9];\n\nconsole.log(numbers.some(n => n % 2 === 0)); // true - 8 is even\nconsole.log(numbers.some(n => n > 100));      // false - none are'
+            },
+            {
+                title: 'every() - All Must Match',
+                description: 'Checking whether every element satisfies a condition.',
+                code: 'const ages = [22, 25, 30, 18];\n\nconsole.log(ages.every(age => age >= 18)); // true - all are adults\nconsole.log(ages.every(age => age >= 21)); // false - 18 fails the check'
+            },
+            {
+                title: 'Practical Validation Example',
+                description: 'A common real-world use: form validation.',
+                code: 'const formFields = [\n  { name: "email", value: "user@test.com" },\n  { name: "password", value: "" },\n  { name: "username", value: "bob" }\n];\n\nconst allFilled = formFields.every(field => field.value.length > 0);\nconsole.log(allFilled); // false - password is empty\n\nconst hasEmptyField = formFields.some(field => field.value.length === 0);\nconsole.log(hasEmptyField); // true'
+            }
+        ],
+        bestPractices: [
+            'Use some() instead of filter().length > 0 when you only need a true/false answer - it stops early, which is more efficient',
+            'Use every() for validation checks where all items must satisfy a rule, like confirming every required field is filled',
+            'Remember every() on an empty array always returns true (vacuous truth), and some() on an empty array always returns false',
+            'Combine some()/every() with logical operators for readable, declarative validation logic'
+        ]
+    },
+
+    {
+        id: 'js-array-sort-reverse',
+        title: 'sort() and reverse()',
+        library: 'js',
+        category: 'arrays',
+        description: 'sort() orders the elements of an array in place. Without a comparator function, it converts elements to strings and sorts lexicographically - which produces surprising results for numbers. A comparator function gives full control over the ordering. reverse() simply flips the current order of the array in place.',
+        syntax: 'arr.sort((a, b) => a - b)\narr.reverse()',
+        examples: [
+            {
+                title: 'The Default sort() Gotcha',
+                description: 'Sorting numbers without a comparator produces unexpected results.',
+                code: 'const numbers = [10, 1, 21, 2];\n\nconsole.log(numbers.sort());\n// [1, 10, 2, 21] - sorted as strings, not numbers!\n\nconsole.log(numbers.sort((a, b) => a - b));\n// [1, 2, 10, 21] - correct numeric ascending order'
+            },
+            {
+                title: 'Sorting with a Comparator',
+                description: 'Using a comparator function for correct numeric and custom ordering.',
+                code: 'const numbers = [5, 2, 8, 1, 9];\n\nnumbers.sort((a, b) => a - b); // ascending\nconsole.log(numbers); // [1, 2, 5, 8, 9]\n\nnumbers.sort((a, b) => b - a); // descending\nconsole.log(numbers); // [9, 8, 5, 2, 1]'
+            },
+            {
+                title: 'Sorting Objects and Reversing',
+                description: 'Sorting an array of objects by a property, and reversing an array.',
+                code: 'const people = [\n  { name: "Charlie", age: 30 },\n  { name: "Alice", age: 25 },\n  { name: "Bob", age: 35 }\n];\n\npeople.sort((a, b) => a.age - b.age);\nconsole.log(people.map(p => p.name)); // ["Alice", "Charlie", "Bob"]\n\nconst letters = ["a", "b", "c"];\nletters.reverse();\nconsole.log(letters); // ["c", "b", "a"]'
+            }
+        ],
+        bestPractices: [
+            'Always provide a comparator function when sorting numbers - the default string-based sort produces incorrect ordering',
+            'Remember sort() and reverse() both mutate the original array in place - copy it first with [...arr].sort() if you need to preserve the original',
+            'For sorting objects, subtract the numeric property (a.value - b.value) for ascending order, or swap the order for descending',
+            'Use localeCompare() as the comparator when sorting strings that may contain accented characters, for correct alphabetical ordering'
+        ]
+    },
+
+    {
+        id: 'js-array-flat-flatmap',
+        title: 'flat() and flatMap()',
+        library: 'js',
+        category: 'arrays',
+        description: 'flat() creates a new array with nested sub-arrays flattened up to a specified depth (default 1 level). flatMap() combines mapping and flattening in a single, more efficient step - it maps each element and then flattens the result by exactly one level, useful when a mapping function returns an array for each item.',
+        syntax: 'arr.flat(depth)\narr.flatMap(item => [values])',
+        examples: [
+            {
+                title: 'flat() - Flattening Nested Arrays',
+                description: 'Flattening arrays to different depths.',
+                code: 'const nested = [1, [2, 3], [4, [5, 6]]];\n\nconsole.log(nested.flat());     // [1, 2, 3, 4, [5, 6]] - only 1 level by default\nconsole.log(nested.flat(2));    // [1, 2, 3, 4, 5, 6] - 2 levels deep\nconsole.log(nested.flat(Infinity)); // fully flattens any depth'
+            },
+            {
+                title: 'flatMap() - Map Then Flatten',
+                description: 'A common use case: expanding each element into multiple elements.',
+                code: 'const sentences = ["Hello world", "How are you"];\n\nconst words = sentences.flatMap(s => s.split(" "));\nconsole.log(words); // ["Hello", "world", "How", "are", "you"]\n\n// Equivalent to, but more efficient than:\n// sentences.map(s => s.split(" ")).flat()'
+            }
+        ],
+        bestPractices: [
+            'Use flat() when you already have a nested array structure that needs flattening',
+            'Use flatMap() instead of .map().flat() when your mapping function returns arrays - it is more efficient since it avoids creating an intermediate array',
+            'Be cautious with flat(Infinity) on deeply nested or very large structures - consider whether the nesting itself should be avoided at the source',
+            'Remember flat() and flatMap() both return new arrays and do not modify the original'
+        ]
+    },
+
+    {
+        id: 'js-array-fill-copywithin',
+        title: 'fill() and copyWithin()',
+        library: 'js',
+        category: 'arrays',
+        description: 'fill() changes all elements in an array (or a specified range) to a single static value, mutating the array in place - useful for initializing arrays. copyWithin() copies a sequence of elements to another position within the same array, also mutating in place, without changing the array\'s length.',
+        syntax: 'arr.fill(value, start, end)\narr.copyWithin(target, start, end)',
+        examples: [
+            {
+                title: 'fill() - Initializing an Array',
+                description: 'A common pattern for creating an array of a fixed size with default values.',
+                code: 'const zeros = new Array(5).fill(0);\nconsole.log(zeros); // [0, 0, 0, 0, 0]\n\nconst partial = [1, 2, 3, 4, 5];\npartial.fill(0, 1, 3); // fill with 0, starting at index 1, up to (not including) index 3\nconsole.log(partial); // [1, 0, 0, 4, 5]'
+            },
+            {
+                title: 'copyWithin() - Copying Within the Same Array',
+                description: 'Shifting a section of elements to overwrite another section.',
+                code: 'const arr = [1, 2, 3, 4, 5];\narr.copyWithin(0, 3); // copy from index 3 to the end, paste starting at index 0\nconsole.log(arr); // [4, 5, 3, 4, 5]'
+            }
+        ],
+        bestPractices: [
+            'Use fill() combined with new Array(n) to quickly initialize a fixed-size array with default values before populating it',
+            'Remember fill() and copyWithin() both mutate the array in place - copy first if the original needs to stay unchanged',
+            'copyWithin() is rarely needed in typical application code - it is more common in performance-sensitive or lower-level array manipulation',
+            'Double-check start/end index arguments carefully, as off-by-one mistakes are easy to make with these methods'
+        ]
+    },
+
+    {
+        id: 'js-string-basics',
+        title: 'String Basics: length, charAt(), at()',
+        library: 'js',
+        category: 'strings',
+        description: 'Strings are immutable sequences of characters - every string method returns a new string rather than modifying the original. The length property gives the character count. charAt() returns the character at a given index, while the newer at() method also supports negative indices to count from the end.',
+        syntax: 'str.length\nstr.charAt(index)\nstr.at(index)',
+        examples: [
+            {
+                title: 'Length and Character Access',
+                description: 'Getting a string\'s length and accessing individual characters.',
+                code: 'const text = "Hello";\n\nconsole.log(text.length);     // 5\nconsole.log(text.charAt(0));  // "H"\nconsole.log(text[1]);         // "e" - bracket access also works\nconsole.log(text.charAt(10)); // "" - out of range returns empty string'
+            },
+            {
+                title: 'at() with Negative Indices',
+                description: 'Using at() to easily access characters from the end of the string.',
+                code: 'const text = "JavaScript";\n\nconsole.log(text.at(0));  // "J"\nconsole.log(text.at(-1)); // "t" - last character\nconsole.log(text.at(-2)); // "p" - second to last\n\n// Compare with charAt(), which has no negative index support\nconsole.log(text.charAt(text.length - 1)); // "t" - more verbose equivalent'
+            }
+        ],
+        bestPractices: [
+            'Use at(-1) instead of str[str.length - 1] for cleaner access to the last character',
+            'Remember strings are immutable - "changing" a character actually means creating an entirely new string',
+            'Use bracket notation (str[0]) or charAt() interchangeably for simple positive-index access - both work identically for valid indices',
+            'Check .length before accessing indices in a loop to avoid undefined results from out-of-range access'
+        ]
+    },
+
+    {
+        id: 'js-string-extract',
+        title: 'slice(), substring(), substr()',
+        library: 'js',
+        category: 'strings',
+        description: 'These three methods extract a portion of a string as a new string. slice() and substring() are similar, but slice() accepts negative indices (counting from the end) while substring() treats negative values as 0 and swaps arguments if start is greater than end. substr() (deprecated) uses a start index and a length rather than an end index.',
+        syntax: 'str.slice(start, end)\nstr.substring(start, end)',
+        examples: [
+            {
+                title: 'slice() - The Recommended Choice',
+                description: 'Extracting substrings, including with negative indices.',
+                code: 'const text = "Hello World";\n\nconsole.log(text.slice(0, 5));  // "Hello"\nconsole.log(text.slice(6));     // "World"\nconsole.log(text.slice(-5));    // "World" - last 5 characters'
+            },
+            {
+                title: 'substring() and Its Quirks',
+                description: 'Similar to slice(), but with different edge-case handling.',
+                code: 'const text = "Hello World";\n\nconsole.log(text.substring(0, 5)); // "Hello" - same as slice() here\nconsole.log(text.substring(-3));   // "Hello World" - negative treated as 0!\nconsole.log(text.substring(5, 0)); // "Hello" - swaps arguments if start > end'
+            }
+        ],
+        bestPractices: [
+            'Prefer slice() over substring() and substr() - it has more predictable, useful behavior with negative indices and no deprecated status',
+            'Avoid substr() entirely in new code - it is deprecated, even though many browsers still support it',
+            'Remember all three treat the end index as exclusive - slice(0, 5) gets characters at indices 0 through 4',
+            'Use negative indices with slice() to extract from the end without manually calculating string.length - n'
+        ]
+    },
+
+    {
+        id: 'js-string-search',
+        title: 'indexOf(), includes(), startsWith(), endsWith()',
+        library: 'js',
+        category: 'strings',
+        description: 'These methods search within a string for a substring. indexOf() returns the position of the first match (or -1). includes() returns a simple true/false. startsWith() and endsWith() check specifically whether the string begins or ends with a given substring. All are case-sensitive.',
+        syntax: 'str.indexOf(substring)\nstr.includes(substring)\nstr.startsWith(substring)\nstr.endsWith(substring)',
+        examples: [
+            {
+                title: 'indexOf() and includes()',
+                description: 'Finding whether and where a substring appears.',
+                code: 'const text = "The quick brown fox";\n\nconsole.log(text.indexOf("quick"));  // 4\nconsole.log(text.indexOf("lazy"));   // -1 - not found\nconsole.log(text.includes("brown")); // true\nconsole.log(text.includes("Brown")); // false - case-sensitive'
+            },
+            {
+                title: 'startsWith() and endsWith()',
+                description: 'Checking the beginning or end of a string specifically.',
+                code: 'const filename = "report.pdf";\n\nconsole.log(filename.endsWith(".pdf"));   // true\nconsole.log(filename.endsWith(".docx"));  // false\nconsole.log(filename.startsWith("report")); // true\n\n// Common use: validating file extensions or URL prefixes\nconst url = "https://example.com";\nconsole.log(url.startsWith("https://")); // true'
+            }
+        ],
+        bestPractices: [
+            'Use includes() for a simple presence check instead of indexOf() !== -1 - it is more readable',
+            'Use startsWith()/endsWith() instead of manually slicing strings to check prefixes or suffixes',
+            'Convert both sides with toLowerCase() first if you need a case-insensitive search',
+            'Remember all these methods are case-sensitive by default - "Hello".includes("hello") is false'
+        ]
+    },
+
+    {
+        id: 'js-string-replace',
+        title: 'replace() and replaceAll()',
+        library: 'js',
+        category: 'strings',
+        description: 'replace() returns a new string with the first match of a pattern replaced by a new value - or all matches, if the pattern is a regex with the global (g) flag. replaceAll(), introduced in ES2021, always replaces every occurrence without needing a regex, making simple find-and-replace-all operations more straightforward.',
+        syntax: 'str.replace(pattern, replacement)\nstr.replaceAll(pattern, replacement)',
+        examples: [
+            {
+                title: 'replace() - First Match Only',
+                description: 'The default behavior replaces only the first occurrence.',
+                code: 'const text = "cat and cat and cat";\n\nconsole.log(text.replace("cat", "dog"));\n// "dog and cat and cat" - only the first match is replaced'
+            },
+            {
+                title: 'replaceAll() - Every Match',
+                description: 'Replacing all occurrences without needing a regex.',
+                code: 'const text = "cat and cat and cat";\n\nconsole.log(text.replaceAll("cat", "dog"));\n// "dog and dog and dog"'
+            },
+            {
+                title: 'Using a Function as the Replacement',
+                description: 'Dynamically computing the replacement value for each match.',
+                code: 'const prices = "Item1: $10, Item2: $25";\n\nconst discounted = prices.replace(/\\$(\\d+)/g, (match, amount) => {\n  return `$${Math.round(amount * 0.9)}`;\n});\n\nconsole.log(discounted); // "Item1: $9, Item2: $23" (rounded)'
+            }
+        ],
+        bestPractices: [
+            'Use replaceAll() for simple string replacements when you want every occurrence changed - it needs no regex or g flag',
+            'Use replace() with a regex and the g flag if you need pattern-based (not literal string) global replacement',
+            'Remember these methods return a new string - the original string is never modified, since strings are immutable',
+            'Use a function as the replacement argument when the new value needs to be computed based on the match itself'
+        ]
+    },
+
+    {
+        id: 'js-string-split',
+        title: 'split()',
+        library: 'js',
+        category: 'strings',
+        description: 'split() divides a string into an array of substrings based on a specified separator, which can be a literal string or a regular expression. It is the inverse operation of Array.prototype.join(). An optional second argument limits the number of resulting elements.',
+        syntax: 'str.split(separator, limit)',
+        examples: [
+            {
+                title: 'Basic Splitting',
+                description: 'Splitting a string on a delimiter character.',
+                code: 'const csv = "apple,banana,cherry";\nconsole.log(csv.split(",")); // ["apple", "banana", "cherry"]\n\nconst sentence = "The quick brown fox";\nconsole.log(sentence.split(" ")); // ["The", "quick", "brown", "fox"]\n\nconsole.log("hello".split("")); // ["h", "e", "l", "l", "o"] - split into characters'
+            },
+            {
+                title: 'Splitting with a Regex and Limit',
+                description: 'Using a pattern to split on multiple possible delimiters, and limiting results.',
+                code: 'const messy = "one, two,  three,four";\nconsole.log(messy.split(/,\\s*/)); // ["one", "two", "three", "four"]\n\nconst limited = "a-b-c-d".split("-", 2);\nconsole.log(limited); // ["a", "b"] - stops after 2 elements'
+            }
+        ],
+        bestPractices: [
+            'Use split("") only for short strings when you specifically need individual characters - it does not correctly handle some Unicode characters',
+            'Use a regex separator when the delimiter pattern is inconsistent, like extra whitespace around commas',
+            'Combine split() and join() for quick string transformations, like reversing word order in a sentence',
+            'Remember the limit argument truncates the result array - it does not stop the splitting logic from continuing internally'
+        ]
+    },
+
+    {
+        id: 'js-string-trim',
+        title: 'trim(), trimStart(), trimEnd()',
+        library: 'js',
+        category: 'strings',
+        description: 'trim() removes whitespace from both ends of a string, commonly used to clean up user input before validation or storage. trimStart() and trimEnd() (aliases: trimLeft/trimRight) remove whitespace from only the beginning or end respectively.',
+        syntax: 'str.trim()\nstr.trimStart()\nstr.trimEnd()',
+        examples: [
+            {
+                title: 'Basic Trimming',
+                description: 'Cleaning whitespace from user input.',
+                code: 'const input = "   hello world   ";\n\nconsole.log(trim = input.trim());       // "hello world"\nconsole.log(input.trimStart());          // "hello world   " - only leading removed\nconsole.log(input.trimEnd());            // "   hello world" - only trailing removed'
+            },
+            {
+                title: 'Validating Trimmed Input',
+                description: 'A common real-world pattern for form validation.',
+                code: 'function validateUsername(input) {\n  const trimmed = input.trim();\n  if (trimmed.length === 0) {\n    return "Username cannot be empty or just whitespace";\n  }\n  return `Valid username: ${trimmed}`;\n}\n\nconsole.log(validateUsername("   ")); // "Username cannot be empty or just whitespace"\nconsole.log(validateUsername("  alice  ")); // "Valid username: alice"'
+            }
+        ],
+        bestPractices: [
+            'Always trim() user input before validation checks (like checking for empty strings) to catch whitespace-only submissions',
+            'Trim input before storing it, to avoid inconsistent data caused by accidental leading/trailing spaces',
+            'Use trimStart()/trimEnd() specifically when only one side needs cleaning, such as preserving intentional trailing formatting',
+            'Remember trim() only removes whitespace characters (spaces, tabs, newlines), not other characters like punctuation'
+        ]
+    },
+
+    {
+        id: 'js-string-case',
+        title: 'toUpperCase() and toLowerCase()',
+        library: 'js',
+        category: 'strings',
+        description: 'toUpperCase() and toLowerCase() return a new string with all characters converted to the respective case. They are frequently used for case-insensitive comparisons, since converting both sides to the same case avoids inconsistent casing causing a false mismatch.',
+        syntax: 'str.toUpperCase()\nstr.toLowerCase()',
+        examples: [
+            {
+                title: 'Basic Case Conversion',
+                description: 'Converting a string\'s case.',
+                code: 'const text = "Hello World";\n\nconsole.log(text.toUpperCase()); // "HELLO WORLD"\nconsole.log(text.toLowerCase()); // "hello world"'
+            },
+            {
+                title: 'Case-Insensitive Comparison',
+                description: 'A very common real-world use: comparing strings regardless of case.',
+                code: 'function isSameWord(a, b) {\n  return a.toLowerCase() === b.toLowerCase();\n}\n\nconsole.log(isSameWord("Hello", "hello")); // true\nconsole.log(isSameWord("JavaScript", "javascript")); // true\n\n// Also useful for case-insensitive search\nconst items = ["Apple", "Banana", "Cherry"];\nconst search = "banana";\nconst found = items.find(item => item.toLowerCase() === search.toLowerCase());\nconsole.log(found); // "Banana"'
+            }
+        ],
+        bestPractices: [
+            'Convert both sides to the same case before comparing user input against known values, to make comparisons case-insensitive',
+            'Use toLocaleUpperCase()/toLocaleLowerCase() instead when working with locale-specific characters, like Turkish "İ"/"i"',
+            'Remember these return new strings - the original is never modified',
+            'Store data in a consistent case (like all lowercase) if you frequently need case-insensitive lookups, rather than converting on every comparison'
+        ]
+    },
+
+    {
+        id: 'js-string-pad-repeat',
+        title: 'padStart(), padEnd(), repeat()',
+        library: 'js',
+        category: 'strings',
+        description: 'padStart() and padEnd() pad a string with a specified character until it reaches a target length, commonly used for formatting numbers with leading zeros or aligning text in columns. repeat() returns a new string with the original repeated a specified number of times.',
+        syntax: 'str.padStart(targetLength, padString)\nstr.padEnd(targetLength, padString)\nstr.repeat(count)',
+        examples: [
+            {
+                title: 'Padding Numbers',
+                description: 'A common use case: formatting numbers with leading zeros.',
+                code: 'console.log("5".padStart(2, "0"));  // "05"\nconsole.log("42".padStart(5, "0")); // "00042"\nconsole.log("7".padEnd(3, "*"));    // "7**"\n\n// Formatting a countdown timer\nfunction formatTime(minutes, seconds) {\n  return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;\n}\nconsole.log(formatTime(3, 5)); // "03:05"'
+            },
+            {
+                title: 'repeat()',
+                description: 'Repeating a string a specified number of times.',
+                code: 'console.log("ab".repeat(3)); // "ababab"\nconsole.log("-".repeat(20)); // "--------------------"\n\n// Simple indentation helper\nfunction indent(text, level) {\n  return "  ".repeat(level) + text;\n}\nconsole.log(indent("nested item", 2)); // "    nested item"'
+            }
+        ],
+        bestPractices: [
+            'Use padStart() for right-aligning content like numbers, and padEnd() for left-aligning content like table columns',
+            'Convert numbers to strings first with String() before padding, since pad methods only work on strings',
+            'Use repeat() for generating separator lines, indentation, or simple ASCII visualizations',
+            'Watch out for negative or non-integer arguments to repeat() - they throw a RangeError'
+        ]
+    },
+
+    {
+        id: 'js-number-methods',
+        title: 'Number Methods & Parsing',
+        library: 'js',
+        category: 'math',
+        description: 'Number methods handle formatting and validation. toFixed() formats a number to a fixed number of decimal places, returning a string. parseInt() and parseFloat() convert strings to numbers, stopping at the first invalid character. Number.isInteger() and Number.isNaN() provide more reliable type checks than their global counterparts.',
+        syntax: 'num.toFixed(digits)\nparseInt(string)\nparseFloat(string)',
+        examples: [
+            {
+                title: 'Formatting with toFixed()',
+                description: 'Rounding and formatting numbers to a fixed decimal precision.',
+                code: 'const price = 19.9899;\n\nconsole.log(price.toFixed(2)); // "19.99" - returns a STRING\nconsole.log(price.toFixed(0)); // "20"\n\nconst whole = 5;\nconsole.log(whole.toFixed(2)); // "5.00"'
+            },
+            {
+                title: 'parseInt() and parseFloat()',
+                description: 'Extracting numeric values from the start of a string.',
+                code: 'console.log(parseInt("42px"));     // 42 - stops at the first non-numeric character\nconsole.log(parseInt("3.14"));     // 3 - parseInt ignores decimals\nconsole.log(parseFloat("3.14px")); // 3.14\nconsole.log(parseInt("abc"));      // NaN\n\n// Always specify the radix for parseInt to avoid ambiguity\nconsole.log(parseInt("08", 10)); // 8'
+            },
+            {
+                title: 'Number.isInteger() and Number.isNaN()',
+                description: 'More reliable checks than the global isNaN() and manual integer testing.',
+                code: 'console.log(Number.isInteger(5));    // true\nconsole.log(Number.isInteger(5.5));  // false\n\nconsole.log(Number.isNaN(NaN));      // true\nconsole.log(Number.isNaN("hello"));  // false - unlike global isNaN(), does not coerce first\nconsole.log(isNaN("hello"));         // true - global isNaN coerces "hello" to NaN first, which is misleading'
+            }
+        ],
+        bestPractices: [
+            'Always specify the radix (base) as the second argument to parseInt(), like parseInt(str, 10), to avoid ambiguity with leading zeros',
+            'Remember toFixed() returns a string, not a number - convert back with Number() if further math is needed',
+            'Prefer Number.isNaN() over the global isNaN(), since the global version coerces its argument first and can give misleading results',
+            'Use Number.isInteger() rather than % 1 === 0 checks for clearer, more explicit integer validation'
+        ]
+    },
+
+    {
+        id: 'js-math-object',
+        title: 'Math Object: round, floor, ceil, abs, max, min, pow, sqrt',
+        library: 'js',
+        category: 'math',
+        description: 'The Math object provides mathematical constants and functions as static methods - it is not a constructor, so you never create a Math instance. Common methods include rounding (round, floor, ceil, trunc), extremes (max, min), and power operations (pow, sqrt, cbrt).',
+        syntax: 'Math.round(num)\nMath.floor(num)\nMath.max(...nums)',
+        examples: [
+            {
+                title: 'Rounding Methods',
+                description: 'The different ways to round a number, and how they differ.',
+                code: 'console.log(Math.round(4.5));  // 5 - rounds to nearest, ties round up\nconsole.log(Math.round(4.4));  // 4\nconsole.log(Math.floor(4.9));  // 4 - always rounds down\nconsole.log(Math.ceil(4.1));   // 5 - always rounds up\nconsole.log(Math.trunc(4.9));  // 4 - simply removes the decimal part\nconsole.log(Math.trunc(-4.9)); // -4 - different from floor for negatives'
+            },
+            {
+                title: 'abs(), max(), and min()',
+                description: 'Absolute value and finding extremes among values.',
+                code: 'console.log(Math.abs(-5));       // 5\nconsole.log(Math.max(3, 7, 2));  // 7\nconsole.log(Math.min(3, 7, 2));  // 2\n\n// Finding max/min in an array requires spread\nconst numbers = [4, 8, 2, 9, 1];\nconsole.log(Math.max(...numbers)); // 9'
+            },
+            {
+                title: 'pow() and sqrt()',
+                description: 'Power and square root operations.',
+                code: 'console.log(Math.pow(2, 3));  // 8 - same as 2 ** 3\nconsole.log(2 ** 3);           // 8 - the ** operator is now preferred\nconsole.log(Math.sqrt(16));    // 4\nconsole.log(Math.cbrt(27));    // 3 - cube root'
+            }
+        ],
+        bestPractices: [
+            'Use the ** exponentiation operator instead of Math.pow() in modern code - it is more concise for the common case',
+            'Choose the right rounding method deliberately - round() for nearest, floor()/ceil() when you specifically need to always round down/up',
+            'Use Math.max(...array) with spread syntax to find the largest value in an array, since Math.max() itself takes individual arguments',
+            'Remember Math methods are all static - always call them as Math.round(), never new Math().round()'
+        ]
+    },
+
+    {
+        id: 'js-math-random',
+        title: 'Math.random()',
+        library: 'js',
+        category: 'math',
+        description: 'Math.random() returns a pseudo-random floating-point number between 0 (inclusive) and 1 (exclusive). It is commonly combined with multiplication and Math.floor() to generate random integers within a specific range. It is not cryptographically secure - for security-sensitive randomness, use the Web Crypto API instead.',
+        syntax: 'Math.random()',
+        examples: [
+            {
+                title: 'Basic Random Number',
+                description: 'Generating a raw random decimal between 0 and 1.',
+                code: 'console.log(Math.random()); // e.g. 0.7234891...\nconsole.log(Math.random()); // a different value each time'
+            },
+            {
+                title: 'Random Integer in a Range',
+                description: 'The standard formula for generating a random whole number within bounds.',
+                code: 'function randomInt(min, max) {\n  return Math.floor(Math.random() * (max - min + 1)) + min;\n}\n\nconsole.log(randomInt(1, 6));   // simulates a dice roll (1-6)\nconsole.log(randomInt(1, 100)); // random number 1-100'
+            },
+            {
+                title: 'Picking a Random Array Element',
+                description: 'A common practical use of Math.random().',
+                code: 'const colors = ["red", "green", "blue", "yellow"];\n\nfunction randomChoice(arr) {\n  const index = Math.floor(Math.random() * arr.length);\n  return arr[index];\n}\n\nconsole.log(randomChoice(colors)); // a random color from the array'
+            }
+        ],
+        bestPractices: [
+            'Use the Math.floor(Math.random() * (max - min + 1)) + min formula for inclusive random integers in a range',
+            'Do not use Math.random() for anything security-related (tokens, passwords, keys) - use crypto.getRandomValues() instead',
+            'Remember Math.random() never returns exactly 1, so ranges should account for that when calculating maximums',
+            'Seed-based reproducible randomness is not built in - use a dedicated library if you need deterministic "random" sequences for testing'
+        ]
+    },
+
+    {
+        id: 'js-date-create-get',
+        title: 'Date: Creating and Getting Values',
+        library: 'js',
+        category: 'date',
+        description: 'The Date object represents a single moment in time. new Date() with no arguments creates the current date/time; it also accepts a specific date, individual components (year, month, day...), or a timestamp. Getter methods like getFullYear(), getMonth(), and getDate() extract individual components - note that getMonth() is zero-indexed (0 = January).',
+        syntax: 'new Date()\ndate.getFullYear()\ndate.getMonth()',
+        examples: [
+            {
+                title: 'Creating Dates',
+                description: 'Different ways to construct a Date object.',
+                code: 'const now = new Date(); // current date and time\nconst specific = new Date(2024, 5, 15); // June 15, 2024 - month is 0-indexed!\nconst fromString = new Date("2024-06-15");\nconst fromTimestamp = new Date(1718409600000); // milliseconds since Jan 1, 1970\n\nconsole.log(specific); // June 15 2024'
+            },
+            {
+                title: 'Getter Methods',
+                description: 'Extracting individual components from a Date object.',
+                code: 'const date = new Date(2024, 5, 15); // June 15, 2024\n\nconsole.log(date.getFullYear()); // 2024\nconsole.log(date.getMonth());    // 5 - remember, 0-indexed! (0=Jan, 5=Jun)\nconsole.log(date.getDate());     // 15 - day of the month\nconsole.log(date.getDay());      // day of the week (0=Sunday, 6=Saturday)\nconsole.log(date.getHours());    // hour (0-23)'
+            },
+            {
+                title: 'Date.now() and Timestamps',
+                description: 'Getting the current timestamp for calculations, like measuring elapsed time.',
+                code: 'const start = Date.now(); // current timestamp in milliseconds\n\n// ... some operation happens ...\n\nconst end = Date.now();\nconsole.log(`Took ${end - start}ms`);\n\n// Comparing two dates by their timestamps\nconst date1 = new Date(2024, 0, 1);\nconst date2 = new Date(2024, 5, 1);\nconsole.log(date2.getTime() > date1.getTime()); // true'
+            }
+        ],
+        bestPractices: [
+            'Remember getMonth() is zero-indexed (January is 0, December is 11) - a very common source of off-by-one bugs',
+            'Use Date.now() rather than new Date().getTime() when you just need the current timestamp for comparisons or performance measurement',
+            'Prefer ISO 8601 format ("2024-06-15") when creating dates from strings, since other formats can be parsed inconsistently across browsers',
+            'For serious date manipulation (time zones, formatting, arithmetic), consider a dedicated library or the newer Temporal API rather than hand-rolling logic with the legacy Date object'
+        ]
+    },
+
+    {
+        id: 'js-date-set-format',
+        title: 'Date: Setting and Formatting',
+        library: 'js',
+        category: 'date',
+        description: 'Setter methods like setFullYear() and setDate() modify a Date object in place. Formatting methods convert a Date into a readable string: toDateString() and toTimeString() give simple readable formats, toISOString() gives the standardized ISO 8601 format (useful for APIs), and toLocaleDateString() formats according to a locale\'s conventions.',
+        syntax: 'date.setFullYear(year)\ndate.toISOString()\ndate.toLocaleDateString()',
+        examples: [
+            {
+                title: 'Setter Methods',
+                description: 'Modifying parts of an existing Date object.',
+                code: 'const date = new Date(2024, 0, 1); // January 1, 2024\n\ndate.setFullYear(2025);\ndate.setMonth(5); // June (0-indexed)\ndate.setDate(15);\n\nconsole.log(date); // June 15, 2025'
+            },
+            {
+                title: 'ISO String - For APIs and Storage',
+                description: 'The standardized format, ideal for sending dates to a server.',
+                code: 'const date = new Date(2024, 5, 15, 14, 30);\nconsole.log(date.toISOString());\n// "2024-06-15T13:30:00.000Z" (converted to UTC)'
+            },
+            {
+                title: 'Locale-Formatted Display Strings',
+                description: 'Formatting dates for human-readable display.',
+                code: 'const date = new Date(2024, 5, 15);\n\nconsole.log(date.toDateString());  // "Sat Jun 15 2024"\nconsole.log(date.toLocaleDateString());        // "6/15/2024" (locale-dependent)\nconsole.log(date.toLocaleDateString("en-GB")); // "15/06/2024"\nconsole.log(date.toLocaleDateString("en-US", {\n  weekday: "long", year: "numeric", month: "long", day: "numeric"\n})); // "Saturday, June 15, 2024"'
+            }
+        ],
+        bestPractices: [
+            'Use toISOString() when sending dates to a server or storing them - it is unambiguous and timezone-standardized (UTC)',
+            'Use toLocaleDateString() with explicit locale and options for user-facing display, rather than the raw toDateString() output',
+            'Remember setter methods mutate the Date object in place - copy it first with new Date(originalDate) if you need to preserve the original',
+            'Be mindful of time zone differences - toISOString() converts to UTC, which can shift the displayed date/time relative to the user\'s local time'
+        ]
+    },
+
+    {
+        id: 'js-object-methods',
+        title: 'Object.keys(), values(), entries(), assign(), freeze()',
+        library: 'js',
+        category: 'basics',
+        description: 'These static Object methods work with any plain object. keys(), values(), and entries() return arrays of an object\'s own enumerable property names, values, or [key, value] pairs respectively - useful for iterating over objects. assign() copies properties from source objects into a target. freeze() prevents any further modification to an object.',
+        syntax: 'Object.keys(obj)\nObject.values(obj)\nObject.entries(obj)',
+        examples: [
+            {
+                title: 'keys(), values(), entries()',
+                description: 'The three ways to extract data from an object for iteration.',
+                code: 'const user = { name: "Alice", age: 25, city: "London" };\n\nconsole.log(Object.keys(user));   // ["name", "age", "city"]\nconsole.log(Object.values(user)); // ["Alice", 25, "London"]\nconsole.log(Object.entries(user)); // [["name","Alice"],["age",25],["city","London"]]\n\n// entries() pairs perfectly with for...of\nfor (const [key, value] of Object.entries(user)) {\n  console.log(`${key}: ${value}`);\n}'
+            },
+            {
+                title: 'Object.assign() - Merging Objects',
+                description: 'Copying properties from one or more source objects into a target.',
+                code: 'const defaults = { theme: "light", fontSize: 14 };\nconst userPrefs = { fontSize: 18 };\n\nconst merged = Object.assign({}, defaults, userPrefs);\nconsole.log(merged); // { theme: "light", fontSize: 18 }\n\n// Note: the spread operator ({...defaults, ...userPrefs}) does the same thing and is more common today'
+            },
+            {
+                title: 'Object.freeze() - Immutability',
+                description: 'Preventing an object from being modified after creation.',
+                code: 'const config = Object.freeze({ apiUrl: "https://api.example.com", timeout: 5000 });\n\nconfig.timeout = 10000; // silently fails in non-strict mode, throws in strict mode\nconsole.log(config.timeout); // still 5000 - the object is frozen\n\nconsole.log(Object.isFrozen(config)); // true'
+            }
+        ],
+        bestPractices: [
+            'Use Object.entries() combined with for...of or map() when you need both the key and value while iterating',
+            'Prefer spread syntax ({...obj}) over Object.assign() for merging objects in modern code - it is more concise and equally capable',
+            'Use Object.freeze() for configuration objects or constants that should never be accidentally mutated',
+            'Remember Object.freeze() is shallow - nested objects inside a frozen object can still be modified unless they are frozen too'
+        ]
+    },
+
+    {
+        id: 'js-promises',
+        title: 'Promises',
+        library: 'js',
+        category: 'async',
+        description: 'A Promise represents a value that may not be available yet - the eventual result of an asynchronous operation. It exists in one of three states: pending, fulfilled, or rejected. then() handles a successful result, catch() handles an error, and finally() runs regardless of outcome. Promises are the foundation that async/await is built on top of.',
+        syntax: 'new Promise((resolve, reject) => { })\npromise.then(onSuccess).catch(onError)',
+        examples: [
+            {
+                title: 'Creating and Using a Promise',
+                description: 'Wrapping an asynchronous operation in a Promise.',
+                code: 'function fetchUserData(userId) {\n  return new Promise((resolve, reject) => {\n    setTimeout(() => {\n      if (userId > 0) {\n        resolve({ id: userId, name: "Alice" });\n      } else {\n        reject(new Error("Invalid user ID"));\n      }\n    }, 1000);\n  });\n}\n\nfetchUserData(1)\n  .then(user => console.log(user))\n  .catch(error => console.log(error.message));'
+            },
+            {
+                title: 'Chaining Promises',
+                description: 'Each then() returns a new promise, allowing sequential operations.',
+                code: 'fetch("/api/user/1")\n  .then(response => response.json())\n  .then(user => {\n    console.log("User:", user.name);\n    return fetch(`/api/posts/${user.id}`);\n  })\n  .then(response => response.json())\n  .then(posts => console.log("Posts:", posts))\n  .catch(error => console.log("Something failed:", error.message))\n  .finally(() => console.log("Request cycle complete"));'
+            }
+        ],
+        bestPractices: [
+            'Always add a .catch() to handle rejected promises - an unhandled rejection can silently fail or crash depending on the environment',
+            'Return a value or another promise from inside .then() when chaining, so the next .then() receives the right data',
+            'Prefer async/await over long .then() chains in most cases - it reads more like familiar synchronous code',
+            'Use .finally() for cleanup logic (hiding a spinner, closing a connection) that should run whether the promise succeeds or fails'
+        ]
+    },
+
+    {
+        id: 'js-promise-combinators',
+        title: 'Promise.all(), allSettled(), race(), any()',
+        library: 'js',
+        category: 'async',
+        description: 'These static methods handle multiple promises at once. Promise.all() waits for every promise to resolve, but rejects immediately if any one fails. allSettled() waits for all to finish regardless of outcome, giving you both successes and failures. race() resolves or rejects as soon as the first promise settles. any() resolves as soon as the first one succeeds, ignoring rejections unless all fail.',
+        syntax: 'Promise.all([p1, p2, p3])\nPromise.allSettled([p1, p2, p3])',
+        examples: [
+            {
+                title: 'Promise.all() - All or Nothing',
+                description: 'Running independent requests in parallel and waiting for all of them.',
+                code: 'const userPromise = fetch("/api/user").then(r => r.json());\nconst postsPromise = fetch("/api/posts").then(r => r.json());\n\nPromise.all([userPromise, postsPromise])\n  .then(([user, posts]) => {\n    console.log(user, posts);\n  })\n  .catch(error => {\n    console.log("At least one request failed:", error.message);\n  });'
+            },
+            {
+                title: 'Promise.allSettled() - Getting Every Result',
+                description: 'Useful when you need results from every promise, even if some fail.',
+                code: 'const promises = [\n  Promise.resolve("Success 1"),\n  Promise.reject("Failure 1"),\n  Promise.resolve("Success 2")\n];\n\nPromise.allSettled(promises).then(results => {\n  results.forEach(result => {\n    if (result.status === "fulfilled") {\n      console.log("Success:", result.value);\n    } else {\n      console.log("Failed:", result.reason);\n    }\n  });\n});'
+            }
+        ],
+        bestPractices: [
+            'Use Promise.all() when every operation must succeed for the result to be useful - like loading required page data',
+            'Use Promise.allSettled() when partial success is acceptable and you want to know exactly what failed without stopping the rest',
+            'Use Promise.race() for timeout patterns - race a real request against a promise that rejects after a delay',
+            'Avoid awaiting promises sequentially in a loop when they are independent - use Promise.all() with map() to run them in parallel instead'
+        ]
+    },
+
+    {
+        id: 'js-fetch-api',
+        title: 'Fetch API',
+        library: 'js',
+        category: 'async',
+        description: 'The Fetch API provides a modern, promise-based way to make HTTP requests, replacing the older XMLHttpRequest. fetch() returns a promise that resolves to a Response object once headers are received - note that a Response is only considered "ok" if the status is 2xx, so checking response.ok is essential, since fetch() does not reject on HTTP error statuses.',
+        syntax: 'fetch(url, options).then(response => response.json())',
+        examples: [
+            {
+                title: 'Basic GET Request',
+                description: 'Fetching and parsing JSON data.',
+                code: 'fetch("https://api.example.com/users/1")\n  .then(response => {\n    if (!response.ok) {\n      throw new Error(`HTTP error: ${response.status}`);\n    }\n    return response.json();\n  })\n  .then(user => console.log(user))\n  .catch(error => console.log("Fetch failed:", error.message));'
+            },
+            {
+                title: 'POST Request with async/await',
+                description: 'Sending data with a request, and awaiting the result.',
+                code: 'async function createUser(userData) {\n  try {\n    const response = await fetch("https://api.example.com/users", {\n      method: "POST",\n      headers: { "Content-Type": "application/json" },\n      body: JSON.stringify(userData)\n    });\n\n    if (!response.ok) {\n      throw new Error(`Server responded with ${response.status}`);\n    }\n\n    return await response.json();\n  } catch (error) {\n    console.log("Failed to create user:", error.message);\n  }\n}\n\ncreateUser({ name: "Alice", email: "alice@example.com" });'
+            }
+        ],
+        bestPractices: [
+            'Always check response.ok before parsing - fetch() only rejects on network failures, not on HTTP error statuses like 404 or 500',
+            'Wrap fetch calls in try/catch (with async/await) or add a .catch() to handle network failures gracefully',
+            'Set the Content-Type header explicitly when sending JSON, and remember to JSON.stringify() the body',
+            'Use AbortController to cancel a fetch request if it is no longer needed, such as when a user navigates away'
+        ]
+    },
+
+    {
+        id: 'js-event-listeners',
+        title: 'addEventListener() and the Event Object',
+        library: 'js',
+        category: 'events',
+        description: 'addEventListener() attaches a function to run when a specific event occurs on an element, without overwriting any other listeners already attached (unlike the older onclick= style). The callback receives an Event object with details about what happened, including target (the element that triggered it) and methods like preventDefault().',
+        syntax: 'element.addEventListener("event", callback)',
+        examples: [
+            {
+                title: 'Basic Click Listener',
+                description: 'Responding to a button click.',
+                code: 'const button = document.querySelector("#myButton");\n\nbutton.addEventListener("click", (event) => {\n  console.log("Button clicked!");\n  console.log("Target:", event.target);\n});'
+            },
+            {
+                title: 'preventDefault() and Form Submission',
+                description: 'Stopping an event\'s default browser behavior.',
+                code: 'const form = document.querySelector("#myForm");\n\nform.addEventListener("submit", (event) => {\n  event.preventDefault(); // stops the page from reloading\n  console.log("Form submitted via JavaScript instead");\n});'
+            },
+            {
+                title: 'Multiple Listeners and removeEventListener()',
+                description: 'Attaching several listeners and later removing one by reference.',
+                code: 'function handleClick() {\n  console.log("Clicked!");\n}\n\nconst button = document.querySelector("#myButton");\nbutton.addEventListener("click", handleClick);\n\n// Later, stop listening - requires the SAME function reference\nbutton.removeEventListener("click", handleClick);\n\n// Anonymous functions cannot be removed this way, since a new reference is created each time'
+            }
+        ],
+        bestPractices: [
+            'Use addEventListener() instead of inline onclick= attributes or element.onclick = - it allows multiple listeners and cleaner separation of HTML and JavaScript',
+            'Keep a reference to named functions if you need to remove a listener later - removeEventListener() requires the exact same function reference',
+            'Call event.preventDefault() when you want to override default browser behavior, like a form submitting and reloading the page',
+            'Remove event listeners on elements that get removed from the DOM to avoid memory leaks in long-running applications'
+        ]
+    },
+
+    {
+        id: 'js-event-bubbling-delegation',
+        title: 'Event Bubbling and Delegation',
+        library: 'js',
+        category: 'events',
+        description: 'Most events "bubble" - after firing on the target element, they also fire on each ancestor element up to the document root, unless stopped with stopPropagation(). Event delegation takes advantage of bubbling by attaching a single listener to a parent element instead of many listeners on individual children, using event.target to identify which child was actually interacted with.',
+        syntax: 'parent.addEventListener("event", (e) => { if (e.target.matches(selector)) { } })',
+        examples: [
+            {
+                title: 'Understanding Bubbling',
+                description: 'An event fired on a child also triggers listeners on its ancestors.',
+                code: '// <div id="outer"><button id="inner">Click</button></div>\n\ndocument.querySelector("#outer").addEventListener("click", () => {\n  console.log("Outer div clicked (via bubbling)");\n});\n\ndocument.querySelector("#inner").addEventListener("click", () => {\n  console.log("Button clicked directly");\n});\n\n// Clicking the button logs both messages, in this order:\n// "Button clicked directly"\n// "Outer div clicked (via bubbling)"'
+            },
+            {
+                title: 'Event Delegation',
+                description: 'Using one listener on a parent to handle events from many current and future children.',
+                code: '// A single listener handles clicks on ANY .item, even ones added later\ndocument.querySelector("#itemList").addEventListener("click", (event) => {\n  if (event.target.matches(".item")) {\n    console.log("Clicked item:", event.target.textContent);\n  }\n});\n\n// Compare to attaching a separate listener to every .item individually,\n// which would need to be redone whenever new items are added'
+            },
+            {
+                title: 'stopPropagation()',
+                description: 'Preventing an event from continuing to bubble up to ancestors.',
+                code: 'document.querySelector("#inner").addEventListener("click", (event) => {\n  event.stopPropagation(); // the outer div\'s listener will NOT fire\n  console.log("Only this listener runs");\n});'
+            }
+        ],
+        bestPractices: [
+            'Use event delegation for lists or grids where items are added/removed dynamically - one listener on the parent handles all current and future children',
+            'Use event.target (the actual element clicked) rather than event.currentTarget (the element the listener is attached to) when delegating',
+            'Reserve stopPropagation() for genuine cases where bubbling would cause a real problem - overusing it can break other legitimate listeners expecting the event to bubble',
+            'Combine delegation with matches() or closest() to reliably identify which specific child element triggered the event'
+        ]
+    },
+
+    {
+        id: 'js-dom-select',
+        title: 'DOM Selection: querySelector(), getElementById()',
+        library: 'js',
+        category: 'dom',
+        description: 'These methods find elements in the DOM. getElementById() finds a single element by its unique id, generally the fastest option. querySelector() finds the first element matching any valid CSS selector, and querySelectorAll() returns all matching elements as a static NodeList.',
+        syntax: 'document.getElementById(id)\ndocument.querySelector(selector)\ndocument.querySelectorAll(selector)',
+        examples: [
+            {
+                title: 'getElementById() and querySelector()',
+                description: 'Finding a single element two different ways.',
+                code: 'const byId = document.getElementById("header");\nconst bySelector = document.querySelector("#header"); // equivalent, but more flexible\n\nconst firstButton = document.querySelector("button");\nconst specificClass = document.querySelector(".btn-primary");\nconst nested = document.querySelector("nav .menu-item.active");'
+            },
+            {
+                title: 'querySelectorAll() and Looping',
+                description: 'Selecting multiple elements and iterating over them.',
+                code: 'const items = document.querySelectorAll(".list-item");\n\nconsole.log(items.length); // number of matches\n\nitems.forEach(item => {\n  console.log(item.textContent);\n});\n\n// NodeList supports forEach directly, but is NOT a real array\n// use Array.from(items) if you need map/filter/etc.'
+            }
+        ],
+        bestPractices: [
+            'Use querySelector()/querySelectorAll() for their flexibility with any valid CSS selector, rather than mixing several older, more specific methods',
+            'Use getElementById() when selecting by a known unique ID - it is marginally faster and communicates clear intent',
+            'Remember querySelectorAll() returns a static NodeList - it does not update automatically if the DOM changes afterward',
+            'Convert a NodeList to a real array with Array.from() if you need array methods like map() or filter() on the results'
+        ]
+    },
+
+    {
+        id: 'js-dom-create-modify',
+        title: 'Creating and Modifying Elements',
+        library: 'js',
+        category: 'dom',
+        description: 'createElement() builds a new DOM element in memory, which can then be customized and inserted into the page with methods like appendChild() or append(). textContent sets plain text safely, while innerHTML parses and inserts HTML markup - which carries injection risks if the content includes untrusted user input.',
+        syntax: 'document.createElement(tag)\nparent.appendChild(child)\nelement.textContent = text',
+        examples: [
+            {
+                title: 'Creating and Appending an Element',
+                description: 'Building a new element from scratch and adding it to the page.',
+                code: 'const newItem = document.createElement("li");\nnewItem.textContent = "New list item";\nnewItem.classList.add("list-item");\n\nconst list = document.querySelector("#myList");\nlist.appendChild(newItem);\n\n// append() is a newer alternative that also accepts plain strings\nlist.append("Some plain text", newItem);'
+            },
+            {
+                title: 'textContent vs innerHTML',
+                description: 'The important security and behavior difference between the two.',
+                code: 'const div = document.querySelector("#output");\n\nconst userInput = "<img src=x onerror=\'alert(1)\'>";\n\ndiv.textContent = userInput; // SAFE - displayed as literal text, not executed\ndiv.innerHTML = userInput;   // DANGEROUS if userInput is untrusted - can execute scripts'
+            },
+            {
+                title: 'Removing Elements',
+                description: 'Cleanly removing elements from the DOM.',
+                code: 'const item = document.querySelector("#tempMessage");\nitem.remove(); // modern, simple way to remove an element\n\n// Older approach, still seen in some codebases:\n// item.parentNode.removeChild(item);'
+            }
+        ],
+        bestPractices: [
+            'Use textContent instead of innerHTML whenever you are inserting plain text, especially anything derived from user input, to avoid XSS vulnerabilities',
+            'Only use innerHTML with content you fully trust and control, or after properly sanitizing it',
+            'Use element.remove() for removing an element - it is simpler than the older parentNode.removeChild() pattern',
+            'Batch multiple DOM insertions where possible (e.g., building a DocumentFragment) instead of appending one element at a time, for better performance on large updates'
+        ]
+    },
+
+    {
+        id: 'js-dom-classlist',
+        title: 'classList: add, remove, toggle, contains',
+        library: 'js',
+        category: 'dom',
+        description: 'The classList property provides a convenient API for managing an element\'s CSS classes without manually parsing the className string. add() and remove() add or remove one or more classes, toggle() switches a class on or off based on its current presence, and contains() checks whether a class is currently applied.',
+        syntax: 'element.classList.add("class")\nelement.classList.toggle("class")',
+        examples: [
+            {
+                title: 'Adding and Removing Classes',
+                description: 'Basic class manipulation.',
+                code: 'const box = document.querySelector("#box");\n\nbox.classList.add("active");\nbox.classList.add("highlighted", "large"); // multiple at once\n\nbox.classList.remove("large");\n\nconsole.log(box.className); // "active highlighted"'
+            },
+            {
+                title: 'toggle() - The Common UI Pattern',
+                description: 'Switching a class on or off, ideal for things like dropdown menus or active states.',
+                code: 'const menuButton = document.querySelector("#menuToggle");\nconst menu = document.querySelector("#menu");\n\nmenuButton.addEventListener("click", () => {\n  menu.classList.toggle("open"); // adds if absent, removes if present\n});\n\n// Force a specific state regardless of current state\nmenu.classList.toggle("open", true);  // always add\nmenu.classList.toggle("open", false); // always remove'
+            },
+            {
+                title: 'contains() - Checking Current State',
+                description: 'Testing whether an element currently has a specific class.',
+                code: 'const panel = document.querySelector("#panel");\n\nif (panel.classList.contains("collapsed")) {\n  console.log("Panel is currently collapsed");\n} else {\n  console.log("Panel is currently expanded");\n}'
+            }
+        ],
+        bestPractices: [
+            'Use classList methods instead of manually manipulating element.className as a string - they handle spacing and duplicates correctly',
+            'Use toggle() for on/off UI states like open/closed menus or active/inactive buttons rather than manually checking and calling add()/remove()',
+            'Pass the optional second argument to toggle() when you need to force a specific state rather than simply flip the current one',
+            'Prefer toggling classes (with the actual styling in CSS) over directly manipulating element.style, for cleaner separation of concerns'
+        ]
+    },
+
+    {
+        id: 'js-storage',
+        title: 'localStorage and sessionStorage',
+        library: 'js',
+        category: 'storage',
+        description: 'localStorage and sessionStorage let you store key-value data directly in the browser, using the same simple API. localStorage persists indefinitely, even after closing the browser, while sessionStorage clears when the tab is closed. Both only store strings - objects must be converted with JSON.stringify() and JSON.parse().',
+        syntax: 'localStorage.setItem(key, value)\nlocalStorage.getItem(key)',
+        examples: [
+            {
+                title: 'Basic Storage Operations',
+                description: 'Storing, retrieving, and removing simple string values.',
+                code: 'localStorage.setItem("username", "alice");\nconsole.log(localStorage.getItem("username")); // "alice"\n\nlocalStorage.removeItem("username");\nconsole.log(localStorage.getItem("username")); // null\n\nlocalStorage.setItem("theme", "dark");\nlocalStorage.setItem("fontSize", "16");\nlocalStorage.clear(); // removes everything'
+            },
+            {
+                title: 'Storing Objects with JSON',
+                description: 'localStorage only stores strings, so objects need to be serialized.',
+                code: 'const userPrefs = { theme: "dark", fontSize: 16, notifications: true };\n\nlocalStorage.setItem("preferences", JSON.stringify(userPrefs));\n\nconst stored = JSON.parse(localStorage.getItem("preferences"));\nconsole.log(stored.theme); // "dark"\nconsole.log(typeof stored); // "object" - properly restored, not just a string'
+            },
+            {
+                title: 'localStorage vs sessionStorage',
+                description: 'Choosing the right storage based on how long data should persist.',
+                code: '// Persists across browser restarts, until explicitly cleared\nlocalStorage.setItem("rememberedEmail", "user@example.com");\n\n// Cleared automatically when the tab/browser is closed\nsessionStorage.setItem("currentStep", "3");\n\n// Both share the identical API - only the lifetime differs'
+            }
+        ],
+        bestPractices: [
+            'Always wrap JSON.parse() calls on stored data in a try/catch, in case the stored value is missing or corrupted',
+            'Use sessionStorage for temporary, per-tab data (like a multi-step form\'s progress), and localStorage for data that should persist long-term',
+            'Never store sensitive information (passwords, tokens, personal data) in localStorage - it is accessible to any JavaScript running on the page, including malicious scripts',
+            'Remember storage is per-origin (protocol + domain + port) and has a size limit (typically around 5-10MB) - it is not a substitute for a real database'
+        ]
+    },
+
     // ================= TYPESCRIPT =================
     {
         id: 'ts-interfaces',
