@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { ThemeColors } from '../types';
-import { ScrollText, CheckCircle, AlertOctagon, Shield } from 'lucide-react';
+import { ScrollText, CheckCircle, AlertOctagon, Shield, Ban, Lock, Scale } from 'lucide-react';
 
 interface TermsProps {
   themeColors: ThemeColors;
@@ -31,7 +30,7 @@ export const Terms: React.FC<TermsProps> = ({ themeColors }) => {
             </h2>
             <div className={`${themeColors.card} border ${themeColors.cardBorder} p-6 rounded-xl`}>
               <p className={`${themeColors.textSecondary} leading-relaxed`}>
-                By accessing and using DevNexus ("the Service"), you accept and agree to be bound by the terms and provision of this agreement. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.
+                By accessing and using DevNexus ("the Service"), you unconditionally accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to abide by these terms, you are strictly prohibited from using or accessing this platform. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.
               </p>
             </div>
           </section>
@@ -42,45 +41,76 @@ export const Terms: React.FC<TermsProps> = ({ themeColors }) => {
             </h2>
             <div className={`${themeColors.card} border ${themeColors.cardBorder} p-6 rounded-xl`}>
               <p className={`${themeColors.textSecondary} leading-relaxed mb-4`}>
-                The Site and its original content, features and functionality are owned by DevNexus and are protected by international copyright, trademark, patent, trade secret and other intellectual property or proprietary rights laws.
+                The Site and its original content, features, interactive quiz modules, and functionality are owned by DevNexus and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.
               </p>
               <ul className={`list-disc pl-5 ${themeColors.textSecondary} space-y-2`}>
-                <li>You may not duplicate, copy, or reuse any portion of the HTML/CSS/JS or visual design elements.</li>
-                <li>Code snippets provided in the documentation are free to use under the MIT license.</li>
+                <li>You may not duplicate, copy, reverse-engineer, or reuse any portion of the HTML/CSS/JS, underlying backend architectures, or visual design elements.</li>
+                <li>Code snippets explicitly provided in the documentation or educational examples are free to use under the MIT license, unless stated otherwise.</li>
               </ul>
             </div>
           </section>
 
           <section>
             <h2 className={`text-xl font-bold ${themeColors.text} mb-4 flex items-center gap-2`}>
-              <AlertOctagon className="w-5 h-5 text-red-500" /> 3. User Conduct
+              <AlertOctagon className="w-5 h-5 text-orange-500" /> 3. Prohibited User Conduct
             </h2>
             <div className={`${themeColors.card} border ${themeColors.cardBorder} p-6 rounded-xl`}>
               <p className={`${themeColors.textSecondary} leading-relaxed mb-4`}>
-                You agree not to use the Service to:
+                To maintain a safe and functional environment for all developers, you explicitly agree NOT to engage in any of the following restricted activities:
               </p>
               <ul className={`list-disc pl-5 ${themeColors.textSecondary} space-y-2`}>
-                <li>Upload or transmit content that is unlawful, harmful, threatening, abusive, or harassing.</li>
-                <li>Impersonate any person or entity.</li>
-                <li>Interfere with or disrupt the Service or servers/networks connected to the Service.</li>
+                <li><strong className={themeColors.text}>Malicious Actions:</strong> Upload or transmit content that contains software viruses, Trojan horses, or any other computer code designed to interrupt, destroy, or limit the functionality of the Service.</li>
+                <li><strong className={themeColors.text}>Exploitation:</strong> Attempt to probe, scan, or test the vulnerability of our system or network, or breach security or authentication measures without proper authorization.</li>
+                <li><strong className={themeColors.text}>Impersonation:</strong> Impersonate any person, entity, or DevNexus staff member, or falsely state your affiliation with a person or entity.</li>
+                <li><strong className={themeColors.text}>Disruption:</strong> Interfere with or disrupt the Service, servers, or networks connected to the Service, or disobey any requirements, procedures, policies, or regulations of connected networks.</li>
               </ul>
             </div>
           </section>
 
           <section>
-            <h2 className={`text-xl font-bold ${themeColors.text} mb-4`}>
-               4. Termination
+            <h2 className={`text-xl font-bold ${themeColors.text} mb-4 flex items-center gap-2`}>
+              <Ban className="w-5 h-5 text-red-500" /> 4. System Abuse & Data Extraction
+            </h2>
+            <div className={`${themeColors.card} border ${themeColors.cardBorder} p-6 rounded-xl`}>
+              <p className={`${themeColors.textSecondary} leading-relaxed mb-4`}>
+                Any automated or manual circumvention of our platform's intended use is strictly forbidden. Violating these terms will result in an immediate and permanent IP ban.
+              </p>
+              <ul className={`list-disc pl-5 ${themeColors.textSecondary} space-y-2`}>
+                <li><strong className={themeColors.text}>Scraping:</strong> The use of automated systems (e.g., spiders, robots, crawlers, or scrapers) to extract data, quiz questions, or user information from the Service is strictly prohibited.</li>
+                <li><strong className={themeColors.text}>API Abuse:</strong> Bypassing rate limits, spamming requests, or attempting to access undocumented internal APIs will result in immediate termination.</li>
+                <li><strong className={themeColors.text}>Cheating & Automation:</strong> Utilizing scripts, extensions, or third-party tools to automatically solve quizzes, farm XP, or manipulate leaderboard standings.</li>
+              </ul>
+            </div>
+          </section>
+
+          <section>
+            <h2 className={`text-xl font-bold ${themeColors.text} mb-4 flex items-center gap-2`}>
+              <Lock className="w-5 h-5 text-indigo-500" /> 5. Account Security
             </h2>
             <div className={`${themeColors.card} border ${themeColors.cardBorder} p-6 rounded-xl`}>
               <p className={`${themeColors.textSecondary} leading-relaxed`}>
-                We may terminate your access to the Site, without cause or notice, which may result in the forfeiture and destruction of all information associated with you. All provisions of this Agreement that by their nature should survive termination shall survive termination, including, without limitation, ownership provisions, warranty disclaimers, indemnity, and limitations of liability.
+                You are solely responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify DevNexus immediately of any unauthorized use of your account or any other breach of security. Selling, trading, or sharing premium account access with unauthorized third parties constitutes a material breach of these terms.
+              </p>
+            </div>
+          </section>
+
+          <section>
+            <h2 className={`text-xl font-bold ${themeColors.text} mb-4 flex items-center gap-2`}>
+              <Scale className="w-5 h-5 text-brand-500" /> 6. Termination & Liability
+            </h2>
+            <div className={`${themeColors.card} border ${themeColors.cardBorder} p-6 rounded-xl space-y-4`}>
+              <p className={`${themeColors.textSecondary} leading-relaxed`}>
+                We may terminate or suspend your access to the Site instantly, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms of Service. Upon termination, your right to use the Service will cease immediately, resulting in the permanent forfeiture of all accumulated data, streaks, and account status.
+              </p>
+              <p className={`${themeColors.textSecondary} leading-relaxed`}>
+                In no event shall DevNexus, nor its directors, employees, partners, or agents, be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your access to, use of, or inability to use the Service.
               </p>
             </div>
           </section>
 
           <div className={`pt-8 border-t ${themeColors.cardBorder} text-center`}>
             <p className={`${themeColors.textSecondary} text-sm`}>
-              Questions about the Terms of Service should be sent to <a href="#" className="text-brand-400 hover:underline">legal@devnexus.com</a>.
+              Questions about the Terms of Service should be sent to <a href="mailto:legal@devnexus.com" className="text-brand-400 hover:text-brand-300 transition-colors hover:underline">legal@devnexus.com</a>.
             </p>
           </div>
 

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { ThemeColors, QuizQuestion, Difficulty } from '../types';
 import { QUIZ_QUESTIONS } from '../data';
@@ -49,6 +48,20 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
       return [...array].sort(() => Math.random() - 0.5);
   };
 
+  // Resolves which option index is correct for a question.
+  // The QUIZ_QUESTIONS data in data.ts stores the correct answer as the literal
+  // answer text (`correct: string`), not as an index (`correctAnswer: number`).
+  // This checks for an explicit index first (in case that shape is used in the
+  // future), then falls back to matching `correct` against the options text -
+  // which is what every question in the current data actually relies on.
+  const getCorrectOptionIndex = (q: QuizQuestion): number => {
+    if (typeof q.correctAnswer === 'number') return q.correctAnswer;
+    if (q.correct && q.options) {
+      return q.options.findIndex(opt => opt === q.correct);
+    }
+    return -1;
+  };
+
   // Timer Effect
   useEffect(() => {
     if (mode === 'active' && timerDuration > 0 && !isAnswerChecked) {
@@ -69,13 +82,43 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
     }
   }, [currentQuestionIndex, mode, timerDuration]);
 
+  // Keyboard Navigation Effect
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const currentQ = activeQuestions[currentQuestionIndex];
+      const isCoding = currentQ?.type === 'code';
+      
+      if (mode !== 'active' || isCoding) return;
+
+      // Number keys 1-4 for option selection
+      if (['1', '2', '3', '4'].includes(e.key)) {
+        const index = parseInt(e.key) - 1;
+        if (currentQ.options && index < currentQ.options.length && !isAnswerChecked) {
+          setSelectedOption(index);
+        }
+      }
+
+      // Enter key to check answer or move to next
+      if (e.key === 'Enter') {
+        if (!isAnswerChecked && selectedOption !== null) {
+          handleCheckAnswer(false);
+        } else if (isAnswerChecked) {
+          handleNextQuestion();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [mode, activeQuestions, currentQuestionIndex, isAnswerChecked, selectedOption]);
+
 
   // --- Handlers ---
 
   const startQuiz = () => {
       const filtered = QUIZ_QUESTIONS.filter(q => {
           const catMatch = selectedCategory === 'all' || q.category === selectedCategory;
-          const diffMatch = q.difficulty === selectedDifficulty;
+          const diffMatch = !q.difficulty || q.difficulty === selectedDifficulty;
           return catMatch && diffMatch;
       });
 
@@ -126,7 +169,7 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
       correct = !!(hasAllPatterns && hasNoForbidden);
     } else {
       // Multiple Choice
-      correct = selectedOption === currentQ.correctAnswer;
+      correct = selectedOption !== null && selectedOption === getCorrectOptionIndex(currentQ);
     }
 
     setIsCorrect(correct);
@@ -244,9 +287,9 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
                        </div>
                    </div>
 
-                   {/* Timer & Count... (kept same) */}
-                   <div className="grid grid-cols-2 gap-4">
-                       <div>
+                   {/* Timer & Count */}
+                   <div className="grid grid-cols-2 gap-4 divide-x divide-white/10">
+                       <div className="pr-2">
                            <label className={`block text-xs font-bold ${themeColors.textSecondary} mb-2 uppercase tracking-wide`}>Timer</label>
                            <div className="grid grid-cols-3 gap-2">
                                {[0, 20, 30].map(sec => (
@@ -260,7 +303,7 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
                                ))}
                            </div>
                        </div>
-                        <div>
+                        <div className="pl-4">
                            <label className={`block text-xs font-bold ${themeColors.textSecondary} mb-2 uppercase tracking-wide`}>Count</label>
                            <div className="grid grid-cols-3 gap-2">
                                {[5, 10, 20].map(num => (
@@ -288,14 +331,13 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
       );
   }
 
-  // 2. Result Phase & 3. Active Phase (Rendering kept similar, using category icon)
-  
+  // 2. Result Phase 
   if (mode === 'result') {
     const correctCount = history.filter(h => h.correct).length;
     const percentage = Math.round((correctCount / activeQuestions.length) * 100);
     const totalTimeSeconds = Math.floor((endTime - startTime) / 1000);
     const incorrectAnswers = history.filter(h => !h.correct);
-    const weakTopics = [...new Set(incorrectAnswers.map(h => h.question.topic))];
+    const weakTopics = [...new Set(incorrectAnswers.map(h => h.question.topic || h.question.category))].filter(Boolean);
     
     let grade = '';
     let color = '';
@@ -378,6 +420,7 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
   // 3. Active Phase
   const currentQ = activeQuestions[currentQuestionIndex];
   const isCoding = currentQ.type === 'code';
+  const correctOptionIndex = getCorrectOptionIndex(currentQ);
   
   return (
     <div className="flex-1 overflow-hidden flex flex-col h-full">
@@ -394,7 +437,11 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
             )}
           </h1>
           <p className={`text-xs ${themeColors.textSecondary}`}>
-            <span className="uppercase tracking-wider font-bold opacity-70">{currentQ.difficulty}</span> • {currentQ.topic}
+            {currentQ.difficulty && (
+              <span className="uppercase tracking-wider font-bold opacity-70">{currentQ.difficulty}</span>
+            )}
+            {currentQ.difficulty && (currentQ.topic || currentQ.category) && ' • '}
+            {currentQ.topic || currentQ.category}
           </p>
         </div>
         
@@ -425,7 +472,7 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-8 w-full max-w-5xl mx-auto">
+      <div className={`flex-1 overflow-y-auto p-4 sm:p-8 w-full mx-auto ${isCoding ? 'max-w-5xl' : 'max-w-3xl'}`}>
         
         <h2 className={`text-xl font-medium ${themeColors.text} mb-6 leading-relaxed`}>
           {currentQ.question}
@@ -464,7 +511,6 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
                  <Play className="w-3 h-3" /> Output Check
                </div>
                <div className="flex-1 bg-white p-4 overflow-auto">
-                   {/* For non-web languages, maybe show a text area or mock output? For now we keep iframe but code may not run if backend required */}
                   <iframe 
                     title="quiz-preview"
                     srcDoc={`<html><head><style>body{font-family:sans-serif;}</style></head><body><pre>${codeAnswer}</pre></body></html>`}
@@ -476,12 +522,12 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
           </div>
         ) : (
           // --- Multiple Choice Interface ---
-          <div className="space-y-3 mb-8 max-w-2xl">
+          <div className="space-y-3 mb-8 w-full">
             {currentQ.options?.map((option, index) => {
               let optionClass = `${themeColors.inputBg} border ${themeColors.cardBorder} hover:border-brand-500/50`;
               
               if (isAnswerChecked) {
-                if (index === currentQ.correctAnswer) {
+                if (index === correctOptionIndex) {
                   optionClass = "bg-green-500/10 border-green-500 text-green-500";
                 } else if (index === selectedOption) {
                   optionClass = "bg-red-500/10 border-red-500 text-red-500";
@@ -499,9 +545,25 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
                   disabled={isAnswerChecked}
                   className={`w-full text-left p-4 rounded-xl transition-all flex items-center justify-between group ${optionClass}`}
                 >
-                  <span className={isAnswerChecked && index === currentQ.correctAnswer ? 'font-bold' : ''}>{option}</span>
-                  {isAnswerChecked && index === currentQ.correctAnswer && <CheckCircle className="w-5 h-5 text-green-500" />}
-                  {isAnswerChecked && index === selectedOption && index !== currentQ.correctAnswer && <XCircle className="w-5 h-5 text-red-500" />}
+                  <div className="flex items-center gap-3">
+                    {/* Mock Radio Button */}
+                    <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${selectedOption === index ? 'border-brand-500 bg-brand-500/20' : 'border-gray-500'}`}>
+                      {selectedOption === index && <div className="w-2 h-2 rounded-full bg-brand-500" />}
+                    </div>
+                    <span className={isAnswerChecked && index === correctOptionIndex ? 'font-bold' : ''}>
+                      {option}
+                    </span>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    {/* Keyboard Shortcut Hint */}
+                    {!isAnswerChecked && <span className={`text-xs font-mono px-2 py-1 rounded bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity ${themeColors.textSecondary}`}>
+                      {index + 1}
+                    </span>}
+                    
+                    {isAnswerChecked && index === correctOptionIndex && <CheckCircle className="w-5 h-5 text-green-500" />}
+                    {isAnswerChecked && index === selectedOption && index !== correctOptionIndex && <XCircle className="w-5 h-5 text-red-500" />}
+                  </div>
                 </button>
               );
             })}
@@ -516,7 +578,13 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
                   {isCorrect ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
                   {isCorrect ? 'Correct!' : 'Incorrect/Time Up'}
                </div>
-               <p>{currentQ.explanation}</p>
+               {currentQ.explanation ? (
+                 <p>{currentQ.explanation}</p>
+               ) : (
+                 !isCorrect && correctOptionIndex !== -1 && currentQ.options && (
+                   <p>The correct answer was: <strong>{currentQ.options[correctOptionIndex]}</strong></p>
+                 )
+               )}
              </div>
            ) : <div />}
            
@@ -524,16 +592,19 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
              <button
                onClick={() => handleCheckAnswer(false)}
                disabled={isCoding ? codeAnswer.trim() === '' : selectedOption === null}
-               className="px-6 py-2.5 bg-brand-600 hover:bg-brand-500 disabled:opacity-50 disabled:hover:bg-brand-600 text-white font-bold rounded-lg transition-all shadow-lg shadow-brand-500/20"
+               className="px-6 py-2.5 bg-brand-600 hover:bg-brand-500 disabled:opacity-50 disabled:hover:bg-brand-600 text-white font-bold rounded-lg transition-all shadow-lg shadow-brand-500/20 flex items-center gap-2"
              >
                Check Answer
+               <span className="hidden sm:inline-block text-xs bg-black/20 px-1.5 py-0.5 rounded opacity-70">Enter ↵</span>
              </button>
            ) : (
              <button
                onClick={handleNextQuestion}
                className="px-6 py-2.5 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-lg transition-all flex items-center gap-2 shadow-lg shadow-brand-500/20"
              >
-               {currentQuestionIndex + 1 === activeQuestions.length ? 'Finish Quiz' : 'Next'} <ArrowRight className="w-4 h-4" />
+               {currentQuestionIndex + 1 === activeQuestions.length ? 'Finish Quiz' : 'Next'} 
+               <ArrowRight className="w-4 h-4" />
+               <span className="hidden sm:inline-block text-xs bg-black/20 px-1.5 py-0.5 rounded opacity-70">Enter ↵</span>
              </button>
            )}
         </div>
