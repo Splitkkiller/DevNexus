@@ -3294,6 +3294,1645 @@ export const DOCS: DocItem[] = [
         ]
     },
 
+
+
+    {
+        id: 'css-box-model',
+        title: 'The Box Model',
+        library: 'css',
+        category: 'layout',
+        description: 'Every element in CSS is a rectangular box made up of four layers, from innermost to outermost: content, padding, border, and margin. Understanding the box model is fundamental to controlling layout - it explains exactly how much space an element actually occupies and how that space is distributed.',
+        syntax: 'width, padding, border, margin',
+        examples: [
+            {
+                title: 'The Four Layers',
+                description: 'Each layer adds space around the one before it.',
+                code: '.box {\n  width: 200px;        /* content width */\n  padding: 20px;        /* space inside the border */\n  border: 2px solid #333; /* the border itself */\n  margin: 10px;          /* space outside the border */\n}\n/* Total rendered width (standard box-sizing) = 200 + 40 + 4 + 20 = 264px */'
+            },
+            {
+                title: 'Visualizing with DevTools Colors',
+                description: 'A common way to debug layout by temporarily outlining the box model layers.',
+                code: '.debug {\n  outline: 2px solid red;      /* shows content edge without affecting layout */\n  background: rgba(0, 150, 255, 0.1); /* shows padding area */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'width / height', type: 'length | %', description: 'Sets the content box dimensions' },
+            { name: 'padding', type: 'length', description: 'Space between content and border' },
+            { name: 'border', type: 'width style color', description: 'The visible edge around the padding' },
+            { name: 'margin', type: 'length | auto', description: 'Space outside the border, between this element and others' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Set box-sizing: border-box globally so padding and border are included in the declared width, avoiding surprise overflow',
+            'Use margin for spacing between elements, and padding for spacing within an element',
+            'Remember vertical margins between block elements can "collapse" into a single margin - the larger of the two, not their sum',
+            'Use browser DevTools box model inspector when layout looks wrong - it visually breaks down all four layers'
+        ]
+    },
+
+    {
+        id: 'css-box-sizing',
+        title: 'box-sizing',
+        library: 'css',
+        category: 'layout',
+        description: 'box-sizing controls how an element\'s total width and height are calculated. The default, content-box, means padding and border are added on top of the declared width, making sizing math confusing. border-box includes padding and border within the declared width instead, which is why nearly every modern CSS reset sets it globally.',
+        syntax: 'box-sizing: content-box | border-box;',
+        examples: [
+            {
+                title: 'content-box vs border-box',
+                description: 'The same declared width producing different rendered sizes.',
+                code: '.content-box {\n  box-sizing: content-box; /* default */\n  width: 200px;\n  padding: 20px;\n  border: 5px solid black;\n  /* Rendered width: 200 + 40 + 10 = 250px */\n}\n\n.border-box {\n  box-sizing: border-box;\n  width: 200px;\n  padding: 20px;\n  border: 5px solid black;\n  /* Rendered width: exactly 200px - padding/border eat into the content area instead */\n}'
+            },
+            {
+                title: 'The Universal Reset',
+                description: 'The standard way nearly every project applies border-box globally.',
+                code: '*, *::before, *::after {\n  box-sizing: border-box;\n}'
+            }
+        ],
+        attributes: [
+            { name: 'content-box', type: 'keyword', description: 'Width/height apply to content only (default, less intuitive)' },
+            { name: 'border-box', type: 'keyword', description: 'Width/height include padding and border (recommended)' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Apply box-sizing: border-box globally at the start of every project - it makes sizing predictable and is nearly universal practice',
+            'Remember border-box does not affect margin - margin is always added outside the declared width regardless of this setting',
+            'Set this once in a reset rather than per-component, so all elements behave consistently'
+        ]
+    },
+
+    {
+        id: 'css-display',
+        title: 'display Property',
+        library: 'css',
+        category: 'layout',
+        description: 'The display property determines how an element generates boxes and participates in layout. block elements start on a new line and fill available width. inline elements flow within text and ignore width/height. inline-block combines inline flow with block-like sizing control. none removes the element from layout entirely.',
+        syntax: 'display: block | inline | inline-block | none | flex | grid;',
+        examples: [
+            {
+                title: 'block vs inline vs inline-block',
+                description: 'The fundamental difference in how each value affects layout flow.',
+                code: '.block { display: block; width: 200px; }      /* own line, respects width */\n.inline { display: inline; width: 200px; }     /* flows in text, IGNORES width */\n.inline-block { display: inline-block; width: 200px; } /* flows in text, respects width */'
+            },
+            {
+                title: 'Hiding Elements',
+                description: 'display: none vs the related visibility: hidden.',
+                code: '.gone { display: none; }       /* removed from layout entirely - other elements shift to fill the space */\n.invisible { visibility: hidden; } /* stays in layout, just invisible - still takes up space */'
+            }
+        ],
+        attributes: [
+            { name: 'block', type: 'keyword', description: 'Starts on a new line, fills available width' },
+            { name: 'inline', type: 'keyword', description: 'Flows within text, ignores width/height' },
+            { name: 'inline-block', type: 'keyword', description: 'Flows within text but respects width/height' },
+            { name: 'none', type: 'keyword', description: 'Removes the element from layout entirely' },
+            { name: 'flex / grid', type: 'keyword', description: 'Turns the element into a flex or grid container' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use display: none to fully remove content from layout and accessibility tree; use visibility: hidden to hide visually while keeping the space reserved',
+            'Remember width/height have no effect on elements with display: inline - switch to inline-block or block if you need to size them',
+            'Default HTML elements already have sensible display values (div is block, span is inline) - only override when you have a specific layout need'
+        ]
+    },
+
+    {
+        id: 'css-position',
+        title: 'position Property',
+        library: 'css',
+        category: 'layout',
+        description: 'The position property controls how an element is positioned in the document. static is the default, following normal flow. relative positions an element relative to its normal position. absolute removes it from flow entirely, positioning it relative to its nearest positioned ancestor. fixed positions relative to the viewport, staying in place during scroll. sticky toggles between relative and fixed based on scroll position.',
+        syntax: 'position: static | relative | absolute | fixed | sticky;',
+        examples: [
+            {
+                title: 'relative and absolute Together',
+                description: 'The most common pattern: a relatively-positioned parent containing an absolutely-positioned child.',
+                code: '.card {\n  position: relative; /* establishes a positioning context for children */\n}\n\n.badge {\n  position: absolute;\n  top: 10px;\n  right: 10px; /* positioned relative to .card, not the page */\n}'
+            },
+            {
+                title: 'fixed for a Persistent Header',
+                description: 'Keeping an element in place regardless of scrolling.',
+                code: '.header {\n  position: fixed;\n  top: 0;\n  left: 0;\n  width: 100%;\n  z-index: 100;\n}'
+            },
+            {
+                title: 'sticky for a Sticky Section Heading',
+                description: 'An element that scrolls normally until it hits a threshold, then sticks.',
+                code: '.section-heading {\n  position: sticky;\n  top: 0; /* sticks once it reaches 0px from the top of the scroll container */\n  background: white;\n}'
+            }
+        ],
+        attributes: [
+            { name: 'static', type: 'keyword', description: 'Default - normal document flow, top/left/etc have no effect' },
+            { name: 'relative', type: 'keyword', description: 'Offset from its normal position, still occupies original space' },
+            { name: 'absolute', type: 'keyword', description: 'Removed from flow, positioned relative to nearest positioned ancestor' },
+            { name: 'fixed', type: 'keyword', description: 'Positioned relative to the viewport, stays put while scrolling' },
+            { name: 'sticky', type: 'keyword', description: 'Relative until a scroll threshold, then behaves like fixed' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Give an absolutely-positioned element\'s closest meaningful ancestor position: relative, or it will position relative to the whole page instead',
+            'Use sticky for section headers, table headers, or sidebars that should follow scrolling within a bound, not for full free-floating overlays',
+            'Remember absolutely and fixed-positioned elements are removed from normal flow - other elements act as if they are not there',
+            'Combine position: fixed with a high z-index for overlays and modals to ensure they render above other content'
+        ]
+    },
+
+    {
+        id: 'css-overflow',
+        title: 'overflow Property',
+        library: 'css',
+        category: 'layout',
+        description: 'overflow controls what happens when content is too large to fit its container. visible (default) lets content spill out. hidden clips anything beyond the box. scroll always shows scrollbars. auto adds scrollbars only when needed. overflow-x and overflow-y control each axis independently.',
+        syntax: 'overflow: visible | hidden | scroll | auto;',
+        examples: [
+            {
+                title: 'Basic Overflow Values',
+                description: 'The four core values and their visual effect.',
+                code: '.visible { overflow: visible; } /* content spills out, default */\n.hidden { overflow: hidden; height: 100px; } /* content beyond 100px is clipped */\n.scroll { overflow: scroll; height: 100px; } /* always shows scrollbars */\n.auto { overflow: auto; height: 100px; } /* scrollbars only appear if needed */'
+            },
+            {
+                title: 'Truncating Text with Ellipsis',
+                description: 'A common combination for single-line text truncation.',
+                code: '.truncate {\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  max-width: 200px;\n}\n/* "This is a very long heading..." */'
+            }
+        ],
+        attributes: [
+            { name: 'visible', type: 'keyword', description: 'Default - overflowing content is not clipped' },
+            { name: 'hidden', type: 'keyword', description: 'Overflowing content is clipped and inaccessible' },
+            { name: 'scroll', type: 'keyword', description: 'Always shows scrollbars, even if content fits' },
+            { name: 'auto', type: 'keyword', description: 'Shows scrollbars only when content overflows' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use overflow: auto over overflow: scroll in most cases, so scrollbars only appear when actually needed',
+            'Setting overflow: hidden on a parent is a classic (if slightly dated) way to contain floated children - modern layouts typically use flexbox/grid instead',
+            'Combine overflow: hidden with text-overflow: ellipsis and white-space: nowrap for single-line text truncation',
+            'Remember overflow: hidden clips focusable content too - test keyboard navigation around clipped areas'
+        ]
+    },
+
+    {
+        id: 'css-float-clear',
+        title: 'float and clear',
+        library: 'css',
+        category: 'layout',
+        description: 'float was CSS\'s original tool for wrapping text around an image or building multi-column layouts, pulling an element to one side while other content flows around it. clear stops an element from wrapping around floated siblings. Flexbox and Grid have replaced float for layout purposes, but float is still legitimately used for wrapping text around images.',
+        syntax: 'float: left | right | none;\nclear: left | right | both;',
+        examples: [
+            {
+                title: 'Wrapping Text Around an Image',
+                description: 'The use case float remains genuinely good for today.',
+                code: 'img.inline-photo {\n  float: left;\n  margin: 0 16px 8px 0;\n  width: 200px;\n}\n/* Paragraph text will wrap around the right and bottom of the image */'
+            },
+            {
+                title: 'clear to Stop Wrapping',
+                description: 'Preventing an element from sitting beside a float.',
+                code: '.footer {\n  clear: both; /* moves below any floated elements, regardless of side */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'float', type: 'left | right | none', description: 'Pulls an element to one side, letting content wrap around it' },
+            { name: 'clear', type: 'left | right | both | none', description: 'Prevents an element from sitting beside floated elements' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use Flexbox or Grid instead of float for building page layouts and component structure - that is what they were designed to replace',
+            'Reserve float genuinely for wrapping text around an image or similar inline content, which is still its best use case today',
+            'Remember a floated element is taken out of normal flow, which can cause its parent to collapse to zero height unless cleared or given overflow: auto',
+            'Avoid float-based grid systems (common in older frameworks) in new projects - modern layout tools are simpler and more capable'
+        ]
+    },
+
+    {
+        id: 'css-flex-item-properties',
+        title: 'Flex Item Properties',
+        library: 'css',
+        category: 'flexbox',
+        description: 'While display: flex controls the container, individual flex items have their own properties for fine-grained control. flex-grow, flex-shrink, and flex-basis (usually combined via the flex shorthand) control how an item grows or shrinks to fill space. order changes visual order without touching the HTML. align-self overrides the container\'s align-items for a single item.',
+        syntax: 'flex: grow shrink basis;\norder: number;\nalign-self: auto | flex-start | center | flex-end;',
+        examples: [
+            {
+                title: 'The flex Shorthand',
+                description: 'Controlling how items grow and shrink relative to each other.',
+                code: '.sidebar { flex: 0 0 250px; }  /* never grow, never shrink, fixed 250px base */\n.main    { flex: 1; }           /* grow to fill all remaining space, shorthand for 1 1 0% */\n.card    { flex: 1 1 200px; }   /* grow and shrink, starting from a 200px base size */'
+            },
+            {
+                title: 'order and align-self',
+                description: 'Reordering items and overriding alignment for a single item.',
+                code: '.item-a { order: 2; } /* moves visually after items with a lower order value */\n.item-b { order: 1; } /* default order is 0 for all items */\n\n.featured {\n  align-self: center; /* overrides the container\'s align-items just for this item */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'flex-grow', type: 'number', description: 'How much an item grows relative to siblings when there is extra space' },
+            { name: 'flex-shrink', type: 'number', description: 'How much an item shrinks relative to siblings when space is tight' },
+            { name: 'flex-basis', type: 'length | auto', description: 'The item\'s starting size before growing/shrinking is applied' },
+            { name: 'order', type: 'number', description: 'Controls visual order independent of source order (default 0)' },
+            { name: 'align-self', type: 'auto | flex-start | center | flex-end | stretch', description: 'Overrides align-items for a single item' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use the flex shorthand (flex: 1) rather than setting flex-grow, flex-shrink, and flex-basis separately, for more concise and standard code',
+            'Use flex: 1 for items that should grow equally to fill space, and flex: 0 0 <size> for items that should stay a fixed size',
+            'Use order sparingly and only for visual reordering - it does not change the underlying DOM order, which can confuse keyboard and screen reader navigation',
+            'Reach for align-self only when one specific item needs different alignment than the rest of the flex items'
+        ]
+    },
+
+    {
+        id: 'css-grid-template-areas',
+        title: 'grid-template-areas',
+        library: 'css',
+        category: 'flexbox',
+        description: 'grid-template-areas lets you visually lay out a grid using named regions written directly in your CSS, making complex page layouts remarkably readable. Each string represents a row, each word represents a named area, and child elements are placed into an area using grid-area, matching the visual shape of your layout with the code itself.',
+        syntax: 'grid-template-areas: "area1 area2" "area3 area3";',
+        examples: [
+            {
+                title: 'A Classic Page Layout',
+                description: 'Header, sidebar, main content, and footer, laid out visually in the CSS itself.',
+                code: '.page {\n  display: grid;\n  grid-template-columns: 200px 1fr;\n  grid-template-rows: auto 1fr auto;\n  grid-template-areas:\n    "header header"\n    "sidebar main"\n    "footer footer";\n  min-height: 100vh;\n}\n\n.header { grid-area: header; }\n.sidebar { grid-area: sidebar; }\n.main { grid-area: main; }\n.footer { grid-area: footer; }'
+            },
+            {
+                title: 'Reflowing Layout at a Breakpoint',
+                description: 'Redefining the areas for a responsive, mobile-first layout change.',
+                code: '@media (max-width: 600px) {\n  .page {\n    grid-template-columns: 1fr;\n    grid-template-areas:\n      "header"\n      "main"\n      "sidebar"\n      "footer";\n  }\n}'
+            }
+        ],
+        attributes: [
+            { name: 'grid-template-areas', type: 'string list', description: 'Defines named regions visually, one quoted string per row' },
+            { name: 'grid-area', type: 'string', description: 'Assigns a child element to a named area' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Format grid-template-areas strings so they visually resemble the actual layout - the readability is the entire point of this feature',
+            'Use a period (.) to represent an intentionally empty cell in the grid',
+            'Redefine grid-template-areas inside a media query to dramatically restructure layout at breakpoints, without touching the HTML',
+            'Every area name used in grid-area must appear in grid-template-areas, and the areas must form a valid rectangle'
+        ]
+    },
+
+    {
+        id: 'css-grid-alignment',
+        title: 'Grid Alignment: place-items, place-content',
+        library: 'css',
+        category: 'flexbox',
+        description: 'Grid alignment properties control how content is positioned within grid cells and how the grid itself is positioned within its container. justify-items/align-items control individual item alignment along each axis, and their shorthand place-items sets both at once. justify-content/align-content position the whole grid when it is smaller than its container, with place-content as their shorthand.',
+        syntax: 'place-items: align justify;\nplace-content: align justify;',
+        examples: [
+            {
+                title: 'Centering with place-items',
+                description: 'The famous one-line perfect-centering trick using Grid.',
+                code: '.center {\n  display: grid;\n  place-items: center; /* centers child both vertically and horizontally */\n  height: 300px;\n}'
+            },
+            {
+                title: 'Positioning the Grid Itself',
+                description: 'When the grid is smaller than its container, place-content controls its position.',
+                code: '.container {\n  display: grid;\n  grid-template-columns: repeat(3, 100px);\n  place-content: center; /* centers the whole grid within a larger container */\n  height: 400px;\n}'
+            }
+        ],
+        attributes: [
+            { name: 'justify-items', type: 'start | center | end | stretch', description: 'Aligns items horizontally within their cells' },
+            { name: 'align-items', type: 'start | center | end | stretch', description: 'Aligns items vertically within their cells' },
+            { name: 'place-items', type: 'shorthand', description: 'Sets align-items and justify-items together' },
+            { name: 'place-content', type: 'shorthand', description: 'Positions the entire grid within its container' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use place-items: center as the simplest, most reliable way to perfectly center a single child element',
+            'Remember justify-items/align-items affect items within their cells, while justify-content/align-content position the grid tracks as a whole within the container',
+            'These same alignment properties work in Flexbox too, though the axis they refer to depends on flex-direction there',
+            'Use align-self/justify-self on an individual grid item to override the container\'s place-items just for that one item'
+        ]
+    },
+
+    {
+        id: 'css-container-queries',
+        title: 'Container Queries',
+        library: 'css',
+        category: 'flexbox',
+        description: 'Container queries let an element style itself based on the size of its containing element, rather than the viewport. This solves a problem media queries never could: a truly reusable component that looks right whether it is placed in a narrow sidebar or a wide main content area. Declare a container with container-type, then respond to it with @container.',
+        syntax: 'container-type: inline-size;\n@container (min-width: 400px) { }',
+        examples: [
+            {
+                title: 'Making a Container Queryable',
+                description: 'Establishing an element as a query container for its descendants.',
+                code: '.card-wrapper {\n  container-type: inline-size;\n  container-name: card; /* optional, lets you target a specific container */\n}'
+            },
+            {
+                title: 'Responding to Container Size',
+                description: 'Styling a card differently depending on how much space its container actually has.',
+                code: '.card {\n  display: flex;\n  flex-direction: column;\n}\n\n@container card (min-width: 400px) {\n  .card {\n    flex-direction: row; /* switches to a horizontal layout once the CONTAINER is wide enough */\n  }\n}'
+            }
+        ],
+        attributes: [
+            { name: 'container-type', type: 'inline-size | size | normal', description: 'Establishes an element as a query container' },
+            { name: 'container-name', type: 'string', description: 'Optional name to target a specific container with @container' },
+            { name: '@container', type: 'at-rule', description: 'Applies styles conditionally based on the named container\'s size' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use container queries for reusable components that need to adapt based on where they are placed, not just overall screen size',
+            'Set container-type on the direct parent of the element you actually want to style - an element cannot query its own container-type',
+            'Use container-name to disambiguate when nested containers exist and you need @container to target a specific one',
+            'Container queries and media queries are complementary, not competitors - use media queries for page-level layout and container queries for component-level layout'
+        ]
+    },
+
+    {
+        id: 'css-font-properties',
+        title: 'Font Properties',
+        library: 'css',
+        category: 'typography',
+        description: 'Core typography properties control how text is displayed. font-family sets the typeface (with fallbacks), font-size controls size, font-weight controls boldness, font-style controls italics, and the font shorthand can set several of these at once. Well-chosen typography is one of the highest-impact, lowest-effort improvements you can make to a design.',
+        syntax: 'font-family: name, fallback;\nfont-size: value;\nfont-weight: value;',
+        examples: [
+            {
+                title: 'Setting a Font Stack',
+                description: 'Specifying a preferred font with sensible fallbacks.',
+                code: 'body {\n  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;\n}\n/* Browser tries each font in order, falling back if one is unavailable */'
+            },
+            {
+                title: 'Weight and Style',
+                description: 'Controlling boldness and italics.',
+                code: 'h1 { font-weight: 700; }         /* numeric weight, same as "bold" */\n.emphasis { font-style: italic; }\n.light { font-weight: 300; }      /* requires the font file to include a light weight */'
+            },
+            {
+                title: 'The font Shorthand',
+                description: 'Setting several font properties in one declaration.',
+                code: '.heading {\n  font: italic 700 24px/1.4 "Georgia", serif;\n  /* style weight size/line-height family */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'font-family', type: 'name list', description: 'Typeface, with comma-separated fallbacks' },
+            { name: 'font-size', type: 'length', description: 'Text size, commonly in rem for accessibility' },
+            { name: 'font-weight', type: 'number | keyword', description: 'Boldness, from 100 (thin) to 900 (black)' },
+            { name: 'font-style', type: 'normal | italic | oblique', description: 'Controls italic styling' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always include a generic fallback (sans-serif, serif, monospace) at the end of a font-family list, in case none of your preferred fonts load',
+            'Use rem for font-size rather than px, so text properly scales if a user has changed their browser\'s default font size for accessibility',
+            'Only load the specific font weights you actually use - loading all 9 weights when you only use 2 wastes bandwidth',
+            'Use numeric font-weight values (400, 700) rather than just "normal"/"bold" when working with variable fonts or multiple weight options'
+        ]
+    },
+
+    {
+        id: 'css-text-properties',
+        title: 'Text Properties',
+        library: 'css',
+        category: 'typography',
+        description: 'Beyond font selection, CSS offers properties to control text alignment, decoration, spacing, and casing. text-align positions text horizontally, text-decoration adds underlines/strikethroughs, text-transform changes casing, and letter-spacing/word-spacing adjust character and word gaps.',
+        syntax: 'text-align: left | center | right | justify;\ntext-decoration: none | underline | line-through;',
+        examples: [
+            {
+                title: 'Alignment and Decoration',
+                description: 'Common text formatting properties.',
+                code: '.centered { text-align: center; }\n.no-underline { text-decoration: none; } /* commonly used to remove default link underlines */\n.strikethrough { text-decoration: line-through; }\n.underline-offset { text-decoration: underline; text-underline-offset: 3px; }'
+            },
+            {
+                title: 'Casing and Spacing',
+                description: 'Transforming text case and adjusting spacing without editing the actual content.',
+                code: '.uppercase-label { text-transform: uppercase; letter-spacing: 0.05em; }\n.capitalize { text-transform: capitalize; } /* Capitalizes The First Letter Of Each Word */\n.tight { letter-spacing: -0.02em; } /* subtly tighter character spacing, common in large headings */'
+            }
+        ],
+        attributes: [
+            { name: 'text-align', type: 'left | center | right | justify', description: 'Horizontal alignment of text within its container' },
+            { name: 'text-decoration', type: 'none | underline | overline | line-through', description: 'Adds or removes decorative lines' },
+            { name: 'text-transform', type: 'none | uppercase | lowercase | capitalize', description: 'Changes displayed casing without altering the actual text' },
+            { name: 'letter-spacing', type: 'length', description: 'Adjusts spacing between characters' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use text-transform: uppercase for visual styling rather than typing text in all caps directly - screen readers may pronounce all-caps text differently',
+            'Avoid text-align: justify for body text on the web - unlike print, it often creates uneven, distracting gaps between words',
+            'Use letter-spacing sparingly and subtly - even small values like 0.05em have a noticeable effect at scale',
+            'Set text-decoration: none on links intentionally, and consider adding a distinct visual style (like color or an underline on hover) to preserve link affordance'
+        ]
+    },
+
+    {
+        id: 'css-line-height-spacing',
+        title: 'line-height and Vertical Spacing',
+        library: 'css',
+        category: 'typography',
+        description: 'line-height controls the vertical space a line of text occupies, directly affecting readability. Unitless values (like 1.5) are generally preferred over fixed units, since they scale proportionally with font-size rather than creating an inconsistent fixed gap.',
+        syntax: 'line-height: number | length | %;',
+        examples: [
+            {
+                title: 'Unitless vs Fixed Line Height',
+                description: 'Why unitless values are the recommended approach.',
+                code: '.good {\n  font-size: 16px;\n  line-height: 1.5; /* scales to 24px - stays proportional if font-size changes */\n}\n\n.risky {\n  font-size: 16px;\n  line-height: 24px; /* fixed - breaks proportionally if a child changes font-size */\n}'
+            },
+            {
+                title: 'Tighter Line Height for Headings',
+                description: 'Large headings typically need a tighter line-height than body text.',
+                code: 'body { line-height: 1.6; }         /* comfortable reading for paragraphs */\nh1, h2, h3 { line-height: 1.2; }    /* tighter, since large text has more natural spacing already */'
+            }
+        ],
+        attributes: [
+            { name: 'line-height', type: 'number | length | %', description: 'Vertical space per line; unitless numbers are recommended' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Prefer unitless line-height values (like 1.5) over fixed pixel values, so it scales correctly if font-size changes anywhere down the tree',
+            'Use a larger line-height (1.5-1.7) for body copy to improve readability, and a tighter one (1.1-1.3) for large headings',
+            'Set a sensible default line-height on body and let individual elements override it only when needed',
+            'Remember line-height also affects the height of inline elements and can influence vertical centering of single lines of text'
+        ]
+    },
+
+    {
+        id: 'css-colors',
+        title: 'Color Values',
+        library: 'css',
+        category: 'visuals',
+        description: 'CSS supports several ways to specify color: named colors, hexadecimal, rgb()/rgba(), hsl()/hsla(), and the modern color functions oklch() and color-mix(). All accept an alpha channel for transparency. oklch() is increasingly preferred because it produces more perceptually uniform, predictable color adjustments than older formats.',
+        syntax: '#hex, rgb(r g b / a), hsl(h s l / a), oklch(l c h)',
+        examples: [
+            {
+                title: 'The Classic Formats',
+                description: 'Named colors, hex, rgb, and hsl.',
+                code: '.a { color: coral; }                     /* named color */\n.b { color: #ff6b35; }                    /* hex */\n.c { color: rgb(255 107 53); }            /* rgb, modern space-separated syntax */\n.d { color: rgb(255 107 53 / 50%); }      /* rgb with alpha transparency */\n.e { color: hsl(16 100% 60%); }           /* hue, saturation, lightness */'
+            },
+            {
+                title: 'Modern Color Functions',
+                description: 'oklch() and color-mix(), which offer more predictable, perceptually accurate results.',
+                code: '.modern {\n  color: oklch(70% 0.15 50); /* lightness, chroma, hue - perceptually uniform */\n}\n\n.mixed {\n  background: color-mix(in oklch, blue 60%, white); /* blends two colors directly in CSS */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'hex', type: '#rrggbb', description: 'Hexadecimal color, most common legacy format' },
+            { name: 'rgb()', type: 'r g b / alpha', description: 'Red, green, blue, with optional alpha' },
+            { name: 'hsl()', type: 'hue sat light / alpha', description: 'Often easier to reason about for adjusting shades' },
+            { name: 'oklch()', type: 'lightness chroma hue', description: 'Modern, perceptually uniform color space' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use hsl() when you need to programmatically create color variations (lighter/darker shades of the same hue) - adjusting lightness alone is intuitive',
+            'Reach for oklch() in new projects for more perceptually accurate and predictable color mixing and adjustments',
+            'Use the modern space-separated rgb()/hsl() syntax with a slash for alpha (rgb(0 0 0 / 50%)) rather than the older comma-separated rgba()',
+            'Store brand colors as CSS custom properties rather than repeating hex codes throughout a stylesheet'
+        ]
+    },
+
+    {
+        id: 'css-backgrounds',
+        title: 'Background Properties',
+        library: 'css',
+        category: 'visuals',
+        description: 'Background properties control an element\'s background color and image. background-image sets one or more images, background-size controls their scaling, background-position controls placement, and background-repeat controls tiling. Multiple backgrounds can be layered by comma-separating values.',
+        syntax: 'background-image: url();\nbackground-size: cover | contain | length;\nbackground-position: value;',
+        examples: [
+            {
+                title: 'A Full-Bleed Cover Image',
+                description: 'The classic hero-image pattern.',
+                code: '.hero {\n  background-image: url("banner.jpg");\n  background-size: cover;       /* fills the box, cropping as needed */\n  background-position: center;   /* keeps the image centered while cropping */\n  background-repeat: no-repeat;\n}'
+            },
+            {
+                title: 'Layering Multiple Backgrounds',
+                description: 'Combining a gradient overlay with an image, comma-separated from front to back.',
+                code: '.overlay-hero {\n  background-image:\n    linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.4)),\n    url("banner.jpg");\n  background-size: cover;\n}'
+            }
+        ],
+        attributes: [
+            { name: 'background-color', type: 'color', description: 'Solid background fill, shows if the image fails to load' },
+            { name: 'background-image', type: 'url() | gradient', description: 'One or more layered background images' },
+            { name: 'background-size', type: 'cover | contain | length', description: 'How the image is scaled within the element' },
+            { name: 'background-position', type: 'keyword | length', description: 'Where the image is placed within the element' },
+            { name: 'background-repeat', type: 'repeat | no-repeat | repeat-x | repeat-y', description: 'Whether/how the image tiles' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always set a background-color as a fallback alongside background-image, in case the image fails to load or is still loading',
+            'Use background-size: cover for full-bleed hero images, and contain when the entire image must always be visible without cropping',
+            'Layer a semi-transparent gradient over a background image to ensure text placed on top remains readable',
+            'Prefer an actual <img> element with alt text over a CSS background-image when the image is meaningful content, not decoration'
+        ]
+    },
+
+    {
+        id: 'css-gradients',
+        title: 'Gradients',
+        library: 'css',
+        category: 'visuals',
+        description: 'CSS gradients generate smooth transitions between colors without needing an image file. linear-gradient() transitions along a straight line/angle, radial-gradient() transitions outward from a center point, and conic-gradient() transitions around a center point like a color wheel. Gradients are used as background-image values.',
+        syntax: 'linear-gradient(direction, color1, color2);\nradial-gradient(shape, color1, color2);',
+        examples: [
+            {
+                title: 'linear-gradient()',
+                description: 'A gradient along a straight line, with a controllable angle.',
+                code: '.basic {\n  background: linear-gradient(to right, #667eea, #764ba2);\n}\n\n.angled {\n  background: linear-gradient(135deg, #ff6b6b, #feca57);\n}\n\n.multi-stop {\n  background: linear-gradient(to right, red, yellow 30%, green);\n}'
+            },
+            {
+                title: 'radial-gradient() and conic-gradient()',
+                description: 'Gradients that radiate from or rotate around a center point.',
+                code: '.radial {\n  background: radial-gradient(circle, #ffffff, #a1c4fd);\n}\n\n.conic {\n  background: conic-gradient(from 0deg, red, yellow, green, blue, red);\n  border-radius: 50%; /* a classic use case: a color wheel */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'linear-gradient()', type: 'function', description: 'Transitions colors along a straight line or angle' },
+            { name: 'radial-gradient()', type: 'function', description: 'Transitions colors outward from a center point' },
+            { name: 'conic-gradient()', type: 'function', description: 'Transitions colors around a center point, like a pie chart' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use gradients instead of image files for simple color transitions - they render sharply at any resolution and add no HTTP request',
+            'Add explicit color stop percentages (yellow 30%) when you need precise control over where each color transition happens',
+            'Use conic-gradient() for pie charts, color wheels, or loading spinners - it is the only gradient type that rotates around a point',
+            'Layer a gradient over a background-image (comma-separated) to create image overlays without extra markup'
+        ]
+    },
+
+    {
+        id: 'css-borders',
+        title: 'Border Properties',
+        library: 'css',
+        category: 'visuals',
+        description: 'border draws a line around an element\'s edge, controlled by width, style, and color, which can be set together via the border shorthand or individually per side (border-top, border-right, etc). border-radius rounds the corners, accepting one value for all corners or up to four for individual control.',
+        syntax: 'border: width style color;\nborder-radius: length;',
+        examples: [
+            {
+                title: 'The border Shorthand',
+                description: 'Setting width, style, and color in one declaration.',
+                code: '.box { border: 2px solid #333; }\n.dashed { border: 1px dashed #999; }\n.top-only { border-top: 3px solid blue; } /* individual sides */'
+            },
+            {
+                title: 'border-radius Variations',
+                description: 'Rounding corners uniformly or individually.',
+                code: '.rounded { border-radius: 8px; }               /* all four corners */\n.pill { border-radius: 999px; }                 /* fully rounded ends */\n.circle { border-radius: 50%; }                 /* on a square element, makes a circle */\n.custom { border-radius: 8px 8px 0 0; }         /* top-left top-right bottom-right bottom-left */'
+            }
+        ],
+        attributes: [
+            { name: 'border-width', type: 'length', description: 'Thickness of the border' },
+            { name: 'border-style', type: 'solid | dashed | dotted | none', description: 'Line style of the border' },
+            { name: 'border-color', type: 'color', description: 'Color of the border' },
+            { name: 'border-radius', type: 'length | %', description: 'Rounds the corners of the border box' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use border-radius: 50% on an element with equal width and height to create a perfect circle',
+            'Use a very large border-radius value (like 999px) as a common trick for reliably pill-shaped buttons regardless of their size',
+            'Remember border-style must be set (border defaults to none) or the border will not render even with width and color set',
+            'Use individual longhand properties (border-top, border-left) when only specific sides need a border, rather than setting border then overriding with border: none on other sides'
+        ]
+    },
+
+    {
+        id: 'css-box-shadow',
+        title: 'box-shadow',
+        library: 'css',
+        category: 'visuals',
+        description: 'box-shadow adds one or more drop shadows to an element\'s box, accepting horizontal offset, vertical offset, blur radius, optional spread radius, and color. The inset keyword flips the shadow to render inside the element instead of outside. Multiple shadows can be layered by comma-separating values, useful for realistic elevation effects.',
+        syntax: 'box-shadow: offsetX offsetY blur spread color;',
+        examples: [
+            {
+                title: 'A Basic Drop Shadow',
+                description: 'The standard elevated-card look.',
+                code: '.card {\n  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);\n  /* offsetX offsetY blur color */\n}\n\n.elevated {\n  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);\n}'
+            },
+            {
+                title: 'Inset Shadow and Layered Shadows',
+                description: 'An inner shadow, and combining multiple shadows for realistic depth.',
+                code: '.pressed {\n  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);\n}\n\n.layered {\n  box-shadow:\n    0 1px 2px rgba(0, 0, 0, 0.07),\n    0 4px 8px rgba(0, 0, 0, 0.07),\n    0 8px 16px rgba(0, 0, 0, 0.07);\n}'
+            }
+        ],
+        attributes: [
+            { name: 'offsetX / offsetY', type: 'length', description: 'Horizontal and vertical shadow position' },
+            { name: 'blur', type: 'length', description: 'How soft/spread out the shadow edge is' },
+            { name: 'spread', type: 'length', description: 'Expands or shrinks the shadow size before blurring' },
+            { name: 'inset', type: 'keyword', description: 'Renders the shadow inside the element instead of outside' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use low-opacity black (rgba(0,0,0,0.1) or similar) rather than solid gray for more natural-looking shadows',
+            'Layer multiple subtle shadows rather than one large one for a more realistic, soft elevation effect (a common design-system pattern)',
+            'Use inset shadows for pressed/active button states or input field focus effects',
+            'Keep shadow intensity proportional to elevation - small, subtle shadows for slightly-raised cards, larger and softer ones for modals and popovers'
+        ]
+    },
+
+    {
+        id: 'css-transitions',
+        title: 'Transitions',
+        library: 'css',
+        category: 'effects',
+        description: 'Transitions smoothly animate a property change over a specified duration, rather than the change happening instantly. They require a property to transition, a duration, and typically a timing function that controls the pace of the animation - useful for hover effects, state changes, and general UI polish.',
+        syntax: 'transition: property duration timing-function delay;',
+        examples: [
+            {
+                title: 'A Basic Hover Transition',
+                description: 'Smoothly animating a color and transform change on hover.',
+                code: '.button {\n  background: #3b82f6;\n  transform: scale(1);\n  transition: background 0.2s ease, transform 0.2s ease;\n}\n\n.button:hover {\n  background: #2563eb;\n  transform: scale(1.05);\n}'
+            },
+            {
+                title: 'transition: all vs Specific Properties',
+                description: 'Why targeting specific properties is usually better than "all".',
+                code: '.risky {\n  transition: all 0.3s ease; /* animates EVERY property that changes, even unintended ones */\n}\n\n.better {\n  transition: background-color 0.3s ease, box-shadow 0.3s ease; /* explicit and predictable */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'transition-property', type: 'property name | all', description: 'Which property(ies) to animate' },
+            { name: 'transition-duration', type: 'time', description: 'How long the animation takes' },
+            { name: 'transition-timing-function', type: 'ease | linear | ease-in-out | cubic-bezier()', description: 'The pacing curve of the animation' },
+            { name: 'transition-delay', type: 'time', description: 'Delay before the transition starts' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Prefer transitioning transform and opacity over properties like width or top - they can be animated by the GPU, resulting in much smoother performance',
+            'List specific properties rather than using transition: all, to avoid accidentally animating unrelated property changes',
+            'Keep UI transitions short (150-300ms) - longer durations start to feel sluggish rather than polished',
+            'Respect prefers-reduced-motion by disabling or reducing non-essential transitions for users who have that preference enabled'
+        ]
+    },
+
+    {
+        id: 'css-animations',
+        title: 'Animations & @keyframes',
+        library: 'css',
+        category: 'effects',
+        description: '@keyframes defines a named sequence of styles at different points (0% to 100%) of an animation, which is then applied to an element via the animation property. Unlike transitions, which only animate between two states, keyframe animations can define arbitrarily complex multi-step sequences and loop indefinitely.',
+        syntax: '@keyframes name { 0% { } 100% { } }\nanimation: name duration timing-function iteration-count;',
+        examples: [
+            {
+                title: 'A Basic Keyframe Animation',
+                description: 'Defining and applying a fade-in-and-rise animation.',
+                code: '@keyframes fadeInUp {\n  from {\n    opacity: 0;\n    transform: translateY(20px);\n  }\n  to {\n    opacity: 1;\n    transform: translateY(0);\n  }\n}\n\n.card {\n  animation: fadeInUp 0.5s ease-out;\n}'
+            },
+            {
+                title: 'Multi-Step and Looping Animation',
+                description: 'A pulsing loading indicator using percentage-based keyframes.',
+                code: '@keyframes pulse {\n  0%, 100% { opacity: 1; transform: scale(1); }\n  50% { opacity: 0.5; transform: scale(1.1); }\n}\n\n.loading-dot {\n  animation: pulse 1.5s ease-in-out infinite;\n}'
+            }
+        ],
+        attributes: [
+            { name: 'animation-name', type: 'identifier', description: 'References a @keyframes rule by name' },
+            { name: 'animation-duration', type: 'time', description: 'Length of one animation cycle' },
+            { name: 'animation-iteration-count', type: 'number | infinite', description: 'How many times the animation repeats' },
+            { name: 'animation-fill-mode', type: 'none | forwards | backwards | both', description: 'What styles apply before/after the animation runs' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use @keyframes for multi-step or looping animations, and simple transitions for animating between exactly two states',
+            'Set animation-fill-mode: forwards when the animation\'s end state should persist after it finishes, rather than snapping back to the original style',
+            'Use infinite only for genuinely continuous effects like loading spinners - most UI animations should run once',
+            'Wrap non-essential animations in an @media (prefers-reduced-motion: no-preference) query so users with motion sensitivity are not affected'
+        ]
+    },
+
+    {
+        id: 'css-transforms',
+        title: 'Transforms',
+        library: 'css',
+        category: 'effects',
+        description: 'transform lets you visually move, rotate, scale, or skew an element without affecting the document flow of surrounding elements - unlike changing position/width directly. Multiple transform functions can be combined in a single declaration, and transform-origin controls the pivot point for rotation and scaling.',
+        syntax: 'transform: translate() rotate() scale() skew();',
+        examples: [
+            {
+                title: 'The Four Core Transform Functions',
+                description: 'Moving, rotating, scaling, and skewing an element.',
+                code: '.move { transform: translate(20px, 10px); }\n.rotate { transform: rotate(15deg); }\n.grow { transform: scale(1.2); }\n.skewed { transform: skew(-10deg, 0); }\n\n/* Combining multiple transforms in one declaration */\n.combined { transform: translateX(10px) rotate(5deg) scale(1.1); }'
+            },
+            {
+                title: 'transform-origin',
+                description: 'Controlling the pivot point that rotation and scaling happen around.',
+                code: '.default-origin {\n  transform: rotate(45deg); /* pivots around the center by default */\n}\n\n.corner-origin {\n  transform-origin: top left;\n  transform: rotate(45deg); /* now pivots around the top-left corner instead */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'translate()', type: 'x, y', description: 'Moves the element without affecting document flow' },
+            { name: 'rotate()', type: 'angle', description: 'Rotates the element around its transform-origin' },
+            { name: 'scale()', type: 'x, y', description: 'Resizes the element proportionally or per-axis' },
+            { name: 'transform-origin', type: 'position', description: 'Sets the pivot point for rotation and scaling' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use transform: translate() instead of changing top/left for moving elements - transforms are GPU-accelerated and do not trigger layout recalculation',
+            'Combine multiple transform functions in a single declaration rather than stacking multiple transform properties, since only the last one would apply',
+            'Use scale() for hover effects instead of changing width/height directly, for smoother performance',
+            'Remember transformed elements do not affect the layout of surrounding elements - the space they originally occupied stays reserved'
+        ]
+    },
+
+    {
+        id: 'css-filters',
+        title: 'Filters',
+        library: 'css',
+        category: 'effects',
+        description: 'The filter property applies graphical effects like blur, brightness, contrast, and grayscale directly to an element, similar to Photoshop-style filters. backdrop-filter applies the same effects to the area behind an element instead, commonly used for frosted-glass UI effects. Multiple filter functions can be chained together.',
+        syntax: 'filter: blur() brightness() contrast() grayscale();',
+        examples: [
+            {
+                title: 'Common Filter Functions',
+                description: 'Blurring, adjusting brightness, and desaturating an image.',
+                code: '.blurred { filter: blur(5px); }\n.dimmed { filter: brightness(0.7); }\n.grayscale { filter: grayscale(100%); }\n.high-contrast { filter: contrast(1.4); }\n\n/* Chaining multiple filters together */\n.vintage { filter: sepia(0.5) contrast(1.1) brightness(0.9); }'
+            },
+            {
+                title: 'backdrop-filter for Frosted Glass',
+                description: 'Applying a blur to whatever is BEHIND a semi-transparent element - the popular glassmorphism effect.',
+                code: '.glass-panel {\n  background: rgba(255, 255, 255, 0.15);\n  backdrop-filter: blur(10px);\n  border: 1px solid rgba(255, 255, 255, 0.2);\n}'
+            }
+        ],
+        attributes: [
+            { name: 'blur()', type: 'length', description: 'Gaussian blur effect' },
+            { name: 'brightness()', type: 'percentage', description: 'Adjusts lightness, 100% is unchanged' },
+            { name: 'grayscale()', type: 'percentage', description: 'Desaturates the element' },
+            { name: 'backdrop-filter', type: 'same functions', description: 'Applies filters to content behind the element, not the element itself' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use backdrop-filter specifically for frosted-glass effects over background content - filter alone only affects the element itself, not what is behind it',
+            'Chain multiple filter functions in one declaration for combined effects, rather than nesting elements to stack filters',
+            'Be mindful of performance - filters, especially blur, can be expensive to render on large areas or during animation',
+            'Test backdrop-filter with an actual background behind the element - it has no visible effect over a plain solid background'
+        ]
+    },
+
+    {
+        id: 'css-units',
+        title: 'Length Units: px, %, em, rem',
+        library: 'css',
+        category: 'sizing',
+        description: 'CSS offers several length units. px is an absolute, fixed unit. % is relative to the parent element. em is relative to the current element\'s font-size (compounding when nested). rem is relative to the root (html) element\'s font-size, avoiding the compounding problem of em, and is generally preferred for consistent, predictable sizing.',
+        syntax: 'value: Npx | N% | Nem | Nrem;',
+        examples: [
+            {
+                title: 'The Compounding Problem with em',
+                description: 'Why em can produce unexpected results when nested.',
+                code: '.parent { font-size: 20px; }\n.child { font-size: 1.5em; }  /* 30px - relative to parent\'s 20px */\n.grandchild { font-size: 1.5em; } /* 45px! - relative to child\'s 30px, compounds */'
+            },
+            {
+                title: 'rem Avoids Compounding',
+                description: 'rem is always relative to the root, regardless of nesting depth.',
+                code: 'html { font-size: 16px; } /* the reference point for ALL rem values */\n\n.deeply-nested-element {\n  font-size: 1.5rem; /* always 24px, no matter how deeply nested */\n  padding: 1rem;      /* always 16px */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'px', type: 'absolute', description: 'Fixed pixel size, does not scale with user font preferences' },
+            { name: '%', type: 'relative', description: 'Relative to the parent element\'s corresponding value' },
+            { name: 'em', type: 'relative', description: 'Relative to the current element\'s font-size, compounds when nested' },
+            { name: 'rem', type: 'relative', description: 'Relative to the root html element\'s font-size, does not compound' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use rem for font-size and most spacing, so everything scales correctly if a user changes their browser\'s base font size for accessibility',
+            'Use em specifically when you want a value to scale with its own element\'s font-size, like padding inside a button that should grow with its text',
+            'Avoid px for font-size specifically, since it ignores user accessibility preferences for text scaling',
+            'Use % for widths within a fluid, responsive container, but be aware % for font-size and most other properties refers to the parent, which can be less predictable than rem'
+        ]
+    },
+
+    {
+        id: 'css-viewport-units',
+        title: 'Viewport Units: vh, vw, dvh',
+        library: 'css',
+        category: 'sizing',
+        description: 'Viewport units are relative to the browser window\'s dimensions rather than a parent element. vh and vw represent 1% of the viewport height and width respectively. The newer dvh (dynamic viewport height) solves the classic mobile browser problem where vh included space later covered by the address bar.',
+        syntax: 'value: Nvh | Nvw | Ndvh | Nsvh | Nlvh;',
+        examples: [
+            {
+                title: 'Full-Height Sections',
+                description: 'A common landing page pattern - a section that fills the screen.',
+                code: '.hero {\n  height: 100vh; /* fills the full viewport height */\n  width: 100vw;\n}'
+              },
+            {
+                title: 'The Mobile Address Bar Problem, Solved',
+                description: 'Why dvh is now preferred over vh on mobile.',
+                code: '.old-approach {\n  height: 100vh; /* on mobile, this can be taller than the VISIBLE area, since vh ignores the collapsing address bar */\n}\n\n.modern-approach {\n  height: 100dvh; /* dynamic viewport height - adjusts as the browser UI shows/hides */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'vh / vw', type: '1% of viewport height/width', description: 'Classic viewport units, can misbehave on mobile' },
+            { name: 'dvh', type: 'dynamic viewport height', description: 'Adjusts in real-time as mobile browser UI shows/hides' },
+            { name: 'svh / lvh', type: 'small/large viewport height', description: 'Fixed to the smallest or largest possible viewport state' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use dvh instead of vh for full-height mobile layouts, to avoid content being cut off or leaving unwanted gaps as the address bar shows/hides',
+            'Use vw carefully for font-size - it can make text so small or large on extreme screen widths that it should typically be combined with clamp()',
+            'Test full-viewport-height layouts on actual mobile devices, not just a desktop browser\'s responsive mode, since the address bar behavior does not simulate accurately'
+        ]
+    },
+
+    {
+        id: 'css-calc-min-max-clamp',
+        title: 'calc(), min(), max(), clamp()',
+        library: 'css',
+        category: 'sizing',
+        description: 'These functions let you compute CSS values dynamically. calc() performs math between different units. min() and max() pick the smallest or largest of a list of values. clamp(min, preferred, max) is especially powerful for fluid, responsive sizing - it uses the preferred value but never goes below min or above max.',
+        syntax: 'calc(expression)\nclamp(min, preferred, max)',
+        examples: [
+            {
+                title: 'calc() for Mixed-Unit Math',
+                description: 'Combining different units in a single calculation.',
+                code: '.sidebar-offset {\n  width: calc(100% - 250px); /* fills remaining space next to a fixed 250px sidebar */\n}\n\n.centered-minus-gap {\n  margin-top: calc(2rem + 10px);\n}'
+            },
+            {
+                title: 'clamp() for Fluid Typography',
+                description: 'The most common modern pattern - text that scales with the viewport but stays within safe bounds.',
+                code: 'h1 {\n  font-size: clamp(1.75rem, 4vw + 1rem, 3.5rem);\n  /* never smaller than 1.75rem, never larger than 3.5rem,\n     scales fluidly with viewport width in between */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'calc()', type: 'function', description: 'Performs math, mixing different units' },
+            { name: 'min()', type: 'function', description: 'Uses the smallest of the given values' },
+            { name: 'max()', type: 'function', description: 'Uses the largest of the given values' },
+            { name: 'clamp(min, val, max)', type: 'function', description: 'Fluidly scales val, bounded between min and max' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use clamp() for fluid typography instead of setting different font-size values in multiple media queries',
+            'Use calc() whenever you need to mix units, like subtracting a fixed sidebar width from a 100% fluid container',
+            'Use min() to cap a fluid width so it never grows unreasonably large on very wide screens, without needing a max-width media query',
+            'Remember these functions can be nested and combined for sophisticated responsive behavior entirely within CSS, with no JavaScript needed'
+        ]
+    },
+
+    {
+        id: 'css-basic-selectors',
+        title: 'Basic Selectors',
+        library: 'css',
+        category: 'selectors',
+        description: 'CSS selectors target elements to style. Type selectors match by tag name, class selectors (.name) match elements with that class, ID selectors (#name) match a single unique element, and the universal selector (*) matches everything. Classes are the most commonly used selector for reusable styling.',
+        syntax: 'element { }\n.class { }\n#id { }\n* { }',
+        examples: [
+            {
+                title: 'The Four Basic Types',
+                description: 'Type, class, ID, and universal selectors.',
+                code: 'p { color: #333; }              /* every <p> element */\n.highlight { background: yellow; } /* every element with class="highlight" */\n#main-header { font-size: 2rem; }  /* the single element with id="main-header" */\n* { box-sizing: border-box; }       /* every element on the page */'
+            },
+            {
+                title: 'Combining Selectors',
+                description: 'Selectors can be combined for more specific targeting.',
+                code: 'p.intro { font-weight: bold; }   /* only <p> elements that ALSO have class="intro" */\n.card.featured { border: 2px solid gold; } /* elements with BOTH classes */'
+            }
+        ],
+        attributes: [
+            { name: 'element', type: 'type selector', description: 'Matches all elements of that tag name' },
+            { name: '.class', type: 'class selector', description: 'Matches all elements with that class' },
+            { name: '#id', type: 'ID selector', description: 'Matches the single element with that id' },
+            { name: '*', type: 'universal selector', description: 'Matches every element' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Prefer classes over IDs for styling - classes are reusable across multiple elements, while IDs must be unique per page and carry high specificity that is hard to override',
+            'Avoid styling directly by element type (like p or div) in larger projects, since it applies globally and is easy to accidentally affect unrelated content',
+            'Use the universal selector (*) sparingly, typically just for resets like box-sizing, since it applies to literally everything',
+            'Combine class selectors (.card.featured) rather than deeply nesting selectors, for flatter, more maintainable specificity'
+        ]
+    },
+
+    {
+        id: 'css-combinators',
+        title: 'Combinators',
+        library: 'css',
+        category: 'selectors',
+        description: 'Combinators define relationships between selectors. The descendant combinator (space) matches any nested element. The child combinator (>) matches only direct children. The adjacent sibling combinator (+) matches the very next sibling. The general sibling combinator (~) matches all following siblings.',
+        syntax: 'A B { }   /* descendant */\nA > B { } /* direct child */\nA + B { } /* adjacent sibling */\nA ~ B { } /* general sibling */',
+        examples: [
+            {
+                title: 'Descendant vs Child Combinator',
+                description: 'The key difference between space and >.',
+                code: '.card p { color: gray; }     /* ANY <p> nested anywhere inside .card, at any depth */\n.card > p { color: gray; }   /* ONLY <p> elements that are DIRECT children of .card */'
+            },
+            {
+                title: 'Sibling Combinators',
+                description: 'Targeting elements based on their position relative to a sibling.',
+                code: 'h2 + p { margin-top: 0; }      /* only the <p> immediately following an <h2> */\ninput:checked ~ label { color: green; } /* every label after a checked input, at any distance */'
+            }
+        ],
+        attributes: [
+            { name: '(space)', type: 'descendant combinator', description: 'Matches elements nested anywhere inside, at any depth' },
+            { name: '>', type: 'child combinator', description: 'Matches only direct (one-level) children' },
+            { name: '+', type: 'adjacent sibling', description: 'Matches only the immediately following sibling' },
+            { name: '~', type: 'general sibling', description: 'Matches all following siblings, not just the next one' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use the child combinator (>) when you specifically want to avoid styling deeply nested elements that happen to share a selector',
+            'Use the adjacent sibling combinator (+) for spacing adjustments, like removing top margin from an element right after a heading',
+            'The ~ general sibling combinator combined with :checked is a classic CSS-only trick for building interactive components without JavaScript',
+            'Avoid overly long combinator chains (like .a .b > .c + .d) - they become fragile and hard to maintain as markup changes'
+        ]
+    },
+
+    {
+        id: 'css-attribute-selectors',
+        title: 'Attribute Selectors',
+        library: 'css',
+        category: 'selectors',
+        description: 'Attribute selectors target elements based on the presence or value of an HTML attribute, using square bracket syntax. They support several matching modes beyond exact equality, including starts-with, ends-with, and contains, making them powerful for targeting elements without needing extra classes.',
+        syntax: '[attr] { }\n[attr="value"] { }\n[attr^="value"] { }',
+        examples: [
+            {
+                title: 'Presence and Exact Match',
+                description: 'Selecting by whether an attribute exists, or matches exactly.',
+                code: '[disabled] { opacity: 0.5; }              /* any element with a disabled attribute at all */\n[type="submit"] { font-weight: bold; }     /* inputs with type exactly "submit" */\n[target="_blank"] { }                      /* links that open in a new tab */'
+            },
+            {
+                title: 'Pattern-Matching Attribute Values',
+                description: 'Starts-with, ends-with, and contains matching.',
+                code: 'a[href^="https://"] { }   /* href starts with https:// */\na[href$=".pdf"] { }        /* href ends with .pdf - useful for styling download links */\n[class*="btn-"] { }        /* class contains "btn-" anywhere within it */'
+            }
+        ],
+        attributes: [
+            { name: '[attr]', type: 'presence', description: 'Matches if the attribute exists, regardless of value' },
+            { name: '[attr="val"]', type: 'exact match', description: 'Matches only an exact value' },
+            { name: '[attr^="val"]', type: 'starts with', description: 'Matches values beginning with the given string' },
+            { name: '[attr$="val"]', type: 'ends with', description: 'Matches values ending with the given string' },
+            { name: '[attr*="val"]', type: 'contains', description: 'Matches values containing the given string anywhere' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use [href$=".pdf"] style selectors to automatically style download links or external links without needing to add classes manually',
+            'Use [disabled] or [aria-expanded="true"] to style based on state attributes, keeping styling in sync with actual element state',
+            'Attribute selectors carry the same specificity as a class selector, so they combine predictably with other class-based rules',
+            'Prefer classes for styling hooks that are purely presentational, and reserve attribute selectors for cases tied to genuine HTML semantics or state'
+        ]
+    },
+
+    {
+        id: 'css-has-selector',
+        title: ':has() - The Parent Selector',
+        library: 'css',
+        category: 'selectors',
+        description: ':has() matches an element if any of the selectors passed to it match something within it - effectively letting you style a parent based on its children or descendants, something CSS could never do natively before. It has broad, mainstream browser support as of 2026 and is safe to use in production.',
+        syntax: ':has(selector)',
+        examples: [
+            {
+                title: 'Styling a Parent Based on Its Children',
+                description: 'Highlighting a form group only if it contains an invalid input.',
+                code: '.form-group:has(input:invalid) {\n  border-left: 3px solid red;\n  background: #fef2f2;\n}'
+            },
+            {
+                title: 'Conditional Layout Based on Content',
+                description: 'Changing a card\'s layout depending on whether it contains an image.',
+                code: '.card:has(img) {\n  grid-template-columns: 100px 1fr; /* image + text layout */\n}\n\n.card:not(:has(img)) {\n  grid-template-columns: 1fr; /* text-only layout */\n}'
+            },
+            {
+                title: 'Sibling-Based Styling',
+                description: 'A powerful combination: styling an element based on the state of a sibling.',
+                code: '.field:has(+ .error-message) input {\n  border-color: red; /* highlights an input if an error message follows it */\n}'
+            }
+        ],
+        attributes: [
+            { name: ':has(selector)', type: 'pseudo-class', description: 'Matches if the given selector matches anything inside the element' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use :has() to replace many patterns that previously required JavaScript, like styling a form field based on its own validity state',
+            'Combine :has() with :not() to style elements that specifically lack certain children',
+            'Keep :has() selectors reasonably simple - deeply nested conditions can become hard to reason about, even though they are valid',
+            'Use :has() for genuinely conditional styling based on content structure, not as a general replacement for simple class-based styling'
+        ]
+    },
+
+    {
+        id: 'css-is-where-selectors',
+        title: ':is() and :where()',
+        library: 'css',
+        category: 'selectors',
+        description: ':is() and :where() both accept a list of selectors and match any of them, letting you write more compact selector groups. The key difference is specificity: :is() takes on the specificity of its most specific argument, while :where() always contributes zero specificity, making its rules trivially easy to override.',
+        syntax: ':is(selector-list)\n:where(selector-list)',
+        examples: [
+            {
+                title: 'Reducing Repetition with :is()',
+                description: 'Combining what would otherwise be several separate selectors.',
+                code: '/* Without :is() */\nheader a:hover, main a:hover, footer a:hover { color: blue; }\n\n/* With :is() - equivalent, more concise */\n:is(header, main, footer) a:hover { color: blue; }'
+            },
+            {
+                title: 'The Specificity Difference',
+                description: 'Why :where() is preferred for low-priority base styles.',
+                code: '/* :is() takes on the highest specificity among its arguments */\n:is(#sidebar, .content) p { color: gray; } /* behaves like #sidebar specificity */\n\n/* :where() always contributes ZERO specificity - trivially overridable */\n:where(#sidebar, .content) p { color: gray; } /* easy for any other rule to override */'
+            }
+        ],
+        attributes: [
+            { name: ':is()', type: 'pseudo-class', description: 'Matches any selector in the list, uses highest specificity among them' },
+            { name: ':where()', type: 'pseudo-class', description: 'Matches any selector in the list, always contributes zero specificity' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use :is() to shorten repetitive selector lists that share a common descendant pattern',
+            'Use :where() specifically for reset styles, base component styles, or CSS you expect (and want) other rules to easily override',
+            'Remember :where() zero-specificity is a genuine tool for library/design-system authors, so consumers can override defaults without fighting specificity',
+            'Both accept complex selector lists, including combinators, giving significant power in a compact syntax'
+        ]
+    },
+
+    {
+        id: 'css-nesting',
+        title: 'Native CSS Nesting',
+        library: 'css',
+        category: 'selectors',
+        description: 'Native CSS nesting lets you write selectors inside other selectors, similar to what Sass offered for years, but now supported directly in browsers with no build step required. The & symbol explicitly references the parent selector, useful for pseudo-classes, modifiers, and compound selectors.',
+        syntax: '.parent {\n  & .child { }\n  &:hover { }\n}',
+        examples: [
+            {
+                title: 'Basic Nesting',
+                description: 'Nesting descendant selectors and pseudo-classes inside a parent rule.',
+                code: '.card {\n  padding: 1rem;\n  background: white;\n\n  &:hover {\n    background: #f3f4f6;\n  }\n\n  & .title {\n    font-size: 1.25rem;\n    font-weight: bold;\n  }\n}'
+            },
+            {
+                title: 'Nesting Media Queries and Modifiers',
+                description: 'Keeping related responsive and state styles physically close to the base rule.',
+                code: '.button {\n  padding: 8px 16px;\n\n  &.primary {\n    background: blue;\n  }\n\n  @media (min-width: 768px) {\n    padding: 12px 24px;\n  }\n}'
+            }
+        ],
+        attributes: [
+            { name: '&', type: 'nesting selector', description: 'Explicitly references the parent selector within a nested rule' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use native nesting to keep a component\'s related styles - base, hover states, modifiers, responsive rules - physically grouped together',
+            'Use & explicitly when nesting a compound selector (&.active) or pseudo-class (&:hover), since omitting it changes the meaning to a descendant selector instead',
+            'Avoid nesting too many levels deep - beyond 2-3 levels, generated specificity and selector length both grow, hurting maintainability',
+            'This is now broadly supported without a preprocessor, but check your specific browser support target if you need to support noticeably older browsers'
+        ]
+    },
+
+    {
+        id: 'css-pseudo-classes-basic',
+        title: 'Interactive Pseudo-classes',
+        library: 'css',
+        category: 'interactivity',
+        description: 'These pseudo-classes style elements based on user interaction state. :hover applies while the pointer is over an element, :focus while it has keyboard focus, :active during the moment of being clicked/pressed, and :visited for links the user has already navigated to.',
+        syntax: ':hover, :focus, :active, :visited',
+        examples: [
+            {
+                title: 'The Interaction State Order',
+                description: 'A button styled across its different interactive states.',
+                code: '.button {\n  background: #3b82f6;\n  transition: background 0.15s ease;\n}\n\n.button:hover {\n  background: #2563eb;\n}\n\n.button:focus {\n  outline: 2px solid #93c5fd;\n  outline-offset: 2px;\n}\n\n.button:active {\n  background: #1d4ed8;\n}'
+            },
+            {
+                title: 'Styling Visited Links',
+                description: 'A subtle way to indicate previously-visited pages.',
+                code: 'a:visited {\n  color: #6b21a8; /* a slightly muted purple, distinct from the unvisited link color */\n}'
+            }
+        ],
+        attributes: [
+            { name: ':hover', type: 'pseudo-class', description: 'Applies while the pointer is over the element' },
+            { name: ':focus', type: 'pseudo-class', description: 'Applies while the element has keyboard/programmatic focus' },
+            { name: ':active', type: 'pseudo-class', description: 'Applies during the moment of being clicked or pressed' },
+            { name: ':visited', type: 'pseudo-class', description: 'Applies to links the user has already navigated to' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Never remove focus outlines (outline: none) without providing a clearly visible custom alternative - it is essential for keyboard navigation accessibility',
+            'Style hover states as a nice-to-have enhancement, not a requirement - hover has no equivalent on touchscreens',
+            'Follow the LVHA order (:link, :visited, :hover, :active) when declaring these together, since later rules override earlier ones at equal specificity',
+            'Use :focus-visible instead of :focus alone in modern projects, so focus rings only show for keyboard users, not every mouse click'
+        ]
+    },
+
+    {
+        id: 'css-focus-visible-within',
+        title: ':focus-visible and :focus-within',
+        library: 'css',
+        category: 'interactivity',
+        description: ':focus-visible applies only when the browser determines focus should be visibly indicated - typically keyboard navigation, not a mouse click - solving the old complaint of unwanted focus rings on click. :focus-within applies to a parent element when any descendant inside it has focus, useful for highlighting an entire form group when one of its fields is active.',
+        syntax: ':focus-visible { }\n:focus-within { }',
+        examples: [
+            {
+                title: ':focus-visible - Smarter Focus Rings',
+                description: 'Showing a focus ring for keyboard users without cluttering mouse interactions.',
+                code: '.button:focus {\n  outline: none; /* remove the default outline for ALL focus, including mouse clicks */\n}\n\n.button:focus-visible {\n  outline: 2px solid #3b82f6; /* but restore it specifically for keyboard focus */\n  outline-offset: 2px;\n}'
+            },
+            {
+                title: ':focus-within - Highlighting a Parent Group',
+                description: 'Styling an entire form field group when any of its inputs are focused.',
+                code: '.field-group {\n  border: 1px solid #d1d5db;\n  transition: border-color 0.15s ease;\n}\n\n.field-group:focus-within {\n  border-color: #3b82f6; /* highlights the whole group, not just the individual input */\n}'
+            }
+        ],
+        attributes: [
+            { name: ':focus-visible', type: 'pseudo-class', description: 'Focus styling that only appears for keyboard/non-pointer interaction' },
+            { name: ':focus-within', type: 'pseudo-class', description: 'Matches a parent when any descendant has focus' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use :focus-visible instead of :focus for custom focus ring styling - it correctly avoids showing rings on simple mouse clicks while preserving them for keyboard users',
+            'Use :focus-within to visually group and highlight a fieldset or custom dropdown component when any part of it is actively focused',
+            'Never combine outline: none with :focus alone and no :focus-visible fallback - that removes focus indication entirely, a serious accessibility regression',
+            'Test focus behavior with actual keyboard (Tab key) navigation, not just mouse clicks, to confirm the intended pseudo-class is doing what you expect'
+        ]
+    },
+
+    {
+        id: 'css-form-pseudo-classes',
+        title: 'Form State Pseudo-classes',
+        library: 'css',
+        category: 'interactivity',
+        description: 'CSS can style form elements based on their validation and interaction state without any JavaScript. :checked applies to checked checkboxes/radios, :disabled to disabled fields, :required and :optional based on the required attribute, and :valid/:invalid based on constraint validation results.',
+        syntax: ':checked, :disabled, :required, :valid, :invalid',
+        examples: [
+            {
+                title: 'Styling Checked and Disabled States',
+                description: 'Visual feedback for checkbox state and disabled fields.',
+                code: 'input[type="checkbox"]:checked {\n  accent-color: #3b82f6; /* tints the native checkbox */\n}\n\ninput:disabled {\n  opacity: 0.5;\n  cursor: not-allowed;\n}'
+            },
+            {
+                title: 'Live Validation Styling',
+                description: 'Giving instant visual feedback based on native HTML validation.',
+                code: 'input:required {\n  border-left: 3px solid #f59e0b; /* marks required fields */\n}\n\ninput:invalid:not(:placeholder-shown) {\n  border-color: red; /* only show invalid state once the user has typed something */\n}\n\ninput:valid:not(:placeholder-shown) {\n  border-color: green;\n}'
+            }
+        ],
+        attributes: [
+            { name: ':checked', type: 'pseudo-class', description: 'Matches checked checkboxes, radios, or selected options' },
+            { name: ':disabled / :enabled', type: 'pseudo-class', description: 'Matches based on the disabled attribute' },
+            { name: ':required / :optional', type: 'pseudo-class', description: 'Matches based on the required attribute' },
+            { name: ':valid / :invalid', type: 'pseudo-class', description: 'Matches based on constraint validation results' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Combine :invalid with :not(:placeholder-shown) to avoid showing an error state before the user has even had a chance to type',
+            'Use :checked alongside the sibling combinator (~) as a classic CSS-only technique for building toggles and accordions without JavaScript',
+            'Style :disabled fields clearly (reduced opacity, not-allowed cursor) so users understand why they cannot interact with them',
+            'Remember :valid/:invalid reflect the browser\'s native HTML validation - custom JavaScript validation needs its own styling approach, like conditional classes'
+        ]
+    },
+
+    {
+        id: 'css-pseudo-elements',
+        title: 'Pseudo-elements',
+        library: 'css',
+        category: 'interactivity',
+        description: 'Pseudo-elements let you style a specific part of an element rather than the whole thing, or insert generated content without adding extra HTML. ::before and ::after insert content before/after an element\'s actual content. ::first-line and ::first-letter target specific text portions. ::placeholder styles input placeholder text, and ::selection styles user-highlighted text.',
+        syntax: 'element::before { content: ""; }',
+        examples: [
+            {
+                title: '::before and ::after',
+                description: 'Inserting decorative content without extra markup - always requires the content property.',
+                code: '.required-label::after {\n  content: " *";\n  color: red;\n}\n\n.quote::before {\n  content: "\\201C"; /* opening curly quote character */\n  font-size: 2em;\n}'
+            },
+            {
+                title: '::first-letter and ::first-line',
+                description: 'Styling just the beginning of a text block, like a drop cap.',
+                code: '.article p::first-letter {\n  font-size: 3em;\n  float: left;\n  line-height: 0.8;\n  margin-right: 4px;\n}'
+            },
+            {
+                title: '::placeholder and ::selection',
+                description: 'Styling input placeholder text and user text selection highlighting.',
+                code: 'input::placeholder {\n  color: #9ca3af;\n  font-style: italic;\n}\n\n::selection {\n  background: #fef08a;\n  color: #000;\n}'
+            }
+        ],
+        attributes: [
+            { name: '::before / ::after', type: 'pseudo-element', description: 'Inserts generated content, requires the content property' },
+            { name: '::first-line / ::first-letter', type: 'pseudo-element', description: 'Targets the first line or letter of text' },
+            { name: '::placeholder', type: 'pseudo-element', description: 'Styles an input\'s placeholder text' },
+            { name: '::selection', type: 'pseudo-element', description: 'Styles user-highlighted text' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Always include a content property (even an empty string) on ::before/::after - without it, the pseudo-element does not render at all',
+            'Use ::before/::after for purely decorative content, not essential information - it is not reliably accessible to all assistive technology',
+            'Use double colons (::) for true pseudo-elements per the modern spec, though single colon (:before) still works for legacy compatibility',
+            'Use ::selection sparingly and ensure sufficient contrast - it affects how your content looks when users highlight text to copy it'
+        ]
+    },
+
+    {
+        id: 'css-pseudo-classes-structural',
+        title: 'Structural Pseudo-classes: nth-child()',
+        library: 'css',
+        category: 'interactivity',
+        description: 'Structural pseudo-classes select elements based on their position among siblings, without needing extra classes. :first-child and :last-child match the first/last element. :nth-child() accepts a formula (like 2n for even, 2n+1 for odd) or a simple number, letting you target patterns like every third item or striped table rows.',
+        syntax: ':first-child, :last-child, :nth-child(formula)',
+        examples: [
+            {
+                title: 'first-child, last-child, and a Specific Position',
+                description: 'Targeting elements by their fixed position among siblings.',
+                code: 'li:first-child { font-weight: bold; }\nli:last-child { border-bottom: none; }\nli:nth-child(3) { color: red; } /* the exact third item */'
+            },
+            {
+                title: 'nth-child() Formulas for Patterns',
+                description: 'Striped rows and other repeating patterns using the an+b formula.',
+                code: 'tr:nth-child(even) { background: #f9fafb; }  /* zebra striping */\ntr:nth-child(odd) { background: white; }\n\nli:nth-child(3n) { margin-right: 0; } /* every 3rd item, e.g. for a 3-column grid */\nli:nth-child(n + 4) { display: none; } /* hide everything from the 4th item onward */'
+            }
+        ],
+        attributes: [
+            { name: ':first-child / :last-child', type: 'pseudo-class', description: 'Matches if the element is the first/last among its siblings' },
+            { name: ':nth-child(n)', type: 'pseudo-class', description: 'Matches based on a formula or specific position among siblings' },
+            { name: ':nth-of-type(n)', type: 'pseudo-class', description: 'Like nth-child, but only counts siblings of the same element type' },
+            { name: ':only-child', type: 'pseudo-class', description: 'Matches an element with no siblings at all' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use :nth-child(even)/:nth-child(odd) for striped table rows or lists instead of manually adding alternating classes',
+            'Use :nth-of-type() instead of :nth-child() when other, different element types are mixed in among the siblings you are targeting',
+            'Combine :nth-child() with the general an+b formula for advanced patterns, like hiding all items after a certain position for a "show more" pattern',
+            'Remember these pseudo-classes count ALL sibling elements, not just ones matching your selector, unless you specifically use the :of-type variants'
+        ]
+    },
+
+    {
+        id: 'css-specificity',
+        title: 'Specificity',
+        library: 'css',
+        category: 'misc',
+        description: 'When multiple CSS rules target the same element with conflicting declarations, specificity determines which one wins. It is calculated as a four-part value: inline styles, ID selectors, class/attribute/pseudo-class selectors, and type/pseudo-element selectors, compared in that order from most to least significant.',
+        syntax: '(inline, ID, class, type)',
+        examples: [
+            {
+                title: 'Comparing Specificity',
+                description: 'Working through the specificity of several selectors.',
+                code: '/* p                -> (0,0,0,1) - one type selector */\n/* .box              -> (0,0,1,0) - one class selector */\n/* #header           -> (0,1,0,0) - one ID selector */\n/* .box.featured      -> (0,0,2,0) - two class selectors, higher than one class */\n/* #header .box       -> (0,1,1,0) - one ID + one class, beats any class-only combination */\n\n.box.featured { color: blue; }  /* (0,0,2,0) wins over .box alone */\n.box { color: red; }             /* (0,0,1,0) loses */'
+            },
+            {
+                title: 'Why !important Should Be a Last Resort',
+                description: '!important overrides normal specificity entirely, which can make future overrides very difficult.',
+                code: '.box { color: red !important; } /* wins regardless of specificity of other rules... */\n#header .box.featured { color: blue; } /* ...even against a highly specific selector like this */\n/* Now overriding .box requires ANOTHER !important, escalating a maintenance problem */'
+            }
+        ],
+        attributes: [],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Keep specificity as flat and low as possible throughout a project - prefer single class selectors over deeply nested or ID-based selectors',
+            'Avoid ID selectors for styling entirely in most modern projects, since their high specificity makes later overrides difficult',
+            'Treat !important as a last resort, not a quick fix - it breaks the normal cascade and often leads to an escalating "specificity war"',
+            'When two rules genuinely conflict, source order settles ties at equal specificity - the rule declared later in the stylesheet wins'
+        ]
+    },
+
+    {
+        id: 'css-cascade-layers',
+        title: 'Cascade Layers (@layer)',
+        library: 'css',
+        category: 'misc',
+        description: '@layer lets you explicitly define the priority order between groups of CSS rules, independent of selector specificity. Styles in a layer declared later always beat styles in an earlier layer, regardless of how specific the earlier layer\'s selectors are - solving specificity conflicts between resets, frameworks, components, and overrides in a predictable, structured way.',
+        syntax: '@layer name { }\n@layer layer1, layer2, layer3;',
+        examples: [
+            {
+                title: 'Declaring Layer Order',
+                description: 'Establishing which layers should win, before any of them are even defined.',
+                code: '@layer reset, base, components, utilities;\n/* utilities will always beat components, which always beats base, etc,\n   regardless of specificity, since layer order is declared upfront */'
+            },
+            {
+                title: 'Layers Beating Specificity',
+                description: 'A low-specificity rule in a later layer wins over a high-specificity rule in an earlier layer.',
+                code: '@layer base {\n  #card.featured.active { color: red; } /* very high specificity */\n}\n\n@layer utilities {\n  .text-blue { color: blue; } /* much lower specificity, but wins - later layer */\n}\n/* Without @layer, the #id-based rule in base would normally win despite coming first */'
+            }
+        ],
+        attributes: [
+            { name: '@layer name { }', type: 'at-rule', description: 'Defines a named cascade layer and its rules' },
+            { name: '@layer a, b, c;', type: 'at-rule', description: 'Declares layer priority order upfront, without defining rules yet' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Declare your full layer order upfront with @layer name1, name2, name3; even before writing rules, so the priority is clear from the start of the stylesheet',
+            'Use layers to cleanly separate resets, base styles, component styles, and utility overrides - a common structure that eliminates most specificity conflicts',
+            'Remember unlayered styles (written outside any @layer) always beat layered styles, regardless of layer order - keep genuinely critical overrides unlayered intentionally',
+            'This replaces many of the reasons teams historically reached for !important - a properly layered stylesheet rarely needs it'
+        ]
+    },
+
+    {
+        id: 'css-custom-properties',
+        title: 'Custom Properties (CSS Variables)',
+        library: 'css',
+        category: 'misc',
+        description: 'Custom properties, written as --name, let you define reusable values directly in CSS, accessed with var(). Unlike Sass variables, they are live in the browser - they can be read and changed with JavaScript, and they respect the cascade, meaning their value can be different in different parts of the DOM.',
+        syntax: '--name: value;\nvar(--name, fallback);',
+        examples: [
+            {
+                title: 'Defining and Using Variables',
+                description: 'A typical theming setup using custom properties on :root.',
+                code: ':root {\n  --primary-color: #3b82f6;\n  --spacing-unit: 8px;\n  --border-radius: 6px;\n}\n\n.button {\n  background: var(--primary-color);\n  padding: calc(var(--spacing-unit) * 2);\n  border-radius: var(--border-radius);\n}'
+            },
+            {
+                title: 'Scoped Overrides and Fallbacks',
+                description: 'Custom properties respect the cascade, so they can be overridden in specific contexts.',
+                code: '.dark-theme {\n  --primary-color: #60a5fa; /* overrides the root value just within this scope */\n}\n\n.button {\n  color: var(--text-color, black); /* falls back to black if --text-color is not defined */\n}'
+            }
+        ],
+        attributes: [
+            { name: '--name: value;', type: 'declaration', description: 'Defines a custom property, commonly on :root for global scope' },
+            { name: 'var(--name)', type: 'function', description: 'Reads a custom property\'s current value' },
+            { name: 'var(--name, fallback)', type: 'function', description: 'Uses a fallback if the custom property is not defined' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Define global theme variables on :root, and override them locally on specific components or contexts (like a .dark-theme class) as needed',
+            'Provide a fallback value in var() for properties that might not always be defined, like var(--gap, 1rem)',
+            'Take advantage of custom properties being live and JavaScript-readable for dynamic theming without regenerating an entire stylesheet',
+            'Use meaningful, consistent naming conventions (--color-primary, --spacing-sm) as a project grows, similar to a design token system'
+        ]
+    },
+
+    {
+        id: 'css-media-queries',
+        title: 'Media Queries',
+        library: 'css',
+        category: 'misc',
+        description: 'Media queries apply CSS conditionally based on characteristics of the device or viewport, most commonly width, forming the foundation of responsive design. They use the @media at-rule with a condition, and can be combined with and/or logic to test multiple conditions at once.',
+        syntax: '@media (min-width: 768px) { }',
+        examples: [
+            {
+                title: 'Mobile-First Breakpoints',
+                description: 'The recommended approach - base styles for mobile, then progressively enhance for larger screens.',
+                code: '.container {\n  padding: 16px; /* mobile default */\n}\n\n@media (min-width: 768px) {\n  .container {\n    padding: 32px;\n    max-width: 720px;\n    margin: 0 auto;\n  }\n}\n\n@media (min-width: 1024px) {\n  .container {\n    max-width: 960px;\n  }\n}'
+            },
+            {
+                title: 'Combining Conditions',
+                description: 'Testing multiple media features together, and targeting print output.',
+                code: '@media (min-width: 768px) and (orientation: landscape) {\n  .sidebar { display: block; }\n}\n\n@media print {\n  .no-print { display: none; } /* hide navigation, buttons, etc when printing */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'min-width / max-width', type: 'feature', description: 'Tests viewport width, the most common responsive breakpoint' },
+            { name: 'orientation', type: 'feature', description: 'Tests portrait vs landscape orientation' },
+            { name: 'print', type: 'media type', description: 'Applies styles specifically for printed output' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Write mobile-first CSS using min-width breakpoints, progressively adding complexity for larger screens, rather than max-width desktop-first overrides',
+            'Base breakpoints on where your own content actually starts looking cramped or awkward, rather than copying generic device-width numbers',
+            'Prefer container queries over media queries for component-level responsiveness - reserve media queries for page-level, viewport-driven layout',
+            'Use @media print to hide non-essential UI (navigation, buttons) and optimize layout specifically for printed pages'
+        ]
+    },
+
+    {
+        id: 'css-preference-media-queries',
+        title: 'prefers-color-scheme & prefers-reduced-motion',
+        library: 'css',
+        category: 'misc',
+        description: 'These media queries detect user system preferences rather than device characteristics. prefers-color-scheme detects whether the user has requested a light or dark theme at the OS level. prefers-reduced-motion detects whether the user has requested minimal animation, important for users with vestibular motion sensitivity.',
+        syntax: '@media (prefers-color-scheme: dark) { }\n@media (prefers-reduced-motion: reduce) { }',
+        examples: [
+            {
+                title: 'Automatic Dark Mode',
+                description: 'Respecting the user\'s OS-level theme preference without needing a toggle.',
+                code: ':root {\n  --bg-color: white;\n  --text-color: black;\n}\n\n@media (prefers-color-scheme: dark) {\n  :root {\n    --bg-color: #1a1a1a;\n    --text-color: #f0f0f0;\n  }\n}\n\nbody {\n  background: var(--bg-color);\n  color: var(--text-color);\n}'
+            },
+            {
+                title: 'Respecting Reduced Motion',
+                description: 'Disabling or simplifying animations for users who have requested reduced motion.',
+                code: '.card {\n  animation: fadeInUp 0.5s ease-out;\n}\n\n@media (prefers-reduced-motion: reduce) {\n  .card {\n    animation: none; /* or a much shorter, simpler transition */\n  }\n}'
+            }
+        ],
+        attributes: [
+            { name: 'prefers-color-scheme', type: 'light | dark', description: 'Detects the user\'s OS-level theme preference' },
+            { name: 'prefers-reduced-motion', type: 'no-preference | reduce', description: 'Detects whether the user has requested minimal animation' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Support prefers-color-scheme as a baseline even in projects with a manual theme toggle, so the OS preference is respected on first visit',
+            'Always wrap meaningful animations and auto-playing effects in a prefers-reduced-motion check - this genuinely matters for users with vestibular disorders',
+            'Test both preferences using actual OS/browser settings, not just guessing, since behavior can be easy to overlook without deliberately checking',
+            'Combine both queries with custom properties for a clean, maintainable way to swap entire sets of values based on user preference'
+        ]
+    },
+
+    {
+        id: 'css-z-index-stacking',
+        title: 'z-index and Stacking Context',
+        library: 'css',
+        category: 'misc',
+        description: 'z-index controls which element appears on top when elements overlap, but only works on positioned elements (anything other than static). Stacking contexts group elements together for z-index comparison purposes - z-index values only compete within the same stacking context, which is why a very high z-index can sometimes mysteriously fail to appear on top.',
+        syntax: 'z-index: number;',
+        examples: [
+            {
+                title: 'z-index Requires Positioning',
+                description: 'A common mistake - z-index silently does nothing without position set.',
+                code: '.behind {\n  z-index: 999; /* has NO effect - position is still static (the default) */\n}\n\n.in-front {\n  position: relative; /* now z-index actually applies */\n  z-index: 999;\n}'
+            },
+            {
+                title: 'The Stacking Context Trap',
+                description: 'Why a huge z-index sometimes still loses to a smaller one.',
+                code: '.parent-a {\n  position: relative;\n  z-index: 1; /* creates a new stacking context */\n}\n.parent-a .child {\n  position: relative;\n  z-index: 9999; /* only competes WITHIN parent-a\'s stacking context */\n}\n\n.parent-b {\n  position: relative;\n  z-index: 2; /* parent-b beats parent-a entirely, so ALL its children render above,\n                 regardless of how high a z-index .child has inside parent-a */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'z-index', type: 'number | auto', description: 'Stacking order among elements in the same stacking context' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Remember z-index only has an effect on positioned elements (position other than static) - set position: relative (or another value) first',
+            'Understand that properties like opacity < 1, transform, and filter also create new stacking contexts, which can trap z-index values unexpectedly',
+            'Use a documented, limited scale of z-index values across a project (like 10, 20, 30, 100 for modals) rather than arbitrary huge numbers, to keep stacking predictable',
+            'When a high z-index "does not work," the real cause is almost always an unexpected stacking context on an ancestor, not the z-index value itself being too low'
+        ]
+    },
+
+    {
+        id: 'css-subgrid',
+        title: 'Subgrid',
+        library: 'css',
+        category: 'flexbox',
+        description: 'subgrid lets a nested grid container inherit the track sizing of its parent grid, instead of defining its own independent tracks. This solves a long-standing alignment problem: getting content in different, unrelated grid items (like card headers and footers) to line up perfectly across a row.',
+        syntax: 'grid-template-columns: subgrid;\ngrid-template-rows: subgrid;',
+        examples: [
+            {
+                title: 'Aligning Nested Content Across Cards',
+                description: 'Without subgrid, each card\'s internal grid is independent - titles and buttons will not align if content lengths differ.',
+                code: '.card-grid {\n  display: grid;\n  grid-template-columns: repeat(3, 1fr);\n  grid-template-rows: auto auto auto; /* title, body, footer rows */\n}\n\n.card {\n  display: grid;\n  grid-row: span 3;\n  grid-template-rows: subgrid; /* inherits the PARENT\'s row sizing */\n}\n/* Now every card\'s title, body, and footer align perfectly across the row,\n   even if one card\'s title wraps to two lines */'
+            }
+        ],
+        attributes: [
+            { name: 'subgrid', type: 'value for grid-template-columns/rows', description: 'Inherits track sizing from the parent grid instead of defining new tracks' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use subgrid specifically when nested elements need to align with the outer grid\'s tracks, like card components in a row that should share row heights',
+            'The nested element must still be a grid item itself (placed via grid-row/grid-column) before subgrid can inherit those specific tracks',
+            'Subgrid only inherits sizing for the axis you specify - use subgrid on both grid-template-columns and grid-template-rows if both need to align',
+            'This solves alignment problems that previously required JavaScript measurement or awkward fixed-height hacks'
+        ]
+    },
+
+    {
+        id: 'css-sizing-properties',
+        title: 'Sizing: width, min/max-width',
+        library: 'css',
+        category: 'sizing',
+        description: 'Beyond a fixed width, CSS offers min-width and max-width to set flexible boundaries - an element can shrink or grow within those limits. This is fundamental to responsive design, letting content adapt fluidly while never becoming unreadably narrow or unreasonably wide.',
+        syntax: 'width: value;\nmin-width: value;\nmax-width: value;',
+        examples: [
+            {
+                title: 'A Responsive Container Pattern',
+                description: 'The extremely common "fluid but capped" content container.',
+                code: '.container {\n  width: 100%;       /* fills available space on small screens */\n  max-width: 1200px;  /* but never grows beyond this on large screens */\n  margin: 0 auto;      /* centers it once max-width is reached */\n  padding: 0 16px;\n}'
+            },
+            {
+                title: 'min-width to Prevent Squishing',
+                description: 'Ensuring a flex item never becomes too narrow to be usable.',
+                code: '.sidebar {\n  flex: 1;\n  min-width: 200px; /* will not shrink below this, even in a tight flex container */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'width / height', type: 'length | % | auto', description: 'Sets a specific dimension' },
+            { name: 'min-width / min-height', type: 'length', description: 'Sets a lower bound the element cannot shrink below' },
+            { name: 'max-width / max-height', type: 'length', description: 'Sets an upper bound the element cannot grow beyond' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use max-width: 100% on images so they never overflow their container on smaller screens, a near-universal responsive image rule',
+            'Prefer max-width over a fixed width for content containers, letting them shrink gracefully on smaller screens',
+            'Use min-width on flex/grid items to prevent them from becoming unreadably narrow when space is constrained',
+            'Combine width: 100% with max-width for the classic fluid-but-capped container pattern used in most responsive layouts'
+        ]
+    },
+
+    {
+        id: 'css-logical-properties',
+        title: 'Logical Properties',
+        library: 'css',
+        category: 'sizing',
+        description: 'Logical properties describe direction in terms of writing mode (inline/block flow) rather than fixed physical directions (left/right/top/bottom). margin-inline-start behaves like margin-left in English but automatically adapts for right-to-left languages, making them essential for properly internationalized layouts.',
+        syntax: 'margin-inline-start, padding-block, inset-inline-end',
+        examples: [
+            {
+                title: 'Physical vs Logical Properties',
+                description: 'The same intent, expressed in a way that adapts to writing direction.',
+                code: '/* Physical - assumes left-to-right, breaks in RTL languages */\n.old {\n  margin-left: 16px;\n  border-right: 1px solid gray;\n}\n\n/* Logical - automatically flips for RTL languages like Arabic or Hebrew */\n.modern {\n  margin-inline-start: 16px;\n  border-inline-end: 1px solid gray;\n}'
+            },
+            {
+                title: 'Block and Inline Direction',
+                description: 'Common shorthand logical properties for spacing.',
+                code: '.card {\n  padding-block: 16px;   /* top and bottom, in the block direction */\n  padding-inline: 24px;  /* left and right, in the inline direction */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'margin-inline-start/end', type: 'length', description: 'Logical equivalent of margin-left/right in LTR' },
+            { name: 'padding-block', type: 'length', description: 'Shorthand for padding-top and padding-bottom' },
+            { name: 'inset-inline / inset-block', type: 'length', description: 'Logical equivalents of left/right and top/bottom for positioning' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use logical properties by default in new projects, even if you are not currently building a multilingual site - they cost nothing and future-proof the layout',
+            'This matters most for genuinely internationalized products supporting right-to-left languages like Arabic or Hebrew',
+            'Logical properties exist for nearly every physical spacing/sizing/positioning property - margin, padding, border, inset, width (inline-size), and height (block-size)',
+            'Mixing physical and logical properties in the same project is fine during migration, but aim for consistency within a single component'
+        ]
+    },
+
+    {
+        id: 'css-aspect-ratio',
+        title: 'aspect-ratio',
+        library: 'css',
+        category: 'sizing',
+        description: 'aspect-ratio sets a preferred width-to-height ratio for an element, letting the browser automatically calculate one dimension from the other. This replaced older, hackier techniques (like the "padding-top trick") for maintaining consistent proportions on responsive elements like video embeds and images.',
+        syntax: 'aspect-ratio: width / height;',
+        examples: [
+            {
+                title: 'A Responsive Video Embed',
+                description: 'The classic use case - maintaining a 16:9 ratio at any width.',
+                code: '.video-embed {\n  width: 100%;\n  aspect-ratio: 16 / 9; /* height is calculated automatically to maintain the ratio */\n}\n\n.video-embed iframe {\n  width: 100%;\n  height: 100%;\n}'
+            },
+            {
+                title: 'Square Thumbnails and Image Placeholders',
+                description: 'Reserving consistent space before an image loads, preventing layout shift.',
+                code: '.thumbnail {\n  width: 100%;\n  aspect-ratio: 1 / 1; /* always a perfect square */\n  object-fit: cover;\n}'
+            }
+        ],
+        attributes: [
+            { name: 'aspect-ratio', type: 'width / height | auto', description: 'Sets a preferred proportional relationship between width and height' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use aspect-ratio instead of the old "padding-top percentage" hack for maintaining proportions - it is far more readable and intuitive',
+            'Combine aspect-ratio with object-fit: cover on images/videos so content fills the box correctly without distortion',
+            'Reserve consistent aspect-ratio space for images before they load, to prevent content from jumping around during page load (improves Cumulative Layout Shift)',
+            'Remember explicit width/height attributes on <img>/<video> elements still matter for aspect-ratio to work correctly without JavaScript'
+        ]
+    },
+
+    {
+        id: 'css-object-fit',
+        title: 'object-fit and object-position',
+        library: 'css',
+        category: 'sizing',
+        description: 'object-fit controls how a replaced element\'s content (like an <img> or <video>) is resized to fit its box, similar to background-size but for actual media elements. cover crops to fill the box, contain scales to fit entirely within it, and object-position controls which part of the content stays visible when cropping occurs.',
+        syntax: 'object-fit: cover | contain | fill;\nobject-position: value;',
+        examples: [
+            {
+                title: 'object-fit: cover for Consistent Thumbnails',
+                description: 'Filling a fixed-size box without distorting the image\'s proportions.',
+                code: '.thumbnail {\n  width: 300px;\n  height: 200px;\n  object-fit: cover; /* fills the box completely, cropping as needed */\n}'
+            },
+            {
+                title: 'object-fit: contain and object-position',
+                description: 'Showing an entire image without cropping, and controlling crop focus.',
+                code: '.logo {\n  width: 200px;\n  height: 100px;\n  object-fit: contain; /* shows the whole image, letterboxing if needed */\n}\n\n.portrait-crop {\n  object-fit: cover;\n  object-position: top; /* keeps the top of the image visible when cropping */\n}'
+            }
+        ],
+        attributes: [
+            { name: 'cover', type: 'keyword', description: 'Fills the box completely, cropping the content as needed' },
+            { name: 'contain', type: 'keyword', description: 'Scales to fit entirely within the box, no cropping' },
+            { name: 'fill', type: 'keyword', description: 'Stretches to fill the box exactly, ignoring original proportions (default)' },
+            { name: 'object-position', type: 'position', description: 'Controls which part of the content remains visible when cropped' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use object-fit: cover for consistent thumbnail grids where images come in varying original proportions',
+            'Use object-fit: contain for logos or images that must never be cropped, even if it means empty space around them',
+            'Combine object-position with cover to control exactly which part of an image stays visible when cropping occurs, like keeping faces in frame',
+            'Remember object-fit only applies to replaced elements like <img>, <video>, and <canvas> - it has no effect on regular elements like <div>'
+        ]
+    },
+
+    {
+        id: 'css-list-style',
+        title: 'List Styling',
+        library: 'css',
+        category: 'typography',
+        description: 'list-style controls how list markers (bullets or numbers) appear on <ul>/<ol> elements. list-style-type sets the marker style, list-style-position controls whether markers sit inside or outside the content box, and list-style: none is the standard way to remove markers entirely, commonly used when repurposing a list for navigation.',
+        syntax: 'list-style: type position image;',
+        examples: [
+            {
+                title: 'Removing Default List Styling',
+                description: 'The standard reset applied when using a <ul> for non-list purposes, like navigation.',
+                code: 'nav ul {\n  list-style: none;\n  padding: 0;\n  margin: 0;\n  display: flex;\n  gap: 16px;\n}'
+            },
+            {
+                title: 'Custom Marker Styles',
+                description: 'Changing marker type and using the ::marker pseudo-element for further styling.',
+                code: 'ol { list-style-type: upper-roman; } /* I, II, III... */\nul { list-style-type: square; }\n\nli::marker {\n  color: #3b82f6; /* styles just the bullet/number, not the text */\n  font-weight: bold;\n}'
+            }
+        ],
+        attributes: [
+            { name: 'list-style-type', type: 'disc | circle | square | decimal | none', description: 'Sets the marker appearance' },
+            { name: 'list-style-position', type: 'inside | outside', description: 'Whether markers sit inside or outside the content box' },
+            { name: '::marker', type: 'pseudo-element', description: 'Targets just the marker for additional styling' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Set list-style: none and remove default padding when using a <ul>/<ol> for navigation or other non-literal-list purposes',
+            'Use the ::marker pseudo-element to style bullets/numbers directly, rather than hiding markers and faking them with ::before',
+            'Keep semantic list markup (<ul>/<ol>/<li>) even when visually removing markers - screen readers still announce it as a list, which is often the correct behavior',
+            'list-style-position: inside wraps text under the marker; outside (the default) keeps wrapped text aligned with the first line, not the marker'
+        ]
+    },
+
+    {
+        id: 'css-scroll-behavior-snap',
+        title: 'scroll-behavior and Scroll Snap',
+        library: 'css',
+        category: 'interactivity',
+        description: 'scroll-behavior: smooth animates scrolling to anchors instead of jumping instantly. Scroll snap properties (scroll-snap-type and scroll-snap-align) create carousel-like scrolling where content snaps neatly into position, commonly used for image galleries and full-page sections, without any JavaScript.',
+        syntax: 'scroll-behavior: smooth;\nscroll-snap-type: x mandatory;',
+        examples: [
+            {
+                title: 'Smooth Anchor Scrolling',
+                description: 'Making in-page anchor links (like #section-2) scroll smoothly instead of jumping.',
+                code: 'html {\n  scroll-behavior: smooth;\n}\n/* Now <a href="#section-2"> smoothly animates the scroll, no JS needed */'
+            },
+            {
+                title: 'A CSS-Only Snap Carousel',
+                description: 'Building a horizontally scrolling gallery that snaps to each item.',
+                code: '.gallery {\n  display: flex;\n  overflow-x: auto;\n  scroll-snap-type: x mandatory;\n  gap: 16px;\n}\n\n.gallery img {\n  scroll-snap-align: center; /* each image snaps to center as the user scrolls */\n  flex: 0 0 80%;\n}'
+            }
+        ],
+        attributes: [
+            { name: 'scroll-behavior', type: 'auto | smooth', description: 'Controls whether scrolling to anchors/targets is animated' },
+            { name: 'scroll-snap-type', type: 'x | y | both, mandatory | proximity', description: 'Enables snap scrolling on a container' },
+            { name: 'scroll-snap-align', type: 'start | center | end', description: 'Sets where a child snaps to within the container' }
+        ],
+        browserSupport: DEFAULT_SUPPORT,
+        bestPractices: [
+            'Use scroll-behavior: smooth as a simple, one-line upgrade for anchor link navigation, with no JavaScript required',
+            'Use mandatory snap type for carousels where content should always land precisely on an item; use proximity for a softer, less forceful snap',
+            'Combine scroll-snap with overflow: auto/scroll on the container - snap properties do nothing without a scrollable container',
+            'Respect prefers-reduced-motion by disabling scroll-behavior: smooth for users who have requested reduced motion'
+        ]
+    },
+
     // ================= JAVASCRIPT =================
     {
         id: 'js-arrow-functions',
