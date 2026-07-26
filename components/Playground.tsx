@@ -234,10 +234,11 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
 
   // --- Compile Logic & Error Catching ---
   useEffect(() => {
-    const timeout = setTimeout(() => {
+    const timeout = setTimeout(async () => {
       const htmlFile = files.find(f => f.name === 'index.html') || files.find(f => f.language === 'html');
       const cssFiles = files.filter(f => f.language === 'css');
       const jsFiles = files.filter(f => f.language === 'javascript');
+      const tsFiles = files.filter(f => f.language === 'typescript');
 
       if (!htmlFile) {
          setSrcDoc("<html><body style='color: #666; font-family: sans-serif; text-align: center; padding-top: 2rem;'><h1>No index.html found</h1></body></html>");
@@ -246,7 +247,54 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
 
       let fullHtml = htmlFile.content;
       const styleTags = cssFiles.map(f => `<style>${f.content}</style>`).join('\n');
-      const scriptContent = jsFiles.map(f => f.content).join('\n');
+
+      // JavaScript files are used as-is; TypeScript files are transpiled to JS first,
+      // since browsers can only ever execute plain JavaScript in a <script> tag.
+      let scriptContent = jsFiles.map(f => f.content).join('\n');
+      const tsDiagnosticLogs: LogEntry[] = [];
+
+      if (tsFiles.length > 0) {
+        try {
+          // Lazy-loaded so the ~several-MB TypeScript compiler only downloads
+          // for users who actually write a .ts file in the playground.
+          const ts = await import('typescript');
+          const transpiled = tsFiles.map(f => {
+            const result = ts.transpileModule(f.content, {
+              compilerOptions: {
+                module: ts.ModuleKind.None,
+                target: ts.ScriptTarget.ES2020
+              },
+              reportDiagnostics: true
+            });
+
+            // transpileModule only catches syntax errors (missing tokens, malformed
+            // syntax) - it intentionally skips full type-checking, which needs the
+            // whole language service and isn't necessary here, since types are
+            // erased at runtime anyway and have no effect on whether the code runs.
+            result.diagnostics?.forEach(d => {
+              const message = ts.flattenDiagnosticMessageText(d.messageText, ' ');
+              const line = d.file && d.start !== undefined
+                ? d.file.getLineAndCharacterOfPosition(d.start).line + 1
+                : undefined;
+              tsDiagnosticLogs.push({
+                type: 'error',
+                message: `${f.name}${line ? ` (Line ${line})` : ''}: ${message}`,
+                timestamp: new Date().toLocaleTimeString()
+              });
+            });
+
+            return result.outputText;
+          }).join('\n');
+
+          scriptContent += '\n' + transpiled;
+        } catch (err) {
+          tsDiagnosticLogs.push({
+            type: 'error',
+            message: `Failed to load TypeScript compiler: ${err instanceof Error ? err.message : String(err)}`,
+            timestamp: new Date().toLocaleTimeString()
+          });
+        }
+      }
       
       // Inject CSS
       fullHtml = fullHtml.includes('</head>') 
@@ -290,7 +338,8 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
         : `${fullHtml}${consoleScript}<script>${scriptContent}</script>`;
 
       setSrcDoc(fullHtml);
-      setLogs([]); 
+      setLogs(tsDiagnosticLogs);
+      if (tsDiagnosticLogs.length > 0) setIsBottomPanelOpen(true);
     }, 1000);
 
     return () => clearTimeout(timeout);
