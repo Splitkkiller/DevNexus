@@ -7788,6 +7788,871 @@ export const DOCS: DocItem[] = [
         ]
     },
 
+
+
+    {
+        id: 'ts-basic-types',
+        title: 'Basic Types',
+        library: 'ts',
+        category: 'basics',
+        description: 'TypeScript extends JavaScript with static types, letting the compiler catch type errors before code ever runs. Beyond the familiar string, number, and boolean, TypeScript adds any (disables checking entirely), unknown (a safer any that requires narrowing), void (a function returning nothing), and never (a value that can never occur, like a function that always throws).',
+        syntax: 'let name: string;\nlet age: number;\nlet isActive: boolean;',
+        examples: [
+            {
+                title: 'Primitive Type Annotations',
+                description: 'Explicitly typing variables with the core primitives.',
+                code: 'let name: string = "Alice";\nlet age: number = 25;\nlet isActive: boolean = true;\n\n// TypeScript catches mismatches immediately\n// age = "twenty-five"; // Error: Type \'string\' is not assignable to type \'number\'\n\nlet id: string | number = 101; // union type, can be either'
+            },
+            {
+                title: 'any vs unknown',
+                description: 'unknown is the type-safe alternative to any - it requires a check before you can use the value.',
+                code: 'let flexible: any = "hello";\nflexible.toUpperCase(); // allowed, no error - any disables checking entirely\nflexible = 42;           // also allowed, any accepts anything\n\nlet safer: unknown = "hello";\n// safer.toUpperCase(); // Error - must narrow the type first\n\nif (typeof safer === "string") {\n  safer.toUpperCase(); // OK now - TypeScript knows it is a string here\n}'
+            },
+            {
+                title: 'void and never',
+                description: 'Types for functions that return nothing, or never return at all.',
+                code: 'function logMessage(message: string): void {\n  console.log(message); // no return statement - return type is void\n}\n\nfunction throwError(message: string): never {\n  throw new Error(message); // never actually returns - always throws\n}\n\nfunction infiniteLoop(): never {\n  while (true) { /* never exits */ }\n}'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Prefer unknown over any whenever possible - it forces you to check a value\'s type before using it, catching bugs any would silently allow',
+            'Let TypeScript infer types where it reasonably can (const age = 25) rather than annotating every single variable - annotate mainly function parameters and return types',
+            'Use never for functions that always throw or never return, which helps TypeScript correctly narrow types in the code that calls them',
+            'Avoid any as a habit - it is sometimes necessary for gradual migration or truly dynamic data, but it opts out of type safety entirely wherever it is used'
+        ]
+    },
+
+    {
+        id: 'ts-type-aliases',
+        title: 'Type Aliases',
+        library: 'ts',
+        category: 'basics',
+        description: 'The type keyword creates a named alias for any type - not just object shapes like interface, but also unions, primitives, tuples, and function signatures. Type aliases make complex types reusable and give them a meaningful name, improving both readability and error messages.',
+        syntax: 'type Name = TypeDefinition;',
+        examples: [
+            {
+                title: 'Aliasing Object Shapes and Unions',
+                description: 'The two most common uses of type aliases.',
+                code: 'type Point = {\n  x: number;\n  y: number;\n};\n\ntype Status = "pending" | "active" | "completed"; // union of literal types\n\nfunction updateStatus(status: Status) {\n  console.log(`Status is now: ${status}`);\n}\n\nupdateStatus("active");\n// updateStatus("done"); // Error - "done" is not one of the allowed literals'
+            },
+            {
+                title: 'Aliasing Function Signatures and Tuples',
+                description: 'Type aliases work for more than just objects.',
+                code: 'type MathFn = (a: number, b: number) => number;\n\nconst add: MathFn = (a, b) => a + b;\nconst multiply: MathFn = (a, b) => a * b;\n\ntype Coordinate = [number, number]; // a tuple alias\n\nconst origin: Coordinate = [0, 0];'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use type aliases for unions, tuples, and function signatures - things interface cannot directly express',
+            'Give type aliases clear, descriptive names (Status, not T1) so error messages and autocomplete stay meaningful',
+            'For plain object shapes, either type or interface works - pick one convention and stay consistent within a project',
+            'Reuse a type alias across multiple functions/variables rather than repeating the same inline type definition'
+        ]
+    },
+
+    {
+        id: 'ts-union-intersection-types',
+        title: 'Union and Intersection Types',
+        library: 'ts',
+        category: 'basics',
+        description: 'A union type (A | B) means a value can be either type A or type B. An intersection type (A & B) means a value must satisfy both A and B simultaneously, combining their members into one type. Unions are common for values with a few valid states; intersections are common for combining smaller, focused types into a larger one.',
+        syntax: 'type Union = TypeA | TypeB;\ntype Intersection = TypeA & TypeB;',
+        examples: [
+            {
+                title: 'Union Types',
+                description: 'A value that can be one of several specific types.',
+                code: 'type ID = string | number;\n\nfunction printId(id: ID) {\n  console.log(`ID: ${id}`);\n}\n\nprintId(101);      // OK\nprintId("abc-123"); // OK\n// printId(true);    // Error - boolean is not part of the union'
+            },
+            {
+                title: 'Intersection Types',
+                description: 'Combining multiple types into one that has all of their members.',
+                code: 'type Named = { name: string };\ntype Aged = { age: number };\n\ntype Person = Named & Aged; // must have BOTH name and age\n\nconst person: Person = {\n  name: "Alice",\n  age: 25\n};\n// A value missing either "name" or "age" would fail to type-check'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use union types to model a value with a small, known set of valid shapes or states, like a status field',
+            'Use intersection types to compose smaller, reusable type fragments into a larger, complete type',
+            'Combine unions with discriminant properties (a shared "kind" or "type" field) to enable clean type narrowing in conditional logic',
+            'Be cautious intersecting types with conflicting property types - the result can resolve to never for that property, which is easy to miss'
+        ]
+    },
+
+    {
+        id: 'ts-literal-types',
+        title: 'Literal Types',
+        library: 'ts',
+        category: 'basics',
+        description: 'Literal types narrow a type down to one specific, exact value rather than a general category - "success" instead of string, or 200 instead of number. They are most useful combined with union types, letting you precisely constrain a value to a specific set of allowed options, catching typos and invalid values at compile time.',
+        syntax: 'let value: "specific-string" | 42 | true;',
+        examples: [
+            {
+                title: 'String and Numeric Literal Unions',
+                description: 'Restricting a value to an exact, known set of options.',
+                code: 'type Direction = "up" | "down" | "left" | "right";\ntype DiceRoll = 1 | 2 | 3 | 4 | 5 | 6;\n\nfunction move(direction: Direction) {\n  console.log(`Moving ${direction}`);\n}\n\nmove("up");     // OK\n// move("north"); // Error - not one of the allowed literals'
+            },
+            {
+                title: 'const Assertions',
+                description: 'Using "as const" to infer the most specific literal type possible.',
+                code: 'let a = "hello";       // inferred as: string (widened)\nconst b = "hello";     // inferred as: "hello" (literal, since const cannot be reassigned)\n\nlet config = {\n  mode: "production"\n} as const;\n// config.mode is typed as the literal "production", not string\n// config.mode = "development"; // Error - as const also makes properties readonly'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use literal type unions instead of a general string/number type when a value only has a small, known set of valid options - it catches typos at compile time',
+            'Use as const on object/array literals to lock in their most specific literal types, especially useful for configuration objects',
+            'Combine literal types with discriminated unions for exhaustive, type-safe handling of different variant shapes',
+            'Prefer literal unions over TypeScript enums for simple cases - they compile to nothing extra and integrate more naturally with plain JavaScript'
+        ]
+    },
+
+    {
+        id: 'ts-type-inference',
+        title: 'Type Inference',
+        library: 'ts',
+        category: 'basics',
+        description: 'TypeScript can automatically determine a value\'s type from its initializer, without an explicit annotation - this is type inference. It reduces boilerplate significantly while still providing full type safety. Understanding what TypeScript infers (and when it needs help) is key to writing idiomatic, uncluttered TypeScript.',
+        syntax: 'const value = expression; // type is inferred automatically',
+        examples: [
+            {
+                title: 'Basic Inference',
+                description: 'TypeScript infers types from initial values without needing annotations.',
+                code: 'let count = 10;        // inferred as: number\nlet name = "Alice";     // inferred as: string\nlet items = [1, 2, 3];  // inferred as: number[]\n\n// count = "ten"; // Error - TypeScript remembers count is a number, even without an explicit annotation'
+            },
+            {
+                title: 'Contextual Typing and Return Type Inference',
+                description: 'TypeScript also infers types based on how a value will be used, and infers function return types.',
+                code: 'window.addEventListener("click", (event) => {\n  console.log(event.button); // "event" is inferred as MouseEvent from context - full autocomplete works\n});\n\nfunction add(a: number, b: number) {\n  return a + b; // return type inferred as: number, no annotation needed\n}'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Let TypeScript infer types for local variables initialized with an obvious value - explicit annotations there are usually redundant noise',
+            'Still explicitly annotate function parameters, since TypeScript cannot infer those from usage the way it can return types',
+            'Explicitly annotate a variable\'s type when it starts as one value but needs to later hold a broader type, like let result: string | null = null',
+            'Use your editor\'s "hover to see inferred type" feature regularly - it is the fastest way to build intuition for how TypeScript reasons about your code'
+        ]
+    },
+
+    {
+        id: 'ts-type-assertions',
+        title: 'Type Assertions: as and satisfies',
+        library: 'ts',
+        category: 'basics',
+        description: 'The as keyword tells the compiler to treat a value as a specific type, overriding its own inference - useful when you know more about a value\'s type than TypeScript can determine on its own. The newer satisfies operator validates that a value matches a type without changing the value\'s own inferred type, giving you both validation and precise inference at once.',
+        syntax: 'value as Type;\nvalue satisfies Type;',
+        examples: [
+            {
+                title: 'as - Overriding Inference',
+                description: 'Asserting a more specific type than TypeScript would infer on its own.',
+                code: 'const input = document.getElementById("email") as HTMLInputElement;\ninput.value = "test@example.com"; // .value only exists on HTMLInputElement, not the general HTMLElement\n\nconst data = JSON.parse(jsonString) as { name: string; age: number };'
+            },
+            {
+                title: 'satisfies - Validate Without Widening',
+                description: 'Checking a value matches a type while keeping its most specific inferred type.',
+                code: 'type Colors = Record<string, string>;\n\nconst palette = {\n  red: "#ff0000",\n  green: "#00ff00"\n} satisfies Colors;\n\n// With satisfies, palette.red is still known as the literal "#ff0000"\n// With a plain type annotation (: Colors), it would widen to just "string"\nconsole.log(palette.red.toUpperCase()); // still gets full autocomplete on the specific keys'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use as sparingly - it disables some of TypeScript\'s checking, so an incorrect assertion can hide real bugs rather than catch them',
+            'Prefer satisfies over as when you want validation against a type while preserving the most specific inferred type of the value itself',
+            'Never use as to force incompatible types together - if truly necessary, assert to unknown first (value as unknown as Type), which signals the risk explicitly',
+            'Reach for a type guard (like a typeof or instanceof check) instead of as whenever runtime validation is genuinely possible'
+        ]
+    },
+
+    {
+        id: 'ts-enums',
+        title: 'Enums',
+        library: 'ts',
+        category: 'basics',
+        description: 'An enum defines a named set of related constants, making code more readable than using raw numbers or strings for a fixed set of options. Numeric enums auto-increment by default, string enums require explicit values for each member, and const enum is fully erased at compile time, replaced by its literal values with no runtime object generated at all.',
+        syntax: 'enum Name { Member1, Member2 }',
+        examples: [
+            {
+                title: 'Numeric and String Enums',
+                description: 'The two main enum flavors.',
+                code: 'enum Direction {\n  Up,    // 0\n  Down,  // 1\n  Left,  // 2\n  Right  // 3\n}\n\nenum Status {\n  Pending = "PENDING",\n  Active = "ACTIVE",\n  Completed = "COMPLETED"\n}\n\nfunction move(direction: Direction) {\n  console.log(Direction[direction]); // reverse lookup: "Up", "Down", etc for numeric enums\n}\n\nmove(Direction.Up);\nconsole.log(Status.Active); // "ACTIVE"'
+            },
+            {
+                title: 'const enum - Zero Runtime Cost',
+                description: 'Fully erased at compile time, unlike a regular enum.',
+                code: 'const enum Size {\n  Small,\n  Medium,\n  Large\n}\n\nlet mySize = Size.Medium;\n// Compiles down to: let mySize = 1;\n// No Size object exists at runtime at all - completely inlined'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Consider a literal type union ("small" | "medium" | "large") instead of an enum for simple cases - it requires no import and integrates more naturally with plain JS',
+            'Use string enums over numeric enums when the value might be logged, serialized, or debugged, since string values are self-explanatory',
+            'Use const enum only when you specifically want zero runtime footprint and do not need reverse lookups - be aware it has some restrictions in certain build tools',
+            'Avoid mixing numeric and string values within the same enum, as it can produce confusing reverse-lookup behavior'
+        ]
+    },
+
+    {
+        id: 'ts-function-types',
+        title: 'Typing Functions',
+        library: 'ts',
+        category: 'basics',
+        description: 'Function parameters and return types can be explicitly typed for safety and clarity. Optional parameters (marked with ?) must come after required ones, and default parameter values let TypeScript infer their type automatically. Function type expressions let you type a variable that holds a function, describing exactly what parameters and return type it must have.',
+        syntax: 'function name(param: type): returnType { }',
+        examples: [
+            {
+                title: 'Parameters and Return Types',
+                description: 'The fundamentals of typing a function signature.',
+                code: 'function greet(name: string, greeting: string = "Hello"): string {\n  return `${greeting}, ${name}!`;\n}\n\nfunction logResult(value: number, label?: string): void {\n  // label is optional - type is "string | undefined"\n  console.log(label ? `${label}: ${value}` : value);\n}\n\ngreet("Alice");           // uses default greeting\ngreet("Bob", "Hi");        // overrides it'
+            },
+            {
+                title: 'Typing a Function as a Value',
+                description: 'Describing the shape of a function stored in a variable or passed as an argument.',
+                code: 'let mathOperation: (a: number, b: number) => number;\n\nmathOperation = (a, b) => a + b; // parameter types are inferred from the variable\'s type\n\nfunction applyOperation(a: number, b: number, operation: (x: number, y: number) => number): number {\n  return operation(a, b);\n}\n\nconsole.log(applyOperation(5, 3, (x, y) => x * y)); // 15'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Always type function parameters explicitly - TypeScript cannot infer them the way it infers return types',
+            'Place optional parameters after all required parameters in a function signature - required parameters cannot follow optional ones',
+            'Let TypeScript infer the return type in most cases rather than annotating it explicitly, unless the function is part of a public API where an explicit contract is valuable',
+            'Use a function type expression when a variable or parameter itself needs to hold a function, describing its expected signature precisely'
+        ]
+    },
+
+    {
+        id: 'ts-arrays-tuples',
+        title: 'Typed Arrays and Tuples',
+        library: 'ts',
+        category: 'basics',
+        description: 'Arrays are typed as Type[] (or Array<Type>), where every element must be the same type. Tuples, written with square brackets containing specific types, are fixed-length arrays where each position has its own distinct, known type - useful for representing a small, ordered, heterogeneous group of values.',
+        syntax: 'let arr: Type[];\nlet tuple: [Type1, Type2];',
+        examples: [
+            {
+                title: 'Typed Arrays',
+                description: 'Restricting an array to hold only elements of a specific type.',
+                code: 'let numbers: number[] = [1, 2, 3];\nlet names: Array<string> = ["Alice", "Bob"]; // equivalent generic syntax\n\n// numbers.push("four"); // Error - "four" is not a number\n\nlet mixed: (string | number)[] = ["id", 101, "name", "Alice"]; // union array'
+            },
+            {
+                title: 'Tuples for Fixed-Shape Data',
+                description: 'A fixed-length array where each position has its own specific type.',
+                code: 'let point: [number, number] = [10, 20];\n\nlet nameAge: [string, number] = ["Alice", 25];\n// nameAge = [25, "Alice"]; // Error - types are in the wrong positions\n\n// A common pattern: React-style useState-esque tuple return\nfunction useToggle(): [boolean, () => void] {\n  let state = false;\n  const toggle = () => { state = !state; };\n  return [state, toggle];\n}'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use Type[] for collections where every element serves the same purpose and the length is not fixed',
+            'Use tuples when a fixed number of values with distinct meanings need to travel together, like a coordinate pair or a [value, setter] pair',
+            'Add readonly before a tuple or array type (readonly [number, number]) when its contents should never be mutated after creation',
+            'Prefer a named object over a tuple with more than 2-3 elements - positional meaning becomes hard to remember beyond that'
+        ]
+    },
+
+    {
+        id: 'ts-type-vs-interface',
+        title: 'type vs interface',
+        library: 'ts',
+        category: 'interfaces',
+        description: 'Both type and interface can describe object shapes, and for that common case they are largely interchangeable. The key differences: interface supports declaration merging (multiple declarations with the same name combine automatically) and can only describe object-like shapes, while type can alias anything - unions, tuples, primitives - but cannot be re-opened once declared.',
+        syntax: 'interface Name { }\ntype Name = { };',
+        examples: [
+            {
+                title: 'Declaration Merging - interface Only',
+                description: 'A capability unique to interfaces, often used to extend third-party library types.',
+                code: 'interface Window {\n  myCustomProperty: string;\n}\n\ninterface Window {\n  anotherProperty: number;\n}\n\n// TypeScript automatically merges both declarations -\n// Window now has BOTH myCustomProperty and anotherProperty\n// This is impossible with type - a duplicate type alias name is a compile error'
+            },
+            {
+                title: 'What type Can Do That interface Cannot',
+                description: 'Unions, tuples, and primitive aliases are exclusive to type.',
+                code: 'type Status = "pending" | "active"; // interface cannot express a union like this\ntype Point = [number, number];       // interface cannot express a tuple like this\ntype ID = string | number;            // interface cannot alias a primitive union'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'For plain object shapes, either works - many teams default to interface for public APIs and type for everything else, but consistency matters more than the specific choice',
+            'Use interface specifically when you need declaration merging, such as augmenting a type from a third-party library',
+            'Use type when you need a union, tuple, or an alias for a primitive - interface simply cannot express these',
+            'Within a single codebase, pick one convention for object shapes and apply it consistently, rather than mixing arbitrarily'
+        ]
+    },
+
+    {
+        id: 'ts-index-signatures',
+        title: 'Index Signatures',
+        library: 'ts',
+        category: 'interfaces',
+        description: 'An index signature lets an interface or type describe an object with dynamic keys of a known type, when you don\'t know the exact property names in advance - only their pattern. This is common for dictionary-like objects, such as a lookup table keyed by user ID or product SKU.',
+        syntax: 'interface Name {\n  [key: string]: ValueType;\n}',
+        examples: [
+            {
+                title: 'A Basic Index Signature',
+                description: 'Describing an object where keys are unknown but values share a common type.',
+                code: 'interface StringDictionary {\n  [key: string]: string;\n}\n\nconst translations: StringDictionary = {\n  hello: "Hola",\n  goodbye: "Adiós"\n  // any number of string keys are allowed, all values must be strings\n};\n\nconsole.log(translations.hello);    // "Hola"\nconsole.log(translations["goodbye"]); // "Adiós"'
+            },
+            {
+                title: 'Combining Known and Dynamic Properties',
+                description: 'An interface can mix specific required properties with an index signature for the rest.',
+                code: 'interface Config {\n  name: string;        // a specific, required property\n  [key: string]: string | number; // plus any number of other string or number properties\n}\n\nconst settings: Config = {\n  name: "MyApp",\n  version: 2,\n  environment: "production"\n};'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use index signatures for genuinely dynamic-key data, like a dictionary or lookup table - not as a shortcut to avoid defining specific properties',
+            'Consider Record<KeyType, ValueType> as a more concise alternative to an index signature for simple dictionary types',
+            'Remember all specifically named properties must be compatible with the index signature\'s value type when both are combined',
+            'Prefer a Map over an index-signature object when keys are added/removed frequently, or when you need reliable iteration and size tracking'
+        ]
+    },
+
+    {
+        id: 'ts-classes-basics',
+        title: 'Typed Classes',
+        library: 'ts',
+        category: 'classes',
+        description: 'TypeScript enhances JavaScript classes with typed properties, constructor parameters, and method signatures. Class fields must either be initialized or explicitly typed, and TypeScript checks that constructor assignments match declared property types, catching mismatches before runtime.',
+        syntax: 'class Name {\n  property: type;\n  constructor(param: type) { }\n}',
+        examples: [
+            {
+                title: 'Typed Properties and Constructor',
+                description: 'Declaring class fields with explicit types, initialized via the constructor.',
+                code: 'class User {\n  id: number;\n  name: string;\n  email: string;\n\n  constructor(id: number, name: string, email: string) {\n    this.id = id;\n    this.name = name;\n    this.email = email;\n  }\n\n  describe(): string {\n    return `${this.name} (${this.email})`;\n  }\n}\n\nconst user = new User(1, "Alice", "alice@example.com");\nconsole.log(user.describe());'
+            },
+            {
+                title: 'Parameter Properties Shorthand',
+                description: 'A concise way to declare and assign class properties directly in the constructor signature.',
+                code: 'class Product {\n  constructor(\n    public id: number,\n    public name: string,\n    private price: number\n  ) {\n    // TypeScript automatically creates and assigns these three properties -\n    // no need to repeat "this.id = id" etc manually\n  }\n\n  getPrice(): number {\n    return this.price;\n  }\n}\n\nconst product = new Product(1, "Laptop", 999);\nconsole.log(product.name);      // accessible - public\n// console.log(product.price);   // Error - private'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use parameter properties (public/private directly in the constructor signature) to reduce repetitive boilerplate for simple classes',
+            'Type every class property explicitly, or initialize it with a value TypeScript can infer from - uninitialized untyped properties default to any implicitly, weakening safety',
+            'Keep constructors focused on initialization - complex setup logic is often clearer in a separate method or factory function',
+            'Use readonly on properties that should be set once in the constructor and never modified afterward'
+        ]
+    },
+
+    {
+        id: 'ts-access-modifiers',
+        title: 'Access Modifiers: public, private, protected',
+        library: 'ts',
+        category: 'classes',
+        description: 'Access modifiers control visibility of class members. public (the default) is accessible from anywhere. private restricts access to within the declaring class only, not even subclasses. protected allows access within the class and its subclasses, but not from outside. These are compile-time only checks - true runtime privacy needs the # syntax instead.',
+        syntax: 'public prop: type;\nprivate prop: type;\nprotected prop: type;',
+        examples: [
+            {
+                title: 'The Three Modifiers',
+                description: 'Controlling exactly where each property/method can be accessed from.',
+                code: 'class BankAccount {\n  public accountHolder: string;\n  private balance: number;\n  protected accountNumber: string;\n\n  constructor(holder: string, initialBalance: number, accountNumber: string) {\n    this.accountHolder = holder;\n    this.balance = initialBalance;\n    this.accountNumber = accountNumber;\n  }\n\n  public getBalance(): number {\n    return this.balance; // accessing private balance is fine from WITHIN the class\n  }\n}\n\nconst account = new BankAccount("Alice", 1000, "ACC-001");\nconsole.log(account.accountHolder); // OK - public\n// console.log(account.balance);      // Error - private'
+            },
+            {
+                title: 'protected in Subclasses',
+                description: 'protected members remain accessible to subclasses, unlike private ones.',
+                code: 'class SavingsAccount extends BankAccount {\n  showAccountNumber(): string {\n    return this.accountNumber; // OK - protected is accessible in subclasses\n    // return this.balance;    // Error - private is NOT accessible, even in a subclass\n  }\n}'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Default to private for internal implementation details, exposing only what genuinely needs to be part of the class\'s public API',
+            'Use protected specifically when subclasses legitimately need access to a member that outside code should not have',
+            'Remember these modifiers are compile-time only - they are erased when compiled to JavaScript and offer no runtime protection, unlike the # private field syntax',
+            'Use JavaScript\'s native #privateField syntax instead of the private keyword when you need genuine runtime privacy, not just compile-time checking'
+        ]
+    },
+
+    {
+        id: 'ts-abstract-classes',
+        title: 'Abstract Classes',
+        library: 'ts',
+        category: 'classes',
+        description: 'An abstract class cannot be instantiated directly - it exists only to be extended. It can define abstract methods (a signature with no implementation, which subclasses must provide) alongside regular, fully-implemented methods that subclasses inherit as-is. This is TypeScript\'s way of enforcing a shared contract across a family of related classes.',
+        syntax: 'abstract class Name {\n  abstract method(): type;\n}',
+        examples: [
+            {
+                title: 'Defining and Extending an Abstract Class',
+                description: 'Enforcing that subclasses implement specific methods, while sharing common logic.',
+                code: 'abstract class Shape {\n  abstract getArea(): number; // no implementation - subclasses MUST provide one\n\n  describe(): string {\n    // a concrete method, shared and inherited as-is by every subclass\n    return `This shape has an area of ${this.getArea()}`;\n  }\n}\n\n// const shape = new Shape(); // Error - cannot instantiate an abstract class\n\nclass Circle extends Shape {\n  constructor(private radius: number) {\n    super();\n  }\n  getArea(): number {\n    return Math.PI * this.radius ** 2;\n  }\n}\n\nconst circle = new Circle(5);\nconsole.log(circle.describe());'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use abstract classes when related classes should share both a common contract (abstract methods) and some actual shared implementation (concrete methods)',
+            'Use a plain interface instead when you only need to enforce a shape/contract with no shared implementation at all',
+            'Remember abstract classes can never be instantiated directly - attempting new AbstractClass() is always a compile error',
+            'Keep abstract method signatures focused and minimal - the fewer methods subclasses are forced to implement, the easier the class family is to extend'
+        ]
+    },
+
+    {
+        id: 'ts-implements-interface',
+        title: 'implements Keyword',
+        library: 'ts',
+        category: 'classes',
+        description: 'The implements keyword declares that a class must conform to a specific interface\'s shape - TypeScript checks that every property and method the interface requires is actually present with a compatible type. Unlike extends, implements does not provide any inherited implementation; it is purely a compile-time contract check.',
+        syntax: 'class Name implements InterfaceName { }',
+        examples: [
+            {
+                title: 'Enforcing a Contract',
+                description: 'A class guaranteed to match an interface\'s shape.',
+                code: 'interface Printable {\n  print(): void;\n}\n\ninterface Serializable {\n  serialize(): string;\n}\n\nclass Document implements Printable, Serializable {\n  constructor(private content: string) {}\n\n  print(): void {\n    console.log(this.content);\n  }\n\n  serialize(): string {\n    return JSON.stringify({ content: this.content });\n  }\n}\n// If Document were missing either method, TypeScript would flag it immediately'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use implements to guarantee a class provides all the members a given interface requires, catching missing implementations at compile time',
+            'A class can implement multiple interfaces at once, comma-separated - useful for composing several small, focused contracts',
+            'Remember implements provides no code - it is purely a type-level check; use extends when you actually want to inherit real behavior',
+            'Combine implements with an interface exported from a shared location when multiple classes across a codebase need to honor the same contract'
+        ]
+    },
+
+    {
+        id: 'ts-decorators',
+        title: 'Decorators',
+        library: 'ts',
+        category: 'classes',
+        description: 'Decorators are functions that can observe, modify, or replace a class, method, property, or accessor, applied with @decoratorName syntax. They became a genuinely stable, standard part of TypeScript with TC39 Stage 3 decorator support landing as of TypeScript 5.9, and are the mechanism behind frameworks like Angular and NestJS for dependency injection and metadata-driven APIs.',
+        syntax: '@decoratorName\nclass Name { }',
+        examples: [
+            {
+                title: 'A Basic Class Decorator',
+                description: 'A decorator that logs class instantiation.',
+                code: 'function logged(target: Function) {\n  console.log(`Class defined: ${target.name}`);\n}\n\n@logged\nclass UserService {\n  constructor() {\n    console.log("UserService created");\n  }\n}\n\nnew UserService();\n// "Class defined: UserService" logs once, at class definition time'
+            },
+            {
+                title: 'A Method Decorator',
+                description: 'Wrapping a method to add behavior, like timing its execution.',
+                code: 'function measure(target: any, context: ClassMethodDecoratorContext) {\n  return function (this: any, ...args: any[]) {\n    const start = performance.now();\n    const result = target.apply(this, args);\n    console.log(`${String(context.name)} took ${performance.now() - start}ms`);\n    return result;\n  };\n}\n\nclass Calculator {\n  @measure\n  compute(n: number): number {\n    return n * n;\n  }\n}'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Decorators are a stable, standard TypeScript feature as of the TC39 Stage 3 support landing in TypeScript 5.9 - no experimental flag is needed for the standard syntax',
+            'Reach for decorators when building framework-level, cross-cutting functionality like dependency injection, validation, or logging - not as a general-purpose everyday tool',
+            'Keep individual decorators focused on a single responsibility, similar to good middleware design',
+            'When adopting a framework like Angular or NestJS, follow that framework\'s specific decorator conventions and configuration requirements closely, since they may build on this feature in framework-specific ways'
+        ]
+    },
+
+    {
+        id: 'ts-generics-basics',
+        title: 'Generics Basics',
+        library: 'ts',
+        category: 'generics',
+        description: 'Generics let you write reusable functions, classes, and types that work with a variety of types while still preserving type safety - rather than using any and losing that safety, or writing near-duplicate code for each type. A generic type parameter, conventionally named T, acts as a placeholder that gets filled in with a real type each time it is used.',
+        syntax: 'function name<T>(param: T): T { }',
+        examples: [
+            {
+                title: 'A Generic Function',
+                description: 'A function that works with any type, while TypeScript still tracks exactly which type was used.',
+                code: 'function identity<T>(value: T): T {\n  return value;\n}\n\nconst num = identity(42);       // T is inferred as number, returns number\nconst str = identity("hello");   // T is inferred as string, returns string\n\n// Without generics, you would need "any" (losing type safety)\n// or separate functions for each type (losing reusability)'
+            },
+            {
+                title: 'Generics with Arrays',
+                description: 'A common, practical use: a function that works with an array of any type.',
+                code: 'function getFirstElement<T>(arr: T[]): T | undefined {\n  return arr[0];\n}\n\nconst firstNum = getFirstElement([1, 2, 3]);         // inferred as: number | undefined\nconst firstName = getFirstElement(["Alice", "Bob"]); // inferred as: string | undefined'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use generics instead of any when a function or class should work with multiple types while still preserving type safety and autocomplete',
+            'Let TypeScript infer the generic type argument from the actual arguments passed, rather than always specifying it explicitly (identity<string>("hi") is rarely needed)',
+            'Use descriptive generic names (TItem, TResponse) instead of just T for complex functions with multiple type parameters, to keep signatures readable',
+            'Reach for generics specifically when a function\'s behavior genuinely does not depend on the specific type - if it does, a union type or overloads may fit better'
+        ]
+    },
+
+    {
+        id: 'ts-generic-constraints',
+        title: 'Generic Constraints',
+        library: 'ts',
+        category: 'generics',
+        description: 'By default, a generic type parameter can be anything. The extends keyword constrains it to only types compatible with a given shape, letting you safely access specific properties or methods within the generic function while still supporting many different concrete types.',
+        syntax: 'function name<T extends Constraint>(param: T) { }',
+        examples: [
+            {
+                title: 'Constraining to Objects with a Property',
+                description: 'Ensuring a generic type has at least a specific property before accessing it.',
+                code: 'interface HasLength {\n  length: number;\n}\n\nfunction logLength<T extends HasLength>(item: T): T {\n  console.log(`Length: ${item.length}`);\n  return item;\n}\n\nlogLength("hello");        // OK - strings have .length\nlogLength([1, 2, 3]);       // OK - arrays have .length\n// logLength(42);            // Error - number has no .length property'
+            },
+            {
+                title: 'keyof Constraint for Safe Property Access',
+                description: 'A common pattern: constraining a key parameter to only the actual keys of an object.',
+                code: 'function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {\n  return obj[key];\n}\n\nconst user = { name: "Alice", age: 25 };\n\nconst name = getProperty(user, "name"); // OK, correctly typed as string\n// getProperty(user, "email");            // Error - "email" is not a key of user'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use extends to constrain a generic parameter whenever the function body needs to access specific properties or methods on it',
+            'Use the K extends keyof T pattern for functions that access an object property by a dynamic key - it keeps both the object and the resulting value type-safe',
+            'Keep constraints as loose as possible while still enabling the functionality you need, to keep the generic function usable with the widest range of types',
+            'Combine multiple constraints with an intersection type (T extends A & B) when a generic parameter needs to satisfy more than one shape'
+        ]
+    },
+
+    {
+        id: 'ts-generic-classes',
+        title: 'Generic Classes and Interfaces',
+        library: 'ts',
+        category: 'generics',
+        description: 'Classes and interfaces can also be generic, letting you build reusable data structures (like a Stack, Queue, or API response wrapper) that work with any type while remaining fully type-safe for whichever specific type is used in each instance.',
+        syntax: 'class Name<T> {\n  value: T;\n}',
+        examples: [
+            {
+                title: 'A Generic Stack Class',
+                description: 'A reusable data structure that works with any type, chosen when instantiated.',
+                code: 'class Stack<T> {\n  private items: T[] = [];\n\n  push(item: T): void {\n    this.items.push(item);\n  }\n\n  pop(): T | undefined {\n    return this.items.pop();\n  }\n\n  peek(): T | undefined {\n    return this.items[this.items.length - 1];\n  }\n}\n\nconst numberStack = new Stack<number>();\nnumberStack.push(1);\nnumberStack.push(2);\nconsole.log(numberStack.pop()); // 2\n\nconst stringStack = new Stack<string>(); // the SAME class, used with a different type'
+            },
+            {
+                title: 'A Generic Interface',
+                description: 'A reusable shape for wrapping different kinds of API response data.',
+                code: 'interface ApiResponse<T> {\n  data: T;\n  status: number;\n  message: string;\n}\n\nconst userResponse: ApiResponse<{ name: string }> = {\n  data: { name: "Alice" },\n  status: 200,\n  message: "Success"\n};\n\nconst productsResponse: ApiResponse<string[]> = {\n  data: ["Laptop", "Mouse"],\n  status: 200,\n  message: "Success"\n};'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use generic classes for reusable data structures (stacks, queues, caches) that should work identically regardless of the specific value type stored',
+            'Use a generic interface like ApiResponse<T> to consistently wrap different data shapes returned from an API, keeping response handling uniform',
+            'Provide the type argument explicitly when constructing a generic class if it cannot be inferred from the constructor arguments, like new Stack<number>()',
+            'Keep a generic class focused on structure and behavior that is genuinely type-independent - if certain methods only make sense for specific types, that is a sign the class may be trying to do too much'
+        ]
+    },
+
+    {
+        id: 'ts-conditional-types',
+        title: 'Conditional Types',
+        library: 'ts',
+        category: 'generics',
+        description: 'A conditional type selects between two types based on a condition, using syntax that mirrors JavaScript\'s ternary operator: T extends U ? X : Y. This lets you build types that adapt based on the shape of another type, forming the foundation for many of TypeScript\'s built-in utility types.',
+        syntax: 'T extends U ? TrueType : FalseType',
+        examples: [
+            {
+                title: 'A Basic Conditional Type',
+                description: 'Selecting a type based on whether another type satisfies a condition.',
+                code: 'type IsString<T> = T extends string ? "yes" : "no";\n\ntype A = IsString<string>;  // "yes"\ntype B = IsString<number>;  // "no"\n\ntype ExtractArray<T> = T extends (infer U)[] ? U : T;\ntype C = ExtractArray<number[]>; // number - extracted the element type\ntype D = ExtractArray<string>;    // string - unchanged, T was not an array'
+            },
+            {
+                title: 'Practical Use: A Custom Utility Type',
+                description: 'Building a type that filters out null/undefined, a common real-world pattern.',
+                code: 'type NonNullable<T> = T extends null | undefined ? never : T;\n\ntype A = NonNullable<string | null>;      // string\ntype B = NonNullable<number | undefined>;  // number\n// This is actually one of TypeScript\'s own built-in utility types'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use conditional types when a type needs to adapt its shape based on characteristics of another type, similar to overloaded function behavior at the type level',
+            'Study TypeScript\'s own built-in utility types (like NonNullable, ReturnType) - many are implemented using conditional types and are excellent learning examples',
+            'Keep conditional types as simple as possible - deeply nested conditional chains become genuinely difficult for anyone (including future you) to read',
+            'Combine conditional types with infer when you need to extract and reuse part of the matched type, not just branch based on it'
+        ]
+    },
+
+    {
+        id: 'ts-infer-keyword',
+        title: 'The infer Keyword',
+        library: 'ts',
+        category: 'generics',
+        description: 'infer, used only within the extends clause of a conditional type, lets you declare a new type variable that captures part of a matched structure, so it can be reused in the result. It is the mechanism behind utility types like ReturnType<T> and Parameters<T>, which extract specific pieces of a function\'s type signature.',
+        syntax: 'T extends SomePattern<infer U> ? U : never',
+        examples: [
+            {
+                title: 'Extracting a Function\'s Return Type',
+                description: 'A simplified version of how TypeScript\'s built-in ReturnType<T> actually works.',
+                code: 'type MyReturnType<T> = T extends (...args: any[]) => infer R ? R : never;\n\nfunction getUser() {\n  return { id: 1, name: "Alice" };\n}\n\ntype User = MyReturnType<typeof getUser>;\n// User is inferred as: { id: number; name: string }'
+            },
+            {
+                title: 'Extracting an Array\'s Element Type',
+                description: 'Unwrapping the inner type from an array or Promise.',
+                code: 'type ElementType<T> = T extends (infer Item)[] ? Item : never;\n\ntype A = ElementType<string[]>; // string\ntype B = ElementType<number[]>; // number\n\ntype UnwrapPromise<T> = T extends Promise<infer Value> ? Value : T;\ntype C = UnwrapPromise<Promise<string>>; // string'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use infer specifically when you need to extract and reuse a piece of a matched type, rather than just checking whether it matches',
+            'Study infer through TypeScript\'s built-in utility types (ReturnType, Parameters, Awaited) - they are the clearest real-world examples of this pattern',
+            'Remember infer can only appear within the extends clause of a conditional type - it has no meaning outside that specific context',
+            'Keep infer-based types well-named and documented, since the syntax itself is dense and can be hard to parse at a glance for readers unfamiliar with it'
+        ]
+    },
+
+    {
+        id: 'ts-mapped-types',
+        title: 'Mapped Types',
+        library: 'ts',
+        category: 'generics',
+        description: 'A mapped type builds a new type by transforming every property of an existing type, using syntax similar to a for...in loop at the type level: { [K in keyof T]: NewType }. This is the mechanism behind built-in utility types like Partial<T> and Readonly<T>, and lets you write your own systematic property transformations.',
+        syntax: '{ [K in keyof T]: NewValueType }',
+        examples: [
+            {
+                title: 'A Custom Mapped Type',
+                description: 'Building a type that makes every property optional - a simplified Partial<T>.',
+                code: 'type MyPartial<T> = {\n  [K in keyof T]?: T[K];\n};\n\ninterface User {\n  id: number;\n  name: string;\n}\n\ntype PartialUser = MyPartial<User>;\n// Equivalent to: { id?: number; name?: string }'
+            },
+            {
+                title: 'Mapped Type Modifiers',
+                description: 'Adding or removing readonly and optional (?) modifiers, and transforming value types.',
+                code: 'type ReadonlyVersion<T> = {\n  readonly [K in keyof T]: T[K];\n};\n\ntype RemoveReadonly<T> = {\n  -readonly [K in keyof T]: T[K]; // the "-" removes the modifier instead of adding it\n};\n\ntype Stringify<T> = {\n  [K in keyof T]: string; // transforms every property\'s VALUE type to string\n};\n\ninterface Product { id: number; inStock: boolean; }\ntype StringProduct = Stringify<Product>; // { id: string; inStock: string }'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use mapped types to systematically transform every property of an existing type, rather than manually retyping each property by hand',
+            'Study TypeScript\'s built-in Partial, Required, and Readonly utility types - they are all implemented as short, readable mapped types',
+            'Use the -readonly and -? modifier syntax when you specifically need to strip a modifier rather than add one',
+            'Combine mapped types with conditional types (as clauses, key remapping) for advanced transformations, but keep an eye on readability as complexity grows'
+        ]
+    },
+
+    {
+        id: 'ts-partial-required',
+        title: 'Partial<T> and Required<T>',
+        library: 'ts',
+        category: 'utility',
+        description: 'Partial<T> constructs a new type with every property of T marked optional - useful for representing partial updates, like a PATCH request body. Required<T> does the opposite, making every property mandatory even if the original type had optional ones, useful for ensuring a fully-populated object at a specific point in your code.',
+        syntax: 'Partial<Type>\nRequired<Type>',
+        examples: [
+            {
+                title: 'Partial<T> for Update Functions',
+                description: 'A very common real-world use case - allowing partial updates to an object.',
+                code: 'interface User {\n  id: number;\n  name: string;\n  email: string;\n}\n\nfunction updateUser(id: number, updates: Partial<User>): void {\n  // updates can include ANY subset of User\'s properties\n  console.log(`Updating user ${id}:`, updates);\n}\n\nupdateUser(1, { name: "New Name" });          // OK - only updating name\nupdateUser(1, { email: "new@example.com" });   // OK - only updating email'
+            },
+            {
+                title: 'Required<T> to Enforce Completeness',
+                description: 'Ensuring an object has every property populated, even ones that started optional.',
+                code: 'interface Config {\n  host?: string;\n  port?: number;\n  timeout?: number;\n}\n\nfunction startServer(config: Required<Config>): void {\n  // every property is guaranteed to be present here, not optional\n  console.log(`Starting on ${config.host}:${config.port}`);\n}\n\n// startServer({ host: "localhost" }); // Error - port and timeout are missing\nstartServer({ host: "localhost", port: 3000, timeout: 5000 }); // OK'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use Partial<T> for update/patch functions where the caller should be able to supply any subset of an object\'s fields',
+            'Use Required<T> at boundaries where a fully-populated object is genuinely necessary, even if the original type allows optional fields elsewhere',
+            'Avoid using Partial<T> for creating brand-new objects when most fields are actually required - it can hide missing-field bugs that a stricter type would catch',
+            'Combine Partial<T> with a spread merge pattern ({ ...existing, ...updates }) for a clean, type-safe update implementation'
+        ]
+    },
+
+    {
+        id: 'ts-pick-omit',
+        title: 'Pick<T> and Omit<T>',
+        library: 'ts',
+        category: 'utility',
+        description: 'Pick<T, Keys> constructs a new type by selecting only the specified properties from T. Omit<T, Keys> does the reverse, constructing a new type with all properties of T except the specified ones. Both are extremely common for deriving smaller, focused types from a larger base type without duplicating the definition.',
+        syntax: 'Pick<Type, Keys>\nOmit<Type, Keys>',
+        examples: [
+            {
+                title: 'Pick<T> - Selecting Specific Properties',
+                description: 'Deriving a smaller type with just the fields you need.',
+                code: 'interface User {\n  id: number;\n  name: string;\n  email: string;\n  password: string;\n}\n\ntype UserPreview = Pick<User, "id" | "name">;\n// Equivalent to: { id: number; name: string }\n\nconst preview: UserPreview = { id: 1, name: "Alice" };'
+            },
+            {
+                title: 'Omit<T> - Excluding Specific Properties',
+                description: 'A very common real-world case: deriving a "safe" type that excludes sensitive fields.',
+                code: 'type PublicUser = Omit<User, "password">;\n// Equivalent to: { id: number; name: string; email: string }\n\nfunction sendToClient(user: User): PublicUser {\n  const { password, ...publicUser } = user;\n  return publicUser; // password is excluded, matching the PublicUser type\n}'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use Pick<T> when you need a smaller type with just a few known fields from a larger interface, keeping both types in sync automatically',
+            'Use Omit<T> especially for excluding sensitive fields (like password or internal IDs) when defining what data is safe to send to a client',
+            'Derive types with Pick/Omit rather than manually rewriting a near-duplicate interface - the derived type stays in sync if the base type changes',
+            'Chain Pick and Omit with other utility types (like Partial<Omit<User, "id">>) for precise, composed type transformations'
+        ]
+    },
+
+    {
+        id: 'ts-record',
+        title: 'Record<K, V>',
+        library: 'ts',
+        category: 'utility',
+        description: 'Record<Keys, ValueType> constructs an object type with a specific set of keys, all mapped to the same value type. It is the concise, standard way to type dictionary-like objects, and is often clearer than writing an equivalent index signature by hand.',
+        syntax: 'Record<KeyType, ValueType>',
+        examples: [
+            {
+                title: 'A Basic Record',
+                description: 'Typing a dictionary object with a known key set.',
+                code: 'type Role = "admin" | "editor" | "viewer";\n\nconst permissions: Record<Role, string[]> = {\n  admin: ["read", "write", "delete"],\n  editor: ["read", "write"],\n  viewer: ["read"]\n};\n\n// TypeScript ensures ALL three roles are present with the correct value type\nconsole.log(permissions.admin); // ["read", "write", "delete"]'
+            },
+            {
+                title: 'Record with String Keys',
+                description: 'A more open dictionary type, equivalent to an index signature but more concise.',
+                code: 'const scores: Record<string, number> = {\n  alice: 95,\n  bob: 87,\n  charlie: 92\n};\n\n// Equivalent to writing:\n// interface Scores { [name: string]: number; }'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use Record<Keys, ValueType> as the concise, preferred way to type dictionary-style objects, rather than writing an index signature by hand',
+            'Use a specific literal union for Keys (like Record<Role, string[]>) when you want TypeScript to enforce that every possible key is actually present',
+            'Use Record<string, ValueType> for a genuinely open-ended dictionary where keys are not known ahead of time',
+            'Prefer Map over Record when keys are added/removed dynamically at runtime - Record is best suited for a fixed, known shape'
+        ]
+    },
+
+    {
+        id: 'ts-readonly-utility',
+        title: 'Readonly<T>',
+        library: 'ts',
+        category: 'utility',
+        description: 'Readonly<T> constructs a new type where every property of T is marked readonly, preventing reassignment after the object is created. It is a shallow transformation - nested objects within a Readonly<T> are not automatically deep-frozen, only the top-level properties are protected from reassignment.',
+        syntax: 'Readonly<Type>',
+        examples: [
+            {
+                title: 'Preventing Property Reassignment',
+                description: 'Using Readonly<T> to enforce immutability at the type level.',
+                code: 'interface Point {\n  x: number;\n  y: number;\n}\n\nconst origin: Readonly<Point> = { x: 0, y: 0 };\n\n// origin.x = 10; // Error - Cannot assign to \'x\' because it is a read-only property'
+            },
+            {
+                title: 'Readonly Is Shallow',
+                description: 'A common gotcha - nested objects are not automatically protected.',
+                code: 'interface Config {\n  settings: { theme: string };\n}\n\nconst config: Readonly<Config> = {\n  settings: { theme: "dark" }\n};\n\n// config.settings = { theme: "light" }; // Error - top-level property is protected\nconfig.settings.theme = "light"; // Allowed! Readonly<T> does not protect nested objects'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use Readonly<T> for function parameters that should not be mutated by the function, to make that contract explicit and enforced',
+            'Remember Readonly<T> is shallow - use a deep-readonly utility type (not built into TypeScript by default) if nested immutability is genuinely required',
+            'Combine with as const for the most specific, fully-locked-down literal types on object literals',
+            'Use readonly on individual array/tuple types (readonly number[]) as an alternative to wrapping the whole structure in Readonly<T>'
+        ]
+    },
+
+    {
+        id: 'ts-returntype-parameters',
+        title: 'ReturnType<T> and Parameters<T>',
+        library: 'ts',
+        category: 'utility',
+        description: 'ReturnType<T> extracts the return type of a function type, and Parameters<T> extracts its parameter types as a tuple. Both are especially useful for deriving types from functions you do not directly control, like third-party library functions, without manually duplicating their signatures.',
+        syntax: 'ReturnType<typeof fn>\nParameters<typeof fn>',
+        examples: [
+            {
+                title: 'ReturnType<T>',
+                description: 'Extracting a function\'s return type without redefining it manually.',
+                code: 'function createUser(name: string, age: number) {\n  return { id: Date.now(), name, age, createdAt: new Date() };\n}\n\ntype User = ReturnType<typeof createUser>;\n// User is inferred as: { id: number; name: string; age: number; createdAt: Date }\n// No need to manually write out this shape - it stays in sync with the function automatically'
+            },
+            {
+                title: 'Parameters<T>',
+                description: 'Extracting a function\'s parameter types as a tuple.',
+                code: 'function greet(name: string, greeting: string = "Hello") {\n  return `${greeting}, ${name}!`;\n}\n\ntype GreetParams = Parameters<typeof greet>;\n// GreetParams is: [name: string, greeting?: string]\n\nfunction logCall(...args: Parameters<typeof greet>) {\n  console.log("Calling greet with:", args);\n}'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use ReturnType<typeof fn> to derive a type from a function\'s actual implementation, rather than manually duplicating and maintaining a matching interface',
+            'Always use typeof when passing a function to these utilities (ReturnType<typeof myFunc>), since they operate on types, not runtime values',
+            'Use Parameters<T> when writing a wrapper or decorator function that needs to accept the exact same arguments as another function',
+            'These are especially valuable for third-party library functions whose exact return shape you do not want to manually re-type and keep in sync'
+        ]
+    },
+
+    {
+        id: 'ts-exclude-extract',
+        title: 'Exclude<T> and Extract<T>',
+        library: 'ts',
+        category: 'utility',
+        description: 'Exclude<UnionType, ExcludedMembers> constructs a type by removing specific members from a union. Extract<UnionType, Union> does the opposite, keeping only the members that are assignable to the given type. Both are useful for deriving a narrower union from an existing one without redefining it from scratch.',
+        syntax: 'Exclude<UnionType, ExcludedMembers>\nExtract<UnionType, Union>',
+        examples: [
+            {
+                title: 'Exclude<T> - Removing Union Members',
+                description: 'Deriving a smaller union by removing specific options.',
+                code: 'type Status = "pending" | "active" | "completed" | "cancelled";\n\ntype ActiveStatus = Exclude<Status, "cancelled">;\n// ActiveStatus is: "pending" | "active" | "completed"\n\ntype NonNullableString = Exclude<string | null | undefined, null | undefined>;\n// NonNullableString is: string'
+            },
+            {
+                title: 'Extract<T> - Keeping Only Matching Members',
+                description: 'The inverse operation - keeping just the members that match.',
+                code: 'type AllTypes = string | number | boolean | (() => void);\n\ntype OnlyFunctions = Extract<AllTypes, Function>;\n// OnlyFunctions is: () => void\n\ntype OnlyPrimitives = Extract<AllTypes, string | number | boolean>;\n// OnlyPrimitives is: string | number | boolean'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Use Exclude<T> to derive a narrower union type by removing specific known members, keeping it in sync if the original union changes',
+            'Use Extract<T> when you need to filter a broad union down to just the members matching a certain shape or category',
+            'Both operate purely on union types - they have no effect on object property removal, which is what Omit is for instead',
+            'Combine with typeof and a literal array (as const) to derive both a runtime array of values and a matching union type from a single source'
+        ]
+    },
+
+    {
+        id: 'ts-tsconfig-basics',
+        title: 'tsconfig.json Basics',
+        library: 'ts',
+        category: 'config',
+        description: 'tsconfig.json configures how the TypeScript compiler behaves for a project - which files to include, what JavaScript version to target, and which type-checking rules to enforce. It is the first file the compiler looks for when run without explicit file arguments.',
+        syntax: '{ "compilerOptions": { }, "include": [], "exclude": [] }',
+        examples: [
+            {
+                title: 'A Typical Configuration',
+                description: 'Common compiler options for a modern web project.',
+                code: '{\n  "compilerOptions": {\n    "target": "ES2022",\n    "module": "ESNext",\n    "moduleResolution": "bundler",\n    "strict": true,\n    "esModuleInterop": true,\n    "skipLibCheck": true,\n    "outDir": "./dist"\n  },\n  "include": ["src/**/*"],\n  "exclude": ["node_modules", "dist"]\n}'
+            },
+            {
+                title: 'Extending a Base Config',
+                description: 'Sharing configuration across multiple projects or packages in a monorepo.',
+                code: '{\n  "extends": "./tsconfig.base.json",\n  "compilerOptions": {\n    "outDir": "./dist/app" // overrides just this one option from the base config\n  }\n}'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Enable "strict": true in every new project - it turns on the full set of TypeScript\'s strictness checks together, catching significantly more bugs',
+            'Set "target" based on the actual JavaScript environments your code needs to run in, not necessarily the newest possible version',
+            'Use "skipLibCheck": true in most projects to skip type-checking of .d.ts files in node_modules, meaningfully speeding up compilation',
+            'Use "extends" to share a common base configuration across multiple packages in a monorepo, overriding only what genuinely differs per package'
+        ]
+    },
+
+    {
+        id: 'ts-strict-mode',
+        title: 'Strict Mode Options',
+        library: 'ts',
+        category: 'config',
+        description: 'The "strict" tsconfig option is actually a shorthand that enables a whole family of individual strictness flags at once, including strictNullChecks (null/undefined are not assignable to other types by default), noImplicitAny (variables must have an inferable or explicit type), and strictFunctionTypes. Enabling strict mode is one of the highest-value changes for TypeScript\'s type safety.',
+        syntax: '{ "compilerOptions": { "strict": true } }',
+        examples: [
+            {
+                title: 'What strict: true Actually Enables',
+                description: 'The individual flags bundled together by the strict shorthand.',
+                code: '{\n  "compilerOptions": {\n    "strict": true\n    // equivalent to enabling all of:\n    // "noImplicitAny": true,\n    // "strictNullChecks": true,\n    // "strictFunctionTypes": true,\n    // "strictBindCallApply": true,\n    // "strictPropertyInitialization": true,\n    // "noImplicitThis": true,\n    // "alwaysStrict": true\n  }\n}'
+            },
+            {
+                title: 'strictNullChecks in Action',
+                description: 'The single most impactful strict flag - catching a huge class of "cannot read property of undefined" bugs.',
+                code: '// Without strictNullChecks:\nfunction getLength(str: string) {\n  return str.length; // no warning, even though str could be null/undefined\n}\n\n// With strictNullChecks:\nfunction getLength(str: string | null) {\n  // return str.length; // Error - str could be null here\n  return str?.length ?? 0; // forces you to actually handle the null case\n}'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Enable strict mode from the very start of a new project - retrofitting it onto a large existing codebase later is significantly more work',
+            'If migrating an existing project, consider enabling individual strict flags one at a time (starting with strictNullChecks) rather than flipping strict all at once',
+            'Treat strictNullChecks errors as genuine bugs to fix, not obstacles - they almost always represent a real, previously-unhandled null/undefined case',
+            'Pair strict mode with noUncheckedIndexedAccess for even stronger guarantees around array/object index access returning possibly-undefined values'
+        ]
+    },
+
+    {
+        id: 'ts-declaration-files',
+        title: 'Declaration Files (.d.ts)',
+        library: 'ts',
+        category: 'config',
+        description: 'Declaration files contain only type information, no actual implementation - they describe the shape of existing JavaScript code so TypeScript can type-check against it. This is how you get autocomplete and type safety for plain JavaScript libraries, and how your own TypeScript library can ship types alongside its compiled JavaScript output.',
+        syntax: 'declare module "name" { }\ndeclare function fn(): type;',
+        examples: [
+            {
+                title: 'Declaring Types for an Untyped Module',
+                description: 'Adding type information for a JavaScript library that has none.',
+                code: '// my-library.d.ts\ndeclare module "my-untyped-library" {\n  export function doSomething(value: string): number;\n  export const version: string;\n}\n\n// Now "my-untyped-library" can be imported with full type checking,\n// even though the actual library is plain, untyped JavaScript'
+            },
+            {
+                title: 'Declaring Global Variables',
+                description: 'Describing a global variable injected by an external script, like an analytics library.',
+                code: '// globals.d.ts\ndeclare const analytics: {\n  track: (event: string, data?: object) => void;\n};\n\n// Now "analytics" can be used anywhere in the project with type checking,\n// even though it is never explicitly imported'
+            }
+        ],
+        browserSupport: undefined,
+        bestPractices: [
+            'Check DefinitelyTyped (the @types/ npm scope) first before writing your own declaration file - many popular untyped libraries already have community-maintained types',
+            'Ship a .d.ts file alongside your own published TypeScript library so consumers get full autocomplete and type checking without needing separate type packages',
+            'Keep hand-written declaration files minimal and focused only on what you actually use from the untyped library, rather than fully typing its entire API upfront',
+            'Use declare global carefully and sparingly for genuinely global values (like a script-injected variable) - overuse can make type origins confusing'
+        ]
+    },
+
     // ================= JAVA =================
     {
         id: 'java-classes',
