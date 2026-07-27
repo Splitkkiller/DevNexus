@@ -239,6 +239,8 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
       const cssFiles = files.filter(f => f.language === 'css');
       const jsFiles = files.filter(f => f.language === 'javascript');
       const tsFiles = files.filter(f => f.language === 'typescript');
+      const pyFiles = files.filter(f => f.language === 'python');
+      const javaFiles = files.filter(f => f.language === 'java');
 
       if (!htmlFile) {
          setSrcDoc("<html><body style='color: #666; font-family: sans-serif; text-align: center; padding-top: 2rem;'><h1>No index.html found</h1></body></html>");
@@ -296,6 +298,47 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
         }
       }
       
+      if (javaFiles.length > 0) {
+        // Java cannot run in a browser at all - not a bug to fix, a fundamentally
+        // different execution model (needs a real compiler + JVM). Be honest about
+        // it in the console rather than silently showing nothing.
+        tsDiagnosticLogs.push({
+          type: 'warn',
+          message: `Java execution isn't supported in the live preview yet (${javaFiles.map(f => f.name).join(', ')} will not run).`,
+          timestamp: new Date().toLocaleTimeString()
+        });
+      }
+
+      // Python files run via Pyodide - a real CPython build compiled to WebAssembly.
+      // It has to load and execute INSIDE the iframe itself (unlike TS, which is a
+      // plain text transform done here and injected as normal JS), so we inject a
+      // loader script only when a .py file actually exists, keeping the ~large
+      // download out of every preview that doesn't use Python.
+      const pyContent = pyFiles.map(f => f.content).join('\n\n');
+      const pythonScript = pyFiles.length > 0 ? `
+        <script src="https://cdn.jsdelivr.net/pyodide/v314.0.3/full/pyodide.js"></script>
+        <script>
+          (async () => {
+            function send(type, message) {
+              try { window.parent.postMessage({ type: 'console-log', logType: type, message: message }, '*'); } catch(e) {}
+            }
+            send('info', 'Loading Python runtime (first run can take a few seconds)...');
+            try {
+              const pyodide = await loadPyodide();
+              pyodide.setStdout({ batched: (msg) => send('info', msg) });
+              pyodide.setStderr({ batched: (msg) => send('error', msg) });
+              try {
+                await pyodide.runPythonAsync(${JSON.stringify(pyContent)});
+              } catch (runErr) {
+                send('error', 'Python Error: ' + runErr.message);
+              }
+            } catch (loadErr) {
+              send('error', 'Failed to load Python runtime: ' + loadErr.message);
+            }
+          })();
+        </script>
+      ` : '';
+
       // Inject CSS
       fullHtml = fullHtml.includes('</head>') 
         ? fullHtml.replace('</head>', `${styleTags}</head>`) 
@@ -334,8 +377,8 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
       `;
 
       fullHtml = fullHtml.includes('</body>')
-        ? fullHtml.replace('</body>', `${consoleScript}<script>${scriptContent}</script></body>`)
-        : `${fullHtml}${consoleScript}<script>${scriptContent}</script>`;
+        ? fullHtml.replace('</body>', `${consoleScript}<script>${scriptContent}</script>${pythonScript}</body>`)
+        : `${fullHtml}${consoleScript}<script>${scriptContent}</script>${pythonScript}`;
 
       setSrcDoc(fullHtml);
       setLogs(tsDiagnosticLogs);
