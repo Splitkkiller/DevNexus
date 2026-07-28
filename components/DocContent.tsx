@@ -13,6 +13,7 @@ export const DocContent: React.FC<DocContentProps> = ({ doc, themeColors }) => {
   const [activeTab, setActiveTab] = useState<'code' | 'preview'>('code');
   const [selectedExampleIndex, setSelectedExampleIndex] = useState(0);
   const [previewKey, setPreviewKey] = useState(0);
+  const [tsModule, setTsModule] = useState<any>(null);
 
   // Reset state when doc changes
   useEffect(() => {
@@ -27,6 +28,14 @@ export const DocContent: React.FC<DocContentProps> = ({ doc, themeColors }) => {
   useEffect(() => {
      setPreviewKey(prev => prev + 1);
   }, [selectedExampleIndex]);
+
+  // Lazy-load the TypeScript compiler only once, only when actually viewing a TS doc -
+  // it's a multi-MB package, no reason to fetch it for HTML/CSS/JS/Python/Java pages.
+  useEffect(() => {
+    if (doc?.library === 'ts' && !tsModule) {
+      import('typescript').then(setTsModule).catch(() => {});
+    }
+  }, [doc?.library, tsModule]);
 
   // CRITICAL FIX: Early return if doc is undefined
   if (!doc) {
@@ -165,8 +174,32 @@ export const DocContent: React.FC<DocContentProps> = ({ doc, themeColors }) => {
       `;
     }
 
-    // JS / TS (simulated)
+    // JS / TS
     if (isJs || isTs) {
+       let executableCode = code;
+       let tsLoadingNotice = '';
+
+       if (isTs) {
+         if (tsModule) {
+           // Strip types so the browser can actually run it - raw TypeScript syntax
+           // (interfaces, type annotations) is not valid JavaScript and would throw
+           // an immediate parse error, killing the whole script silently.
+           const result = tsModule.transpileModule(code, {
+             compilerOptions: {
+               module: tsModule.ModuleKind.None,
+               target: tsModule.ScriptTarget.ES2020
+             },
+             reportDiagnostics: true
+           });
+           executableCode = result.outputText;
+         } else {
+           // Compiler hasn't finished loading yet - show a brief loading state
+           // rather than silently executing broken/untranspiled code.
+           executableCode = '';
+           tsLoadingNotice = `document.getElementById('console-output').innerHTML = '<div style="opacity:0.6;font-style:italic;">Loading TypeScript compiler...</div>';`;
+         }
+       }
+
        return `
       <!DOCTYPE html>
       <html>
@@ -214,14 +247,67 @@ export const DocContent: React.FC<DocContentProps> = ({ doc, themeColors }) => {
             console.error = (...args) => log('error', args);
             console.warn = (...args) => log('warn', args);
             window.onerror = (msg) => log('error', [msg]);
-            try { ${isTs ? '// TypeScript is treated as JS here for demo\n' : ''}${code} } catch (e) { console.error(e); }
+            ${tsLoadingNotice}
+            try { ${executableCode} } catch (e) { console.error(e); }
           </script>
         </body>
       </html>
     `;
     }
 
-    // Python / Java (Backend languages - Read Only)
+    // Python - runs for real via Pyodide (actual CPython compiled to WebAssembly),
+    // self-contained entirely inside this iframe, same pattern as the JS console above.
+    if (isPy) {
+      return `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <style>
+              ${baseStyle}
+              body { font-family: 'JetBrains Mono', 'Fira Code', monospace; font-size: 13px; }
+              .console-line { padding: 4px 0; border-bottom: 1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}; white-space: pre-wrap; }
+              .log-error { color: #f87171; background: rgba(248, 113, 113, 0.1); }
+              .log-info { color: ${isDark ? '#e5e7eb' : '#374151'}; }
+              .log-loading { opacity: 0.6; font-style: italic; }
+            </style>
+          </head>
+          <body>
+            <div style="font-weight: bold; opacity: 0.5; text-transform: uppercase; font-size: 11px; margin-bottom: 10px;">Python Output</div>
+            <div id="console-output"><div class="console-line log-loading">Loading Python runtime (first run can take a few seconds)...</div></div>
+            <script src="https://cdn.jsdelivr.net/pyodide/v314.0.3/full/pyodide.js"></script>
+            <script>
+              const consoleDiv = document.getElementById('console-output');
+              function log(type, message) {
+                const line = document.createElement('div');
+                line.className = 'console-line log-' + type;
+                line.innerText = message;
+                consoleDiv.appendChild(line);
+              }
+              (async () => {
+                try {
+                  const pyodide = await loadPyodide();
+                  consoleDiv.innerHTML = '';
+                  pyodide.setStdout({ batched: (msg) => log('info', msg) });
+                  pyodide.setStderr({ batched: (msg) => log('error', msg) });
+                  try {
+                    await pyodide.runPythonAsync(${JSON.stringify(code)});
+                  } catch (runErr) {
+                    log('error', 'Python Error: ' + runErr.message);
+                  }
+                } catch (loadErr) {
+                  consoleDiv.innerHTML = '';
+                  log('error', 'Failed to load Python runtime: ' + loadErr.message);
+                }
+              })();
+            </script>
+          </body>
+        </html>
+      `;
+    }
+
+    // Java - no viable way to compile/run Java in a browser, so be upfront about
+    // it rather than faking output. Needs either a sandboxed backend compiler or
+    // a third-party code-execution service - a bigger, separate decision.
     return `
         <!DOCTYPE html>
         <html>
@@ -234,12 +320,12 @@ export const DocContent: React.FC<DocContentProps> = ({ doc, themeColors }) => {
           </head>
           <body>
              <div class="terminal">
-                <div><span class="prompt">$</span> ${isPy ? 'python3 script.py' : 'javac Main.java && java Main'}</div>
-                <div style="margin-top: 1rem; color: #6b7280; font-style: italic;">
-                   (Output simulation not available in browser for backend languages)
+                <div><span class="prompt">$</span> javac Main.java &amp;&amp; java Main</div>
+                <div style="margin-top: 1rem; color: #f59e0b;">
+                   Live execution isn't available for Java in the browser yet.
                 </div>
-                <div style="margin-top: 1rem;">
-                   Code is valid syntax for ${isPy ? 'Python 3.x' : 'Java SE'}.
+                <div style="margin-top: 0.5rem; color: #6b7280;">
+                   Read the code example above - this preview can't run it.
                 </div>
              </div>
           </body>
