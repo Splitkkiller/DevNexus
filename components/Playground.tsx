@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ThemeColors } from '../types';
 import {
   Files, Play, Settings, Maximize2, Minimize2, Plus,
@@ -93,13 +93,76 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Placeholder for now - real logging arrives in Phase 2 when HTML/CSS/JS
-  // execution gets wired up. Kept here so the console UI has something to show.
-  const [logs] = useState<LogEntry[]>([
-    { type: 'info', message: 'System ready...', timestamp: new Date().toLocaleTimeString() },
-  ]);
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [srcDoc, setSrcDoc] = useState('');
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const activeFile = files.find(f => f.id === activeFileId) ?? files[0];
+
+  // --- Compile HTML/CSS/JS into a single runnable document ---
+  // TypeScript, Python, and Java files exist in the file tree but aren't
+  // executed yet - that's Phase 3, added one language at a time.
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      const htmlFile = files.find(f => f.name === 'index.html') || files.find(f => f.language === 'html');
+      const cssFiles = files.filter(f => f.language === 'css');
+      const jsFiles = files.filter(f => f.language === 'javascript');
+
+      if (!htmlFile) {
+        setSrcDoc(`<html><body style="font-family:sans-serif;color:#888;text-align:center;padding-top:3rem;">No index.html found</body></html>`);
+        return;
+      }
+
+      let fullHtml = htmlFile.content;
+      const styleTags = cssFiles.map(f => `<style>${f.content}</style>`).join('\n');
+      const scriptContent = jsFiles.map(f => f.content).join('\n');
+
+      fullHtml = fullHtml.includes('</head>')
+        ? fullHtml.replace('</head>', `${styleTags}</head>`)
+        : `${styleTags}${fullHtml}`;
+
+      const consoleScript = `
+        <script>
+          (function () {
+            function send(type, message) {
+              try { window.parent.postMessage({ type: 'console-log', logType: type, message: message }, '*'); } catch (e) {}
+            }
+            const oldLog = console.log, oldWarn = console.warn, oldError = console.error;
+            console.log = function (...args) { oldLog.apply(console, args); send('info', args.join(' ')); };
+            console.warn = function (...args) { oldWarn.apply(console, args); send('warn', args.join(' ')); };
+            console.error = function (...args) { oldError.apply(console, args); send('error', args.join(' ')); };
+            window.onerror = function (msg, url, line) { send('error', 'Runtime Error: ' + msg + ' (Line ' + line + ')'); return false; };
+            window.addEventListener('unhandledrejection', function (event) { send('error', 'Unhandled Promise: ' + event.reason); });
+          })();
+        </script>
+      `;
+
+      fullHtml = fullHtml.includes('</body>')
+        ? fullHtml.replace('</body>', `${consoleScript}<script>${scriptContent}</script></body>`)
+        : `${fullHtml}${consoleScript}<script>${scriptContent}</script>`;
+
+      setSrcDoc(fullHtml);
+      setLogs([{ type: 'info', message: 'Compiled successfully.', timestamp: new Date().toLocaleTimeString() }]);
+    }, 600);
+
+    return () => clearTimeout(timeout);
+  }, [files, refreshKey]);
+
+  // --- Receive console output / errors from inside the preview iframe ---
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (e.data && e.data.type === 'console-log') {
+        setLogs(prev => [...prev, {
+          type: e.data.logType,
+          message: String(e.data.message),
+          timestamp: new Date().toLocaleTimeString(),
+        }]);
+        if (e.data.logType === 'error') setIsBottomPanelOpen(true);
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, []);
 
   const updateActiveFileContent = (content: string) => {
     setFiles(prev => prev.map(f => (f.id === activeFileId ? { ...f, content } : f)));
@@ -151,7 +214,10 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
           />
         </div>
         <div className="flex items-center gap-3">
-          <button className="flex items-center gap-1.5 bg-[#1D9E75] hover:bg-[#1B8F69] transition-colors text-[#04342C] text-[13px] font-medium px-4 py-1.5 rounded-lg">
+          <button
+            onClick={() => setRefreshKey(k => k + 1)}
+            className="flex items-center gap-1.5 bg-[#1D9E75] hover:bg-[#1B8F69] transition-colors text-[#04342C] text-[13px] font-medium px-4 py-1.5 rounded-lg"
+          >
             <Play className="w-3.5 h-3.5" fill="currentColor" />
             Run
           </button>
@@ -278,15 +344,22 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
             <div className="flex items-center gap-2 px-3 h-9 bg-[#1c1c21] border-b border-[#2a2a30] shrink-0">
               <ArrowLeft className="w-3.5 h-3.5 text-[#4a4a52]" />
               <ArrowRight className="w-3.5 h-3.5 text-[#4a4a52]" />
-              <RotateCw className="w-3.5 h-3.5 text-[#6b6b72] cursor-pointer hover:text-[#9d9da3] transition-colors" />
+              <RotateCw
+                onClick={() => setRefreshKey(k => k + 1)}
+                className="w-3.5 h-3.5 text-[#6b6b72] cursor-pointer hover:text-[#9d9da3] transition-colors"
+              />
               <div className="flex-1 bg-[#131316] rounded-md px-2.5 py-1 text-[11px] font-mono text-[#6b6b72]">
                 preview
               </div>
             </div>
-            <div className="flex-1 bg-white flex items-center justify-center">
-              <span className="text-[13px] text-[#a1a1aa] font-sans">
-                Live preview arrives in the next phase
-              </span>
+            <div className="flex-1 bg-white">
+              <iframe
+                key={refreshKey}
+                title="preview"
+                srcDoc={srcDoc}
+                sandbox="allow-scripts allow-modals"
+                className="w-full h-full border-none"
+              />
             </div>
           </div>
         </div>

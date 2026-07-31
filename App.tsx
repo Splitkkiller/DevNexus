@@ -221,9 +221,13 @@ function App() {
           <div className="w-6" />
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className={activeView === 'playground' ? 'flex-1 min-h-0' : 'flex-1 overflow-y-auto'}>
+          {activeView === 'playground' ? (
+            <div className="h-full">
+              <Playground themeColors={themeColors} />
+            </div>
+          ) : (
           <main className="max-w-5xl mx-auto p-4 md:p-10">
-            {activeView === 'playground' && <Playground themeColors={themeColors} />}
             {activeView === 'quiz' && <Quiz themeColors={themeColors} onQuizComplete={() => {}} />}
             {activeView === 'ai' && <Assistant themeColors={themeColors} />}
             {activeView === 'flashcards' && <Flashcards themeColors={themeColors} />}
@@ -240,6 +244,7 @@ function App() {
               onContactClick={() => toggleView('contact')}
             />
           </main>
+          )}
         </div>
       </div>
     </div>
