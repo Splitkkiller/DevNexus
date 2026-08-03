@@ -4,7 +4,7 @@ import {
   Files, Play, Settings, Maximize2, Minimize2, Plus,
   FileCode2, Palette, Braces, FileType2, Coffee,
   Terminal, ChevronDown, ArrowLeft, ArrowRight, RotateCw,
-  Trash2, AlertCircle, Ban, CheckCircle2
+  Trash2, AlertCircle, Pencil
 } from 'lucide-react';
 import Editor from 'react-simple-code-editor';
 import Prism from 'prismjs';
@@ -81,7 +81,6 @@ const LANGUAGE_PICKER: { language: Language; label: string }[] = [
   { language: 'java', label: 'Java' },
 ];
 
-// --- Web Worker String for Pyodide ---
 const PYODIDE_WORKER_CODE = `
   let pyodideReady = false;
   let pyodidePromise = null;
@@ -119,15 +118,17 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   const [projectName, setProjectName] = useState('DevStudio Project');
   const [files, setFiles] = useState<PlaygroundFile[]>(DEFAULT_FILES);
   const [activeFileId, setActiveFileId] = useState('1');
+  
+  // UI State
   const [isBottomPanelOpen, setIsBottomPanelOpen] = useState(true);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  
-  // Right-click context menu state for the explorer
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
-
-  // Enhanced Error Handling state
   const [logFilter, setLogFilter] = useState<'all' | 'error'>('all');
+
+  // File Renaming State
+  const [editingFileId, setEditingFileId] = useState<string | null>(null);
+  const [editFileName, setEditFileName] = useState("");
 
   const containerRef = useRef<HTMLDivElement>(null);
   const workerRef = useRef<Worker | null>(null);
@@ -140,7 +141,6 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   const activeFile = files.find(f => f.id === activeFileId) ?? files[0];
   const errorCount = logs.filter(l => l.type === 'error').length;
 
-  // Close context menu on global window clicks
   useEffect(() => {
     const handleGlobalClick = () => setContextMenu(null);
     window.addEventListener('click', handleGlobalClick);
@@ -178,16 +178,16 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     }
   }, [files, tsModule]);
 
-  // --- Pipeline 1: Live Preview Compilation (HTML/CSS/JS/TS) ---
+  // --- Pipeline 1: Live Preview Compilation ---
   useEffect(() => {
     const timeout = setTimeout(() => {
-      const htmlFile = files.find(f => f.name === 'index.html') || files.find(f => f.language === 'html');
-      const cssFiles = files.filter(f => f.language === 'css');
-      const jsFiles = files.filter(f => f.language === 'javascript');
-      const tsFiles = files.filter(f => f.language === 'typescript');
+      const htmlFile = files.find(f => f.name.endsWith('.html')) || files.find(f => f.language === 'html');
+      const cssFiles = files.filter(f => f.language === 'css' || f.name.endsWith('.css'));
+      const jsFiles = files.filter(f => f.language === 'javascript' || f.name.endsWith('.js'));
+      const tsFiles = files.filter(f => f.language === 'typescript' || f.name.endsWith('.ts'));
 
       if (!htmlFile) {
-        setSrcDoc(`<html><body style="font-family:sans-serif;color:#888;text-align:center;padding-top:3rem;">No index.html found</body></html>`);
+        setSrcDoc(`<html><body style="font-family:sans-serif;color:#888;text-align:center;padding-top:3rem;">No HTML file found</body></html>`);
         return;
       }
 
@@ -235,7 +235,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     return () => clearTimeout(timeout);
   }, [files, tsModule]);
 
-  // --- Receive Console Logs from the Iframe ---
+  // --- Receive Console Logs ---
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       if (e.data && e.data.type === 'console-log') {
@@ -251,7 +251,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     return () => window.removeEventListener('message', handler);
   }, []);
 
-  // --- Pipeline 2: Manual Execution (Triggered by the Run Button) ---
+  // --- Pipeline 2: Manual Execution ---
   const handleRunClick = useCallback(() => {
     setLogs([]);
     setRefreshKey(k => k + 1);
@@ -299,6 +299,27 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     if (activeFileId === id) setActiveFileId(remaining[0].id);
   };
 
+  // --- Rename Handlers ---
+  const startRenaming = (e: React.MouseEvent, file: PlaygroundFile) => {
+    e.stopPropagation();
+    setEditingFileId(file.id);
+    setEditFileName(file.name);
+  };
+
+  const handleRenameKeyDown = (e: React.KeyboardEvent, id: string) => {
+    if (e.key === 'Enter') commitRename(id);
+    if (e.key === 'Escape') setEditingFileId(null);
+  };
+
+  const commitRename = (id: string) => {
+    if (!editFileName.trim()) {
+      setEditingFileId(null);
+      return;
+    }
+    setFiles(prev => prev.map(f => f.id === id ? { ...f, name: editFileName.trim() } : f));
+    setEditingFileId(null);
+  };
+
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
     if (!isFullscreen) {
@@ -309,10 +330,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     setIsFullscreen(!isFullscreen);
   };
 
-  const filteredLogs = logs.filter(log => {
-    if (logFilter === 'error') return log.type === 'error';
-    return true;
-  });
+  const filteredLogs = logs.filter(log => logFilter === 'all' || log.type === 'error');
 
   return (
     <div
@@ -354,26 +372,20 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
           </div>
         </div>
 
-        {/* --- File Explorer with Right-Click Context Menu Support --- */}
+        {/* --- File Explorer --- */}
         <div
           className="w-44 bg-[#1a1a1f] border-r border-[#2a2a30] flex flex-col shrink-0 relative select-none"
           onContextMenu={(e) => {
             e.preventDefault();
             const rect = e.currentTarget.getBoundingClientRect();
-            setContextMenu({
-              x: e.clientX - rect.left,
-              y: e.clientY - rect.top,
-            });
+            setContextMenu({ x: e.clientX - rect.left, y: e.clientY - rect.top });
           }}
         >
           <div className="flex items-center justify-between px-4 pt-4 pb-3">
             <span className="text-[11px] font-medium tracking-wide text-[#6b6b72] uppercase">Explorer</span>
             <div className="relative">
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsPickerOpen(!isPickerOpen);
-                }}
+                onClick={(e) => { e.stopPropagation(); setIsPickerOpen(!isPickerOpen); }}
                 className="text-[#6b6b72] hover:text-[#e8e8ea] transition-colors"
               >
                 <Plus className="w-4 h-4" />
@@ -402,30 +414,53 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
             {files.map(file => {
               const Icon = LANGUAGE_META[file.language].icon;
               const isActive = file.id === activeFileId;
+              const isEditing = editingFileId === file.id;
+
               return (
                 <button
                   key={file.id}
-                  onClick={() => setActiveFileId(file.id)}
+                  onClick={() => !isEditing && setActiveFileId(file.id)}
                   className={`group flex items-center gap-2 px-2.5 py-[7px] rounded-md text-left transition-colors ${
                     isActive ? 'bg-[#2a2a35]' : 'hover:bg-[#212127]'
                   }`}
                 >
                   <Icon className="w-[15px] h-[15px] shrink-0" style={{ color: LANGUAGE_META[file.language].color }} />
-                  <span className={`text-[13px] truncate flex-1 ${isActive ? 'text-[#e8e8ea]' : 'text-[#9d9da3]'}`}>
-                    {file.name}
-                  </span>
-                  {files.length > 1 && (
-                    <Trash2
-                      className="w-3 h-3 text-[#5a5a62] opacity-0 group-hover:opacity-100 hover:text-[#E85A5A] transition-opacity shrink-0"
-                      onClick={e => { e.stopPropagation(); deleteFile(file.id); }}
+                  
+                  {isEditing ? (
+                    <input
+                      autoFocus
+                      value={editFileName}
+                      onChange={e => setEditFileName(e.target.value)}
+                      onKeyDown={e => handleRenameKeyDown(e, file.id)}
+                      onBlur={() => commitRename(file.id)}
+                      onClick={e => e.stopPropagation()}
+                      className="flex-1 bg-[#131316] text-[#e8e8ea] text-[13px] outline-none border border-[#7F77DD] rounded px-1 min-w-0"
                     />
+                  ) : (
+                    <span className={`text-[13px] truncate flex-1 ${isActive ? 'text-[#e8e8ea]' : 'text-[#9d9da3]'}`}>
+                      {file.name}
+                    </span>
+                  )}
+
+                  {!isEditing && (
+                    <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                      <Pencil
+                        className="w-3 h-3 text-[#5a5a62] hover:text-[#e8e8ea] transition-colors"
+                        onClick={(e) => startRenaming(e, file)}
+                      />
+                      {files.length > 1 && (
+                        <Trash2
+                          className="w-3 h-3 text-[#5a5a62] hover:text-[#E85A5A] transition-colors"
+                          onClick={e => { e.stopPropagation(); deleteFile(file.id); }}
+                        />
+                      )}
+                    </div>
                   )}
                 </button>
               );
             })}
           </div>
 
-          {/* Right-Click Context Menu Popup */}
           {contextMenu && (
             <div
               className="absolute z-30 bg-[#232328] border border-[#33333a] rounded-lg shadow-2xl py-1.5 w-40"
@@ -466,27 +501,49 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
                 </>
               )}
             </div>
-            <div className="flex-1 overflow-auto custom-scrollbar p-4">
+            
+            {/* Editor with Line Numbers */}
+            <div className="flex-1 overflow-auto custom-scrollbar bg-[#16161a] flex relative">
               {activeFile && (
-                <Editor
-                  value={activeFile.content}
-                  onValueChange={updateActiveFileContent}
-                  highlight={code =>
-                    Prism.highlight(
-                      code,
-                      Prism.languages[LANGUAGE_META[activeFile.language].prism] || Prism.languages.javascript,
-                      LANGUAGE_META[activeFile.language].prism
-                    )
-                  }
-                  padding={0}
-                  style={{
-                    fontFamily: '"JetBrains Mono", monospace',
-                    fontSize: 13,
-                    lineHeight: 1.6,
-                    color: '#d4d4d8',
-                    minHeight: '100%',
-                  }}
-                />
+                <>
+                  <div
+                    className="sticky left-0 flex flex-col items-end py-4 pl-3 pr-3 select-none shrink-0 border-r border-[#2a2a30] bg-[#1a1a1f] z-10"
+                    style={{
+                      fontFamily: '"JetBrains Mono", monospace',
+                      fontSize: 13,
+                      lineHeight: 1.6,
+                      color: '#5a5a62',
+                      minHeight: '100%'
+                    }}
+                  >
+                    {activeFile.content.split('\n').map((_, i) => (
+                      <div key={i} className="min-w-[1.5rem] text-right">{i + 1}</div>
+                    ))}
+                  </div>
+                  
+                  <div className="flex-1 p-4 min-w-max">
+                    <Editor
+                      value={activeFile.content}
+                      onValueChange={updateActiveFileContent}
+                      highlight={code =>
+                        Prism.highlight(
+                          code,
+                          Prism.languages[LANGUAGE_META[activeFile.language].prism] || Prism.languages.javascript,
+                          LANGUAGE_META[activeFile.language].prism
+                        )
+                      }
+                      padding={0}
+                      textareaClassName="focus:outline-none"
+                      style={{
+                        fontFamily: '"JetBrains Mono", monospace',
+                        fontSize: 13,
+                        lineHeight: 1.6,
+                        color: '#d4d4d8',
+                        whiteSpace: 'pre',
+                      }}
+                    />
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -517,7 +574,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
         </div>
       </div>
 
-      {/* ===== Enhanced Console & Error Handling Panel ===== */}
+      {/* ===== Console Panel ===== */}
       <div className={`bg-[#16161a] border-t border-[#2a2a30] shrink-0 transition-all ${isBottomPanelOpen ? 'h-44' : 'h-9'}`}>
         <div
           onClick={() => setIsBottomPanelOpen(!isBottomPanelOpen)}
