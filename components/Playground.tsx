@@ -4,7 +4,7 @@ import {
   Files, Play, Settings, Maximize2, Minimize2, Plus,
   FileCode2, Palette, Braces, FileType2, Coffee,
   Terminal, ChevronDown, ArrowLeft, ArrowRight, RotateCw,
-  Trash2, AlertCircle, Pencil
+  Trash2, AlertCircle, Pencil, Columns
 } from 'lucide-react';
 import Editor from 'react-simple-code-editor';
 import Prism from 'prismjs';
@@ -32,6 +32,7 @@ interface LogEntry {
   type: 'info' | 'warn' | 'error';
   message: string;
   timestamp: string;
+  count: number;
 }
 
 const LANGUAGE_META: Record<Language, { icon: React.ElementType; color: string; ext: string; prism: string }> = {
@@ -119,12 +120,19 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   const [files, setFiles] = useState<PlaygroundFile[]>(DEFAULT_FILES);
   const [activeFileId, setActiveFileId] = useState('1');
   
-  // UI State
+  // UI & Layout State
   const [isBottomPanelOpen, setIsBottomPanelOpen] = useState(true);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const [logFilter, setLogFilter] = useState<'all' | 'error'>('all');
+  
+  // Resizable Panels State
+  const [showPreview, setShowPreview] = useState(true);
+  const [splitPos, setSplitPos] = useState(50); // percentage for editor vs preview
+  const [consoleHeight, setConsoleHeight] = useState(176); // pixels
+  const [isDraggingH, setIsDraggingH] = useState(false);
+  const [isDraggingV, setIsDraggingV] = useState(false);
 
   // File Renaming State
   const [editingFileId, setEditingFileId] = useState<string | null>(null);
@@ -139,12 +147,65 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   const [tsModule, setTsModule] = useState<any>(null);
 
   const activeFile = files.find(f => f.id === activeFileId) ?? files[0];
-  const errorCount = logs.filter(l => l.type === 'error').length;
+  const errorCount = logs.filter(l => l.type === 'error').reduce((sum, log) => sum + log.count, 0);
 
+  // --- Layout Dragging Handlers ---
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDraggingH && containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const sidebarWidth = 220; // Approx fixed width of Explorer + Icons
+        const availableWidth = rect.width - sidebarWidth;
+        const mouseX = e.clientX - rect.left - sidebarWidth;
+        let newPct = (mouseX / availableWidth) * 100;
+        newPct = Math.max(15, Math.min(85, newPct)); // Constrain to 15%-85%
+        setSplitPos(newPct);
+      }
+      if (isDraggingV && containerRef.current) {
+        const rect = containerRef.current.getBoundingClientRect();
+        const mouseY = e.clientY - rect.top;
+        let newHeight = rect.height - mouseY;
+        newHeight = Math.max(36, Math.min(rect.height - 100, newHeight)); // Constrain
+        setConsoleHeight(newHeight);
+        if (newHeight > 50) setIsBottomPanelOpen(true);
+      }
+    };
+    const handleMouseUp = () => {
+      setIsDraggingH(false);
+      setIsDraggingV(false);
+    };
+
+    if (isDraggingH || isDraggingV) {
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDraggingH, isDraggingV]);
+
+  // Close context menu on click
   useEffect(() => {
     const handleGlobalClick = () => setContextMenu(null);
     window.addEventListener('click', handleGlobalClick);
     return () => window.removeEventListener('click', handleGlobalClick);
+  }, []);
+
+  // --- Unified Log Appender (with Deduplication) ---
+  const addLog = useCallback((logType: 'info' | 'warn' | 'error', message: string) => {
+    setLogs(prev => {
+      const lastLog = prev[prev.length - 1];
+      // Deduplicate: If the exact same message occurs sequentially, increment count
+      if (lastLog && lastLog.message === message && lastLog.type === logType) {
+        return [
+          ...prev.slice(0, -1),
+          { ...lastLog, count: lastLog.count + 1, timestamp: new Date().toLocaleTimeString() }
+        ];
+      }
+      return [...prev, { type: logType, message, timestamp: new Date().toLocaleTimeString(), count: 1 }];
+    });
+    if (logType === 'error') setIsBottomPanelOpen(true);
   }, []);
 
   // --- Initialize Python Web Worker ---
@@ -154,12 +215,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     const worker = new Worker(workerUrl);
 
     worker.onmessage = (e) => {
-      setLogs(prev => [...prev, {
-        type: e.data.type,
-        message: String(e.data.message),
-        timestamp: new Date().toLocaleTimeString(),
-      }]);
-      if (e.data.type === 'error') setIsBottomPanelOpen(true);
+      addLog(e.data.type, String(e.data.message));
     };
 
     workerRef.current = worker;
@@ -168,7 +224,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
       worker.terminate();
       URL.revokeObjectURL(workerUrl);
     };
-  }, []);
+  }, [addLog]);
 
   // --- Lazy Load TypeScript ---
   useEffect(() => {
@@ -239,17 +295,12 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       if (e.data && e.data.type === 'console-log') {
-        setLogs(prev => [...prev, {
-          type: e.data.logType,
-          message: String(e.data.message),
-          timestamp: new Date().toLocaleTimeString(),
-        }]);
-        if (e.data.logType === 'error') setIsBottomPanelOpen(true);
+        addLog(e.data.logType, String(e.data.message));
       }
     };
     window.addEventListener('message', handler);
     return () => window.removeEventListener('message', handler);
-  }, []);
+  }, [addLog]);
 
   // --- Pipeline 2: Manual Execution ---
   const handleRunClick = useCallback(() => {
@@ -265,13 +316,9 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     }
 
     if (javaFiles.length > 0) {
-      setLogs(prev => [...prev, {
-        type: 'warn',
-        message: `Java execution isn't supported in the live preview yet (${javaFiles.map(f => f.name).join(', ')} will not run).`,
-        timestamp: new Date().toLocaleTimeString(),
-      }]);
+      addLog('warn', `Java execution isn't supported in the live preview yet (${javaFiles.map(f => f.name).join(', ')} will not run).`);
     }
-  }, [files]);
+  }, [files, addLog]);
 
   // --- UI Handlers ---
   const updateActiveFileContent = (content: string) => {
@@ -333,10 +380,16 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   const filteredLogs = logs.filter(log => logFilter === 'all' || log.type === 'error');
 
   return (
-    <div
-      ref={containerRef}
-      className="flex flex-col h-full bg-[#131316] text-[#e8e8ea] font-sans overflow-hidden"
-    >
+    <div ref={containerRef} className="flex flex-col h-full bg-[#131316] text-[#e8e8ea] font-sans overflow-hidden relative">
+      
+      {/* Invisible overlay during dragging to prevent iframes from stealing mouse events */}
+      {(isDraggingH || isDraggingV) && (
+        <div 
+          className="absolute inset-0 z-50" 
+          style={{ cursor: isDraggingH ? 'col-resize' : 'row-resize' }} 
+        />
+      )}
+
       {/* ===== Top Bar ===== */}
       <div className="flex items-center justify-between px-5 py-3 bg-[#1c1c21] border-b border-[#2a2a30] shrink-0">
         <div className="flex items-center gap-2.5">
@@ -348,6 +401,16 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
           />
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowPreview(!showPreview)}
+            className="flex items-center gap-1.5 text-[#6b6b72] hover:text-[#9d9da3] transition-colors bg-[#232328] hover:bg-[#2a2a32] px-2.5 py-1.5 rounded-lg text-[12px] font-medium"
+          >
+            <Columns className="w-3.5 h-3.5" />
+            {showPreview ? 'Hide Preview' : 'Show Preview'}
+          </button>
+          
+          <div className="w-px h-4 bg-[#2a2a30] mx-1"></div>
+
           <button
             onClick={handleRunClick}
             className="flex items-center gap-1.5 bg-[#1D9E75] hover:bg-[#1B8F69] transition-colors text-[#04342C] text-[13px] font-medium px-4 py-1.5 rounded-lg"
@@ -363,7 +426,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
       </div>
 
       {/* ===== Main Body ===== */}
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 flex-row">
 
         {/* --- Icon Rail --- */}
         <div className="w-11 bg-[#0f0f12] border-r border-[#2a2a30] flex flex-col items-center pt-4 gap-4 shrink-0">
@@ -485,11 +548,14 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
           )}
         </div>
 
-        {/* --- Editor + Preview --- */}
-        <div className="flex flex-1 min-w-0">
-
+        {/* --- Editor + Preview Area --- */}
+        <div className="flex flex-1 min-w-0 flex-row">
+          
           {/* Editor */}
-          <div className="flex flex-col flex-1 min-w-0 border-r border-[#2a2a30]">
+          <div 
+            className="flex flex-col min-w-0 bg-[#16161a]" 
+            style={{ width: showPreview ? `${splitPos}%` : '100%' }}
+          >
             <div className="flex items-center gap-2 px-4 h-9 bg-[#1c1c21] border-b border-[#2a2a30] shrink-0">
               {activeFile && (
                 <>
@@ -502,8 +568,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
               )}
             </div>
             
-            {/* Editor with Line Numbers */}
-            <div className="flex-1 overflow-auto custom-scrollbar bg-[#16161a] flex relative">
+            <div className="flex-1 overflow-auto custom-scrollbar flex relative">
               {activeFile && (
                 <>
                   <div
@@ -548,37 +613,63 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
             </div>
           </div>
 
+          {/* Vertical Resizer (Left/Right) */}
+          {showPreview && (
+            <div
+              className="w-1 bg-[#2a2a30] hover:bg-[#7F77DD] cursor-col-resize shrink-0 z-20 transition-colors"
+              onMouseDown={(e) => { e.preventDefault(); setIsDraggingH(true); }}
+            />
+          )}
+
           {/* Preview */}
-          <div className="flex flex-col flex-1 min-w-0">
-            <div className="flex items-center gap-2 px-3 h-9 bg-[#1c1c21] border-b border-[#2a2a30] shrink-0">
-              <ArrowLeft className="w-3.5 h-3.5 text-[#4a4a52]" />
-              <ArrowRight className="w-3.5 h-3.5 text-[#4a4a52]" />
-              <RotateCw
-                onClick={handleRunClick}
-                className="w-3.5 h-3.5 text-[#6b6b72] cursor-pointer hover:text-[#9d9da3] transition-colors"
-              />
-              <div className="flex-1 bg-[#131316] rounded-md px-2.5 py-1 text-[11px] font-mono text-[#6b6b72]">
-                preview
+          {showPreview && (
+            <div 
+              className="flex flex-col min-w-0" 
+              style={{ width: `${100 - splitPos}%` }}
+            >
+              <div className="flex items-center gap-2 px-3 h-9 bg-[#1c1c21] border-b border-[#2a2a30] shrink-0">
+                <ArrowLeft className="w-3.5 h-3.5 text-[#4a4a52]" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#4a4a52]" />
+                <RotateCw
+                  onClick={handleRunClick}
+                  className="w-3.5 h-3.5 text-[#6b6b72] cursor-pointer hover:text-[#9d9da3] transition-colors"
+                />
+                <div className="flex-1 bg-[#131316] rounded-md px-2.5 py-1 text-[11px] font-mono text-[#6b6b72]">
+                  preview
+                </div>
+              </div>
+              <div className="flex-1 bg-white">
+                <iframe
+                  key={refreshKey}
+                  title="preview"
+                  srcDoc={srcDoc}
+                  sandbox="allow-scripts allow-modals"
+                  className="w-full h-full border-none"
+                />
               </div>
             </div>
-            <div className="flex-1 bg-white">
-              <iframe
-                key={refreshKey}
-                title="preview"
-                srcDoc={srcDoc}
-                sandbox="allow-scripts allow-modals"
-                className="w-full h-full border-none"
-              />
-            </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* ===== Console Panel ===== */}
-      <div className={`bg-[#16161a] border-t border-[#2a2a30] shrink-0 transition-all ${isBottomPanelOpen ? 'h-44' : 'h-9'}`}>
+      {/* ===== Resizable Console Panel ===== */}
+      <div 
+        className={`bg-[#16161a] flex flex-col shrink-0 ${!isDraggingV ? 'transition-all duration-300' : ''}`} 
+        style={{ height: isBottomPanelOpen ? `${consoleHeight}px` : '36px' }}
+      >
+        {/* Horizontal Resizer (Up/Down) */}
+        {isBottomPanelOpen && (
+          <div
+            className="h-1 w-full bg-[#2a2a30] hover:bg-[#7F77DD] cursor-row-resize shrink-0 z-20 transition-colors"
+            onMouseDown={(e) => { e.preventDefault(); setIsDraggingV(true); }}
+          />
+        )}
+        
+        {!isBottomPanelOpen && <div className="h-[1px] w-full bg-[#2a2a30] shrink-0" />}
+
         <div
           onClick={() => setIsBottomPanelOpen(!isBottomPanelOpen)}
-          className="flex items-center justify-between px-4 h-9 cursor-pointer border-b border-[#222228]"
+          className="flex items-center justify-between px-4 h-[35px] shrink-0 cursor-pointer border-b border-[#222228]"
         >
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
@@ -624,14 +715,14 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
         </div>
 
         {isBottomPanelOpen && (
-          <div className="px-4 py-2 overflow-y-auto custom-scrollbar" style={{ height: 'calc(100% - 37px)' }}>
+          <div className="px-4 py-2 overflow-y-auto custom-scrollbar flex-1">
             {filteredLogs.length === 0 ? (
               <div className="flex items-center justify-center h-full text-[12px] text-[#5a5a62] italic">
                 {logs.length === 0 ? 'No logs yet. Click Run to execute code.' : 'No logs match the current filter.'}
               </div>
             ) : (
               filteredLogs.map((log, i) => (
-                <div key={i} className="flex items-center gap-2.5 py-1 border-b border-[#1f1f24]/50">
+                <div key={i} className="flex items-center gap-2.5 py-1 border-b border-[#1f1f24]/50 hover:bg-[#1a1a1f] transition-colors rounded px-1 -mx-1">
                   <span className="text-[10px] text-[#5a5a62] font-mono w-16 shrink-0">{log.timestamp}</span>
                   <span
                     className={`text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0 ${
@@ -644,7 +735,15 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
                   >
                     {log.type.toUpperCase()}
                   </span>
-                  <span className="text-[12px] text-[#b8b8bd] font-mono select-text flex-1">{log.message}</span>
+                  
+                  <span className="text-[12px] text-[#b8b8bd] font-mono select-text flex-1 flex items-center gap-2">
+                    {log.message}
+                    {log.count > 1 && (
+                      <span className="bg-[#2a2a30] text-[#e8e8ea] text-[9px] px-1.5 py-0.5 rounded-full font-sans">
+                        {log.count}
+                      </span>
+                    )}
+                  </span>
                 </div>
               ))
             )}
