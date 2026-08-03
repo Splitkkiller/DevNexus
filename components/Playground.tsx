@@ -1,10 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { ThemeColors } from '../types';
 import {
   Files, Play, Settings, Maximize2, Minimize2, Plus,
   FileCode2, Palette, Braces, FileType2, Coffee,
   Terminal, ChevronDown, ArrowLeft, ArrowRight, RotateCw,
-  Trash2
+  Trash2, AlertCircle, Ban, CheckCircle2
 } from 'lucide-react';
 import Editor from 'react-simple-code-editor';
 import Prism from 'prismjs';
@@ -34,9 +34,6 @@ interface LogEntry {
   timestamp: string;
 }
 
-// --- Per-language visual identity ---
-// A deliberate, distinct color per language rather than one generic file icon -
-// this is what actually makes a file tree scannable at a glance.
 const LANGUAGE_META: Record<Language, { icon: React.ElementType; color: string; ext: string; prism: string }> = {
   html: { icon: FileCode2, color: '#E8734A', ext: '.html', prism: 'markup' },
   css: { icon: Palette, color: '#4B9FE8', ext: '.css', prism: 'css' },
@@ -84,6 +81,40 @@ const LANGUAGE_PICKER: { language: Language; label: string }[] = [
   { language: 'java', label: 'Java' },
 ];
 
+// --- Web Worker String for Pyodide ---
+const PYODIDE_WORKER_CODE = `
+  let pyodideReady = false;
+  let pyodidePromise = null;
+
+  self.onmessage = async (event) => {
+    if (event.data.type === 'run') {
+      if (!pyodidePromise) {
+        self.postMessage({ type: 'info', message: 'Initializing Python Web Worker (first run takes a moment)...' });
+        importScripts("https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js");
+        
+        pyodidePromise = loadPyodide({ indexURL: "https://cdn.jsdelivr.net/pyodide/v0.25.0/full/" })
+          .then(pyodide => {
+            pyodide.setStdout({ batched: (msg) => self.postMessage({ type: 'info', message: msg }) });
+            pyodide.setStderr({ batched: (msg) => self.postMessage({ type: 'error', message: msg }) });
+            pyodideReady = true;
+            return pyodide;
+          })
+          .catch(err => {
+            self.postMessage({ type: 'error', message: 'Failed to load Pyodide: ' + err.message });
+            throw err;
+          });
+      }
+
+      try {
+        const pyodide = await pyodidePromise;
+        await pyodide.runPythonAsync(event.data.code);
+      } catch (e) {
+        self.postMessage({ type: 'error', message: 'Python Error: ' + e.message });
+      }
+    }
+  };
+`;
+
 export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   const [projectName, setProjectName] = useState('DevStudio Project');
   const [files, setFiles] = useState<PlaygroundFile[]>(DEFAULT_FILES);
@@ -91,22 +122,69 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   const [isBottomPanelOpen, setIsBottomPanelOpen] = useState(true);
   const [isPickerOpen, setIsPickerOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  
+  // Right-click context menu state for the explorer
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
+
+  // Enhanced Error Handling state
+  const [logFilter, setLogFilter] = useState<'all' | 'error'>('all');
+
   const containerRef = useRef<HTMLDivElement>(null);
+  const workerRef = useRef<Worker | null>(null);
 
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [srcDoc, setSrcDoc] = useState('');
   const [refreshKey, setRefreshKey] = useState(0);
+  const [tsModule, setTsModule] = useState<any>(null);
 
   const activeFile = files.find(f => f.id === activeFileId) ?? files[0];
+  const errorCount = logs.filter(l => l.type === 'error').length;
 
-  // --- Compile HTML/CSS/JS into a single runnable document ---
-  // TypeScript, Python, and Java files exist in the file tree but aren't
-  // executed yet - that's Phase 3, added one language at a time.
+  // Close context menu on global window clicks
+  useEffect(() => {
+    const handleGlobalClick = () => setContextMenu(null);
+    window.addEventListener('click', handleGlobalClick);
+    return () => window.removeEventListener('click', handleGlobalClick);
+  }, []);
+
+  // --- Initialize Python Web Worker ---
+  useEffect(() => {
+    const blob = new Blob([PYODIDE_WORKER_CODE], { type: 'application/javascript' });
+    const workerUrl = URL.createObjectURL(blob);
+    const worker = new Worker(workerUrl);
+
+    worker.onmessage = (e) => {
+      setLogs(prev => [...prev, {
+        type: e.data.type,
+        message: String(e.data.message),
+        timestamp: new Date().toLocaleTimeString(),
+      }]);
+      if (e.data.type === 'error') setIsBottomPanelOpen(true);
+    };
+
+    workerRef.current = worker;
+
+    return () => {
+      worker.terminate();
+      URL.revokeObjectURL(workerUrl);
+    };
+  }, []);
+
+  // --- Lazy Load TypeScript ---
+  useEffect(() => {
+    const hasTs = files.some(f => f.language === 'typescript');
+    if (hasTs && !tsModule) {
+      import('typescript').then(setTsModule).catch(() => {});
+    }
+  }, [files, tsModule]);
+
+  // --- Pipeline 1: Live Preview Compilation (HTML/CSS/JS/TS) ---
   useEffect(() => {
     const timeout = setTimeout(() => {
       const htmlFile = files.find(f => f.name === 'index.html') || files.find(f => f.language === 'html');
       const cssFiles = files.filter(f => f.language === 'css');
       const jsFiles = files.filter(f => f.language === 'javascript');
+      const tsFiles = files.filter(f => f.language === 'typescript');
 
       if (!htmlFile) {
         setSrcDoc(`<html><body style="font-family:sans-serif;color:#888;text-align:center;padding-top:3rem;">No index.html found</body></html>`);
@@ -115,7 +193,17 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
 
       let fullHtml = htmlFile.content;
       const styleTags = cssFiles.map(f => `<style>${f.content}</style>`).join('\n');
-      const scriptContent = jsFiles.map(f => f.content).join('\n');
+      let scriptContent = jsFiles.map(f => f.content).join('\n');
+
+      if (tsFiles.length > 0 && tsModule) {
+        const transpiled = tsFiles.map(f => {
+          const result = tsModule.transpileModule(f.content, {
+            compilerOptions: { module: tsModule.ModuleKind.None, target: tsModule.ScriptTarget.ES2020 },
+          });
+          return result.outputText;
+        }).join('\n');
+        scriptContent += '\n' + transpiled;
+      }
 
       fullHtml = fullHtml.includes('</head>')
         ? fullHtml.replace('</head>', `${styleTags}</head>`)
@@ -142,13 +230,12 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
         : `${fullHtml}${consoleScript}<script>${scriptContent}</script>`;
 
       setSrcDoc(fullHtml);
-      setLogs([{ type: 'info', message: 'Compiled successfully.', timestamp: new Date().toLocaleTimeString() }]);
     }, 600);
 
     return () => clearTimeout(timeout);
-  }, [files, refreshKey]);
+  }, [files, tsModule]);
 
-  // --- Receive console output / errors from inside the preview iframe ---
+  // --- Receive Console Logs from the Iframe ---
   useEffect(() => {
     const handler = (e: MessageEvent) => {
       if (e.data && e.data.type === 'console-log') {
@@ -164,6 +251,29 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     return () => window.removeEventListener('message', handler);
   }, []);
 
+  // --- Pipeline 2: Manual Execution (Triggered by the Run Button) ---
+  const handleRunClick = useCallback(() => {
+    setLogs([]);
+    setRefreshKey(k => k + 1);
+
+    const pyFiles = files.filter(f => f.language === 'python');
+    const javaFiles = files.filter(f => f.language === 'java');
+
+    if (pyFiles.length > 0 && workerRef.current) {
+      const pyContent = pyFiles.map(f => f.content).join('\n\n');
+      workerRef.current.postMessage({ type: 'run', code: pyContent });
+    }
+
+    if (javaFiles.length > 0) {
+      setLogs(prev => [...prev, {
+        type: 'warn',
+        message: `Java execution isn't supported in the live preview yet (${javaFiles.map(f => f.name).join(', ')} will not run).`,
+        timestamp: new Date().toLocaleTimeString(),
+      }]);
+    }
+  }, [files]);
+
+  // --- UI Handlers ---
   const updateActiveFileContent = (content: string) => {
     setFiles(prev => prev.map(f => (f.id === activeFileId ? { ...f, content } : f)));
   };
@@ -179,10 +289,11 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     setFiles(prev => [...prev, newFile]);
     setActiveFileId(newFile.id);
     setIsPickerOpen(false);
+    setContextMenu(null);
   };
 
   const deleteFile = (id: string) => {
-    if (files.length <= 1) return; // always keep at least one file
+    if (files.length <= 1) return;
     const remaining = files.filter(f => f.id !== id);
     setFiles(remaining);
     if (activeFileId === id) setActiveFileId(remaining[0].id);
@@ -197,6 +308,11 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     }
     setIsFullscreen(!isFullscreen);
   };
+
+  const filteredLogs = logs.filter(log => {
+    if (logFilter === 'error') return log.type === 'error';
+    return true;
+  });
 
   return (
     <div
@@ -215,7 +331,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
         </div>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setRefreshKey(k => k + 1)}
+            onClick={handleRunClick}
             className="flex items-center gap-1.5 bg-[#1D9E75] hover:bg-[#1B8F69] transition-colors text-[#04342C] text-[13px] font-medium px-4 py-1.5 rounded-lg"
           >
             <Play className="w-3.5 h-3.5" fill="currentColor" />
@@ -236,17 +352,28 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
           <div className="p-1.5 rounded-lg bg-[#232328]">
             <Files className="w-[17px] h-[17px] text-[#b8b8bd]" />
           </div>
-          {/* More tools (a saved-projects browser, the onboarding tour) land here in a later phase -
-              left empty for now rather than adding icons that don't do anything yet. */}
         </div>
 
-        {/* --- File Explorer --- */}
-        <div className="w-44 bg-[#1a1a1f] border-r border-[#2a2a30] flex flex-col shrink-0">
+        {/* --- File Explorer with Right-Click Context Menu Support --- */}
+        <div
+          className="w-44 bg-[#1a1a1f] border-r border-[#2a2a30] flex flex-col shrink-0 relative select-none"
+          onContextMenu={(e) => {
+            e.preventDefault();
+            const rect = e.currentTarget.getBoundingClientRect();
+            setContextMenu({
+              x: e.clientX - rect.left,
+              y: e.clientY - rect.top,
+            });
+          }}
+        >
           <div className="flex items-center justify-between px-4 pt-4 pb-3">
             <span className="text-[11px] font-medium tracking-wide text-[#6b6b72] uppercase">Explorer</span>
             <div className="relative">
               <button
-                onClick={() => setIsPickerOpen(!isPickerOpen)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsPickerOpen(!isPickerOpen);
+                }}
                 className="text-[#6b6b72] hover:text-[#e8e8ea] transition-colors"
               >
                 <Plus className="w-4 h-4" />
@@ -270,7 +397,8 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
               )}
             </div>
           </div>
-          <div className="flex flex-col gap-0.5 px-2 overflow-y-auto custom-scrollbar">
+
+          <div className="flex flex-col gap-0.5 px-2 overflow-y-auto custom-scrollbar flex-1">
             {files.map(file => {
               const Icon = LANGUAGE_META[file.language].icon;
               const isActive = file.id === activeFileId;
@@ -296,6 +424,30 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
               );
             })}
           </div>
+
+          {/* Right-Click Context Menu Popup */}
+          {contextMenu && (
+            <div
+              className="absolute z-30 bg-[#232328] border border-[#33333a] rounded-lg shadow-2xl py-1.5 w-40"
+              style={{ top: contextMenu.y, left: contextMenu.x }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="px-3 py-1 text-[10px] font-semibold text-[#6b6b72] uppercase tracking-wider">New File</div>
+              {LANGUAGE_PICKER.map(({ language, label }) => {
+                const Icon = LANGUAGE_META[language].icon;
+                return (
+                  <button
+                    key={language}
+                    onClick={() => createNewFile(language)}
+                    className="w-full flex items-center gap-2.5 px-3 py-1.5 text-[13px] text-[#d4d4d8] hover:bg-[#2a2a32] transition-colors"
+                  >
+                    <Icon className="w-3.5 h-3.5" style={{ color: LANGUAGE_META[language].color }} />
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* --- Editor + Preview --- */}
@@ -345,7 +497,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
               <ArrowLeft className="w-3.5 h-3.5 text-[#4a4a52]" />
               <ArrowRight className="w-3.5 h-3.5 text-[#4a4a52]" />
               <RotateCw
-                onClick={() => setRefreshKey(k => k + 1)}
+                onClick={handleRunClick}
                 className="w-3.5 h-3.5 text-[#6b6b72] cursor-pointer hover:text-[#9d9da3] transition-colors"
               />
               <div className="flex-1 bg-[#131316] rounded-md px-2.5 py-1 text-[11px] font-mono text-[#6b6b72]">
@@ -365,37 +517,80 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
         </div>
       </div>
 
-      {/* ===== Console Panel ===== */}
-      <div className={`bg-[#16161a] border-t border-[#2a2a30] shrink-0 transition-all ${isBottomPanelOpen ? 'h-40' : 'h-9'}`}>
+      {/* ===== Enhanced Console & Error Handling Panel ===== */}
+      <div className={`bg-[#16161a] border-t border-[#2a2a30] shrink-0 transition-all ${isBottomPanelOpen ? 'h-44' : 'h-9'}`}>
         <div
           onClick={() => setIsBottomPanelOpen(!isBottomPanelOpen)}
-          className="flex items-center justify-between px-4 h-9 cursor-pointer"
+          className="flex items-center justify-between px-4 h-9 cursor-pointer border-b border-[#222228]"
         >
-          <div className="flex items-center gap-2">
-            <Terminal className="w-3.5 h-3.5 text-[#6b6b72]" />
-            <span className="text-[12px] font-medium text-[#9d9da3]">Console</span>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <Terminal className="w-3.5 h-3.5 text-[#6b6b72]" />
+              <span className="text-[12px] font-medium text-[#9d9da3]">Console</span>
+            </div>
+            {errorCount > 0 && (
+              <span className="flex items-center gap-1 bg-[#3D1515] text-[#F2A0A0] text-[10px] font-medium px-2 py-0.5 rounded-full">
+                <AlertCircle className="w-3 h-3" />
+                {errorCount} {errorCount === 1 ? 'error' : 'errors'}
+              </span>
+            )}
           </div>
-          <ChevronDown className={`w-4 h-4 text-[#6b6b72] transition-transform ${!isBottomPanelOpen ? '-rotate-90' : ''}`} />
-        </div>
-        {isBottomPanelOpen && (
-          <div className="px-4 pb-3 overflow-y-auto custom-scrollbar" style={{ height: 'calc(100% - 36px)' }}>
-            {logs.map((log, i) => (
-              <div key={i} className="flex items-center gap-2.5 py-1">
-                <span className="text-[10px] text-[#5a5a62] font-mono w-16 shrink-0">{log.timestamp}</span>
-                <span
-                  className={`text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0 ${
-                    log.type === 'error'
-                      ? 'bg-[#3D1515] text-[#F2A0A0]'
-                      : log.type === 'warn'
-                      ? 'bg-[#3D2F0F] text-[#F2CB7A]'
-                      : 'bg-[#0F3D30] text-[#9FE1CB]'
-                  }`}
+          
+          <div className="flex items-center gap-2">
+            {isBottomPanelOpen && (
+              <div className="flex items-center gap-1 bg-[#232328] p-0.5 rounded-md text-[11px]" onClick={e => e.stopPropagation()}>
+                <button
+                  onClick={() => setLogFilter('all')}
+                  className={`px-2 py-0.5 rounded ${logFilter === 'all' ? 'bg-[#33333b] text-[#e8e8ea]' : 'text-[#7a7a85]'}`}
                 >
-                  {log.type.toUpperCase()}
-                </span>
-                <span className="text-[12px] text-[#b8b8bd] font-mono">{log.message}</span>
+                  All Logs
+                </button>
+                <button
+                  onClick={() => setLogFilter('error')}
+                  className={`px-2 py-0.5 rounded flex items-center gap-1 ${logFilter === 'error' ? 'bg-[#3D1515] text-[#F2A0A0]' : 'text-[#7a7a85]'}`}
+                >
+                  Errors Only
+                </button>
               </div>
-            ))}
+            )}
+            {isBottomPanelOpen && logs.length > 0 && (
+              <button
+                onClick={(e) => { e.stopPropagation(); setLogs([]); }}
+                className="text-[11px] text-[#7a7a85] hover:text-[#d4d4d8] px-2 py-0.5 transition-colors"
+                title="Clear Console"
+              >
+                Clear
+              </button>
+            )}
+            <ChevronDown className={`w-4 h-4 text-[#6b6b72] transition-transform ${!isBottomPanelOpen ? '-rotate-90' : ''}`} />
+          </div>
+        </div>
+
+        {isBottomPanelOpen && (
+          <div className="px-4 py-2 overflow-y-auto custom-scrollbar" style={{ height: 'calc(100% - 37px)' }}>
+            {filteredLogs.length === 0 ? (
+              <div className="flex items-center justify-center h-full text-[12px] text-[#5a5a62] italic">
+                {logs.length === 0 ? 'No logs yet. Click Run to execute code.' : 'No logs match the current filter.'}
+              </div>
+            ) : (
+              filteredLogs.map((log, i) => (
+                <div key={i} className="flex items-center gap-2.5 py-1 border-b border-[#1f1f24]/50">
+                  <span className="text-[10px] text-[#5a5a62] font-mono w-16 shrink-0">{log.timestamp}</span>
+                  <span
+                    className={`text-[10px] font-medium px-1.5 py-0.5 rounded shrink-0 ${
+                      log.type === 'error'
+                        ? 'bg-[#3D1515] text-[#F2A0A0]'
+                        : log.type === 'warn'
+                        ? 'bg-[#3D2F0F] text-[#F2CB7A]'
+                        : 'bg-[#0F3D30] text-[#9FE1CB]'
+                    }`}
+                  >
+                    {log.type.toUpperCase()}
+                  </span>
+                  <span className="text-[12px] text-[#b8b8bd] font-mono select-text flex-1">{log.message}</span>
+                </div>
+              ))
+            )}
           </div>
         )}
       </div>
