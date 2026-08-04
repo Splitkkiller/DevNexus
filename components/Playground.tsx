@@ -82,6 +82,34 @@ const LANGUAGE_PICKER: { language: Language; label: string }[] = [
   { language: 'java', label: 'Java' },
 ];
 
+// Extension detection helper to auto-switch file formatting & syntax on rename
+const detectLanguageFromName = (fileName: string, defaultLang: Language): Language => {
+  const dotIndex = fileName.lastIndexOf('.');
+  if (dotIndex === -1) return defaultLang;
+  const ext = fileName.slice(dotIndex).toLowerCase();
+  
+  switch (ext) {
+    case '.html':
+    case '.htm':
+      return 'html';
+    case '.css':
+      return 'css';
+    case '.js':
+    case '.mjs':
+    case '.cjs':
+      return 'javascript';
+    case '.ts':
+    case '.tsx':
+      return 'typescript';
+    case '.py':
+      return 'python';
+    case '.java':
+      return 'java';
+    default:
+      return defaultLang;
+  }
+};
+
 const PYODIDE_WORKER_CODE = `
   let pyodideReady = false;
   let pyodidePromise = null;
@@ -129,8 +157,8 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   
   // Resizable Panels State
   const [showPreview, setShowPreview] = useState(true);
-  const [splitPos, setSplitPos] = useState(50); // percentage for editor vs preview
-  const [consoleHeight, setConsoleHeight] = useState(176); // pixels
+  const [splitPos, setSplitPos] = useState(50);
+  const [consoleHeight, setConsoleHeight] = useState(176);
   const [isDraggingH, setIsDraggingH] = useState(false);
   const [isDraggingV, setIsDraggingV] = useState(false);
 
@@ -154,18 +182,18 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     const handleMouseMove = (e: MouseEvent) => {
       if (isDraggingH && containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        const sidebarWidth = 220; // Approx fixed width of Explorer + Icons
+        const sidebarWidth = 220;
         const availableWidth = rect.width - sidebarWidth;
         const mouseX = e.clientX - rect.left - sidebarWidth;
         let newPct = (mouseX / availableWidth) * 100;
-        newPct = Math.max(15, Math.min(85, newPct)); // Constrain to 15%-85%
+        newPct = Math.max(15, Math.min(85, newPct));
         setSplitPos(newPct);
       }
       if (isDraggingV && containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
         const mouseY = e.clientY - rect.top;
         let newHeight = rect.height - mouseY;
-        newHeight = Math.max(36, Math.min(rect.height - 100, newHeight)); // Constrain
+        newHeight = Math.max(36, Math.min(rect.height - 100, newHeight));
         setConsoleHeight(newHeight);
         if (newHeight > 50) setIsBottomPanelOpen(true);
       }
@@ -196,7 +224,6 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   const addLog = useCallback((logType: 'info' | 'warn' | 'error', message: string) => {
     setLogs(prev => {
       const lastLog = prev[prev.length - 1];
-      // Deduplicate: If the exact same message occurs sequentially, increment count
       if (lastLog && lastLog.message === message && lastLog.type === logType) {
         return [
           ...prev.slice(0, -1),
@@ -237,10 +264,10 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   // --- Pipeline 1: Live Preview Compilation ---
   useEffect(() => {
     const timeout = setTimeout(() => {
-      const htmlFile = files.find(f => f.name.endsWith('.html')) || files.find(f => f.language === 'html');
-      const cssFiles = files.filter(f => f.language === 'css' || f.name.endsWith('.css'));
-      const jsFiles = files.filter(f => f.language === 'javascript' || f.name.endsWith('.js'));
-      const tsFiles = files.filter(f => f.language === 'typescript' || f.name.endsWith('.ts'));
+      const htmlFile = files.find(f => f.language === 'html') || files.find(f => f.name.endsWith('.html'));
+      const cssFiles = files.filter(f => f.language === 'css');
+      const jsFiles = files.filter(f => f.language === 'javascript');
+      const tsFiles = files.filter(f => f.language === 'typescript');
 
       if (!htmlFile) {
         setSrcDoc(`<html><body style="font-family:sans-serif;color:#888;text-align:center;padding-top:3rem;">No HTML file found</body></html>`);
@@ -346,7 +373,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
     if (activeFileId === id) setActiveFileId(remaining[0].id);
   };
 
-  // --- Rename Handlers ---
+  // --- Dynamic File Rename & Auto-Format Detection ---
   const startRenaming = (e: React.MouseEvent, file: PlaygroundFile) => {
     e.stopPropagation();
     setEditingFileId(file.id);
@@ -359,11 +386,23 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   };
 
   const commitRename = (id: string) => {
-    if (!editFileName.trim()) {
+    const trimmedName = editFileName.trim();
+    if (!trimmedName) {
       setEditingFileId(null);
       return;
     }
-    setFiles(prev => prev.map(f => f.id === id ? { ...f, name: editFileName.trim() } : f));
+
+    setFiles(prev => prev.map(f => {
+      if (f.id === id) {
+        const newLanguage = detectLanguageFromName(trimmedName, f.language);
+        return {
+          ...f,
+          name: trimmedName,
+          language: newLanguage,
+        };
+      }
+      return f;
+    }));
     setEditingFileId(null);
   };
 
@@ -382,7 +421,6 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
   return (
     <div ref={containerRef} className="flex flex-col h-full bg-[#131316] text-[#e8e8ea] font-sans overflow-hidden relative">
       
-      {/* Invisible overlay during dragging to prevent iframes from stealing mouse events */}
       {(isDraggingH || isDraggingV) && (
         <div 
           className="absolute inset-0 z-50" 
@@ -613,7 +651,7 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
             </div>
           </div>
 
-          {/* Vertical Resizer (Left/Right) */}
+          {/* Vertical Resizer */}
           {showPreview && (
             <div
               className="w-1 bg-[#2a2a30] hover:bg-[#7F77DD] cursor-col-resize shrink-0 z-20 transition-colors"
@@ -657,7 +695,6 @@ export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
         className={`bg-[#16161a] flex flex-col shrink-0 ${!isDraggingV ? 'transition-all duration-300' : ''}`} 
         style={{ height: isBottomPanelOpen ? `${consoleHeight}px` : '36px' }}
       >
-        {/* Horizontal Resizer (Up/Down) */}
         {isBottomPanelOpen && (
           <div
             className="h-1 w-full bg-[#2a2a30] hover:bg-[#7F77DD] cursor-row-resize shrink-0 z-20 transition-colors"
