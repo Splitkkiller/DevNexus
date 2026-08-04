@@ -1,195 +1,125 @@
 import React from 'react';
 import { 
-  Play, Code2, Cpu, Zap, Terminal, Sparkles, 
-  ArrowRight, FileCode2, Palette, Braces, FileType2, Coffee, CheckCircle2 
+  Code2, 
+  TerminalSquare, 
+  BrainCircuit, 
+  Sparkles, 
+  ArrowRight,
+  LogIn,
+  BookOpen
 } from 'lucide-react';
 
 interface LandingPageProps {
   onLaunchPlayground: () => void;
+  onLoginClick: () => void;
 }
 
-const LANGUAGES = [
-  { name: 'HTML5', ext: '.html', icon: FileCode2, color: '#E8734A', desc: 'Structure web pages with modern HTML tags.' },
-  { name: 'CSS3', ext: '.css', icon: Palette, color: '#4B9FE8', desc: 'Style responsive layouts and smooth animations.' },
-  { name: 'JavaScript', ext: '.js', icon: Braces, color: '#EFC94C', desc: 'Build interactive logic and DOM manipulation.' },
-  { name: 'TypeScript', ext: '.ts', icon: FileType2, color: '#5B8DEF', desc: 'Master type-safe enterprise web development.' },
-  { name: 'Python', ext: '.py', icon: Braces, color: '#6FBF73', desc: 'Run real CPython code via browser WebAssembly.' },
-  { name: 'Java', ext: '.java', icon: Coffee, color: '#E85A5A', desc: 'Learn core object-oriented programming concepts.' },
-];
-
-const FEATURES = [
-  {
-    icon: Cpu,
-    title: 'In-Browser Pyodide WASM',
-    desc: 'Run Python natively inside Web Workers without sending data to an external server.'
-  },
-  {
-    icon: Zap,
-    title: 'Instant Live Previews',
-    desc: 'Watch HTML, CSS, and JavaScript update automatically on your screen as you type.'
-  },
-  {
-    icon: Terminal,
-    title: 'Smart Console & Debugger',
-    desc: 'Clear error counts, deduplicated logs, and log filtering keep your environment clean.'
-  },
-  {
-    icon: Code2,
-    title: 'Resizable Workspace',
-    desc: 'Tailor your IDE layout with draggable panels, toggleable preview panes, and line numbers.'
-  }
-];
-
-export const LandingPage: React.FC<LandingPageProps> = ({ onLaunchPlayground }) => {
+export function LandingPage({ onLaunchPlayground, onLoginClick }: LandingPageProps) {
   return (
-    <div className="min-h-full bg-[#131316] text-[#e8e8ea] font-sans overflow-y-auto custom-scrollbar">
+    <div className="min-h-screen bg-[#131316] text-[#e8e8ea] flex flex-col font-sans selection:bg-blue-500/30">
       
-      {/* ===== Hero Section ===== */}
-      <section className="max-w-6xl mx-auto px-6 pt-16 pb-20 text-center flex flex-col items-center">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#232328] border border-[#2a2a30] text-[12px] font-medium text-[#7F77DD] mb-6">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>DevNexus Playground Phase 2 Active</span>
+      {/* ===== Landing Page Navigation ===== */}
+      <nav className="flex items-center justify-between px-6 py-4 border-b border-[#2a2a30] bg-[#16161a]/80 backdrop-blur-md sticky top-0 z-50">
+        <div className="flex items-center gap-2 select-none">
+          <div className="bg-blue-500 p-1.5 rounded-lg shadow-lg shadow-blue-500/20">
+            <Code2 className="w-5 h-5 text-white" />
+          </div>
+          <span className="font-extrabold text-lg tracking-wide text-white">
+            DevNexus
+          </span>
         </div>
+        
+        <button
+          onClick={onLoginClick}
+          className="flex items-center gap-2 px-5 py-2.5 text-sm font-semibold text-white bg-[#2a2a35] hover:bg-[#353542] rounded-lg transition-all active:scale-95 border border-[#3f3f4e]"
+        >
+          <LogIn className="w-4 h-4" />
+          Log In / Sign Up
+        </button>
+      </nav>
 
-        <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight max-w-3xl leading-tight">
-          Master Coding Hands-On, <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#1D9E75] via-[#7F77DD] to-[#4B9FE8]">
-            Right in Your Browser.
+      {/* ===== Hero Section ===== */}
+      <main className="flex-1 flex flex-col items-center text-center px-4 pt-24 pb-16">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 text-blue-400 text-sm font-medium mb-8 border border-blue-500/20">
+          <Sparkles className="w-4 h-4" />
+          <span>The Ultimate Developer Learning Hub</span>
+        </div>
+        
+        <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white max-w-4xl mb-6 leading-tight">
+          Master Coding with <br className="hidden md:block" />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">
+            Interactive Learning
           </span>
         </h1>
-
-        <p className="mt-6 text-base sm:text-lg text-[#9d9da3] max-w-2xl leading-relaxed">
-          Zero installation required. Write web applications, run Python WebAssembly routines, and debug code instantly in a professional multi-language IDE.
+        
+        <p className="text-lg md:text-xl text-[#9d9da3] max-w-2xl mb-10 leading-relaxed">
+          Dive into our comprehensive documentation, test your knowledge with interactive quizzes, and write real code in our integrated IDE Playground.
         </p>
 
-        <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center">
+        <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
           <button
             onClick={onLaunchPlayground}
-            className="flex items-center gap-2 bg-[#1D9E75] hover:bg-[#1B8F69] transition-all text-[#04342C] text-sm font-semibold px-6 py-3.5 rounded-xl shadow-lg shadow-[#1D9E75]/20"
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-900/20 active:scale-95 group"
           >
-            <Play className="w-4 h-4" fill="currentColor" />
+            <TerminalSquare className="w-5 h-5" />
             Launch IDE Playground
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
           
-          <a
-            href="#languages"
-            className="flex items-center gap-2 bg-[#1c1c21] hover:bg-[#232328] border border-[#2a2a30] transition-colors text-sm font-medium px-6 py-3.5 rounded-xl text-[#d4d4d8]"
-          >
-            Explore Languages
-            <ArrowRight className="w-4 h-4 text-[#6b6b72]" />
-          </a>
-        </div>
-
-        {/* Hero IDE Teaser Graphic */}
-        <div className="mt-14 w-full max-w-4xl bg-[#1c1c21] border border-[#2a2a30] rounded-2xl shadow-2xl overflow-hidden text-left">
-          <div className="flex items-center justify-between px-4 py-3 bg-[#17171c] border-b border-[#2a2a30]">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-[#E85A5A]/80"></div>
-              <div className="w-3 h-3 rounded-full bg-[#EFC94C]/80"></div>
-              <div className="w-3 h-3 rounded-full bg-[#6FBF73]/80"></div>
-              <span className="ml-2 text-[12px] font-mono text-[#6b6b72]">script.py — DevNexus Environment</span>
-            </div>
-            <button 
-              onClick={onLaunchPlayground}
-              className="text-[11px] font-mono bg-[#1D9E75]/20 text-[#6FBF73] px-2.5 py-1 rounded hover:bg-[#1D9E75]/30 transition-colors"
-            >
-              ▶ Click to Run
-            </button>
-          </div>
-          <div className="p-5 font-mono text-xs sm:text-sm text-[#b8b8bd] bg-[#131316] leading-relaxed">
-            <span className="text-[#6b6b72]"># Instant Python WASM execution</span><br />
-            <span className="text-[#7F77DD]">def</span> <span className="text-[#4B9FE8]">welcome_developer</span>(name):<br />
-            &nbsp;&nbsp;&nbsp;&nbsp;return <span className="text-[#6FBF73]">f"Ready to code, {'{name}'}!"</span><br /><br />
-            print(welcome_developer(<span className="text-[#6FBF73]" >"DevNexus Student"</span>))
-          </div>
-        </div>
-      </section>
-
-      {/* ===== Languages Showcase ===== */}
-      <section id="languages" className="max-w-6xl mx-auto px-6 py-16 border-t border-[#2a2a30]/60">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold">Supported Technologies</h2>
-          <p className="text-[#6b6b72] text-sm mt-2">Switch extensions dynamically inside the workspace at any time.</p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {LANGUAGES.map((lang, idx) => {
-            const Icon = lang.icon;
-            return (
-              <div 
-                key={idx}
-                className="bg-[#1c1c21] border border-[#2a2a30] hover:border-[#33333a] p-5 rounded-xl transition-all flex flex-col justify-between group cursor-pointer"
-                onClick={onLaunchPlayground}
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2.5">
-                      <Icon className="w-5 h-5" style={{ color: lang.color }} />
-                      <span className="font-semibold text-sm">{lang.name}</span>
-                    </div>
-                    <span className="text-[11px] font-mono bg-[#131316] text-[#6b6b72] px-2 py-0.5 rounded border border-[#2a2a30]">
-                      {lang.ext}
-                    </span>
-                  </div>
-                  <p className="text-xs text-[#8e8e96] leading-relaxed">{lang.desc}</p>
-                </div>
-                
-                <div className="mt-5 flex items-center gap-1 text-xs text-[#1D9E75] font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  <span>Open in Playground</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ===== Key Features Section ===== */}
-      <section className="max-w-6xl mx-auto px-6 py-16 border-t border-[#2a2a30]/60">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl sm:text-3xl font-bold">Engineered for Seamless Learning</h2>
-          <p className="text-[#6b6b72] text-sm mt-2">Everything you need to practice and build projects without friction.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {FEATURES.map((feat, idx) => {
-            const Icon = feat.icon;
-            return (
-              <div key={idx} className="bg-[#1a1a1f] border border-[#2a2a30] p-6 rounded-xl flex items-start gap-4">
-                <div className="p-2.5 rounded-lg bg-[#232328] text-[#7F77DD] shrink-0">
-                  <Icon className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm mb-1">{feat.title}</h3>
-                  <p className="text-xs text-[#8e8e96] leading-relaxed">{feat.desc}</p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ===== Call to Action Banner ===== */}
-      <section className="max-w-6xl mx-auto px-6 py-16">
-        <div className="bg-gradient-to-r from-[#1c1c21] via-[#232328] to-[#1c1c21] border border-[#2a2a30] rounded-2xl p-8 sm:p-12 text-center flex flex-col items-center">
-          <h2 className="text-2xl sm:text-3xl font-bold">Ready to Start Writing Code?</h2>
-          <p className="text-[#9d9da3] text-sm mt-3 max-w-xl">
-            Launch the interactive DevNexus IDE right now and start experimenting with HTML, CSS, JavaScript, TypeScript, and Python.
-          </p>
           <button
-            onClick={onLaunchPlayground}
-            className="mt-6 flex items-center gap-2 bg-[#1D9E75] hover:bg-[#1B8F69] transition-all text-[#04342C] text-sm font-semibold px-8 py-3.5 rounded-xl shadow-lg shadow-[#1D9E75]/20"
+            onClick={onLoginClick}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 bg-[#2a2a35] hover:bg-[#353542] text-white font-bold rounded-xl transition-all active:scale-95"
           >
-            <Play className="w-4 h-4" fill="currentColor" />
-            Open IDE Playground
+            Create Free Account
           </button>
         </div>
+      </main>
+
+      {/* ===== Features Grid ===== */}
+      <section className="px-6 py-16 bg-[#16161a] border-t border-[#2a2a30]">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          {/* Feature 1 */}
+          <div className="p-6 rounded-2xl bg-[#131316] border border-[#2a2a30] hover:border-[#3f3f4e] transition-colors">
+            <div className="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-xl flex items-center justify-center mb-4">
+              <TerminalSquare className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Integrated IDE</h3>
+            <p className="text-[#9d9da3] text-sm leading-relaxed">
+              Write, test, and execute code directly in your browser. No setup required. Perfect for testing HTML, CSS, JS, and Python snippets.
+            </p>
+          </div>
+
+          {/* Feature 2 */}
+          <div className="p-6 rounded-2xl bg-[#131316] border border-[#2a2a30] hover:border-[#3f3f4e] transition-colors">
+            <div className="w-12 h-12 bg-purple-500/10 text-purple-400 rounded-xl flex items-center justify-center mb-4">
+              <BrainCircuit className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Skill Quizzes & Cards</h3>
+            <p className="text-[#9d9da3] text-sm leading-relaxed">
+              Solidify your knowledge with interactive flashcards and comprehensive quizzes designed to test your understanding of core concepts.
+            </p>
+          </div>
+
+          {/* Feature 3 */}
+          <div className="p-6 rounded-2xl bg-[#131316] border border-[#2a2a30] hover:border-[#3f3f4e] transition-colors">
+            <div className="w-12 h-12 bg-emerald-500/10 text-emerald-400 rounded-xl flex items-center justify-center mb-4">
+              <BookOpen className="w-6 h-6" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Extensive Docs</h3>
+            <p className="text-[#9d9da3] text-sm leading-relaxed">
+              Access well-structured, easy-to-read documentation spanning multiple languages. Learn best practices and modern syntax effortlessly.
+            </p>
+          </div>
+
+        </div>
       </section>
 
-      {/* ===== Footer ===== */}
-      <footer className="border-t border-[#2a2a30] py-8 text-center text-xs text-[#5a5a62]">
-        <p>© 2026 DevNexus Learning Engine. Built for modern developer education.</p>
+      {/* ===== Simple Footer ===== */}
+      <footer className="py-8 text-center text-[#5a5a62] text-sm bg-[#16161a]">
+        <p>© {new Date().getFullYear()} DevNexus. All rights reserved.</p>
       </footer>
+
     </div>
   );
-};
+}

@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Sidebar, DevNexusLogo } from './components/Sidebar';
 import { DocContent } from './components/DocContent';
 import { Assistant } from './components/Assistant';
-import { AuthModal } from "./components/AuthModal";
+// Changed from AuthModal to AuthPage
+import { AuthPage } from "./components/AuthPage"; 
 import { ResetPassword } from "./components/ResetPassword";
 import { Playground } from './components/Playground';
 import { LandingPage } from './components/LandingPage';
@@ -82,18 +83,18 @@ function Footer({ themeColors, onTermsClick, onFaqClick, onContactClick }: any) 
 function App() {
   const [library, setLibrary] = useState<DocLibrary>('html');
   const [currentDocId, setCurrentDocId] = useState<string>('html');
-  // Default the active view to 'landing' instead of 'docs'
   const [activeView, setActiveView] = useState<string>('landing'); 
   const [user, setUser] = useState<User | null>(null);
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true); 
   const [theme, setTheme] = useState<Theme>('dark');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const themeColors = THEMES[theme];
-
   const isResetPasswordRoute = new URLSearchParams(window.location.search).has('token');
+  
+  // Boolean to determine if the current view should hide the sidebar/header
+  const isFullScreenView = activeView === 'landing' || activeView === 'auth';
 
   useEffect(() => {
     if (isResetPasswordRoute) {
@@ -113,7 +114,7 @@ function App() {
   const handleLogin = (u: User, token?: string) => {
     if (token) localStorage.setItem("token", token);
     setUser(u);
-    setIsAuthModalOpen(false);
+    setActiveView('docs'); // Route directly to docs after logging in
   };
 
   const handleLogout = () => {
@@ -136,8 +137,9 @@ function App() {
   };
 
   const toggleView = (view: string) => {
+    // Replaced isAuthModalOpen with activeView routing
     if (['quiz', 'ai', 'flashcards'].includes(view) && !user) {
-      setIsAuthModalOpen(true);
+      setActiveView('auth');
       return;
     }
     setActiveView(view);
@@ -161,97 +163,107 @@ function App() {
 
   return (
     <div className={`flex h-screen w-full ${themeColors.bg} ${themeColors.text} font-sans overflow-hidden transition-colors`}>
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        onLogin={handleLogin}
-        themeColors={themeColors}
-      />
+      
+      {/* Conditionally render the Sidebar only if we are NOT in a full screen view */}
+      {!isFullScreenView && (
+        <>
+          {isMobileMenuOpen && (
+            <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden" onClick={() => setIsMobileMenuOpen(false)} />
+          )}
 
-      {isMobileMenuOpen && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden" onClick={() => setIsMobileMenuOpen(false)} />
+          <div className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 lg:relative lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <Sidebar
+              docs={DOCS}
+              currentDocId={activeView === 'docs' ? currentDocId : ''}
+              currentLibrary={library}
+              onSelectDoc={handleDocSelect}
+              onSwitchLibrary={handleSwitchLibrary}
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+              user={user}
+              onLoginClick={() => setActiveView('auth')}
+              onLogoutClick={handleLogout}
+              themeColors={themeColors}
+              currentTheme={theme}
+              onThemeChange={setTheme}
+              isPlaygroundActive={activeView === 'playground'}
+              onPlaygroundClick={() => toggleView('playground')}
+              isQuizActive={activeView === 'quiz'}
+              onQuizClick={() => toggleView('quiz')}
+              isAiActive={activeView === 'ai'}
+              onAiClick={() => toggleView('ai')}
+              isFlashcardsActive={activeView === 'flashcards'}
+              onFlashcardsClick={() => toggleView('flashcards')}
+              isWatchActive={activeView === 'watch'}
+              onWatchClick={() => toggleView('watch')}
+              isContactActive={activeView === 'contact'}
+              onContactClick={() => toggleView('contact')}
+              isFaqActive={activeView === 'faq'}
+              onFaqClick={() => toggleView('faq')}
+              isTermsActive={activeView === 'terms'}
+              onTermsClick={() => toggleView('terms')}
+              onHomeClick={() => setActiveView('landing')} 
+            />
+          </div>
+        </>
       )}
 
-      <div className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 lg:relative lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <Sidebar
-          docs={DOCS}
-          currentDocId={activeView === 'docs' ? currentDocId : ''}
-          currentLibrary={library}
-          onSelectDoc={handleDocSelect}
-          onSwitchLibrary={handleSwitchLibrary}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          user={user}
-          onLoginClick={() => setIsAuthModalOpen(true)}
-          onLogoutClick={handleLogout}
-          themeColors={themeColors}
-          currentTheme={theme}
-          onThemeChange={setTheme}
-          isPlaygroundActive={activeView === 'playground'}
-          onPlaygroundClick={() => toggleView('playground')}
-          isQuizActive={activeView === 'quiz'}
-          onQuizClick={() => toggleView('quiz')}
-          isAiActive={activeView === 'ai'}
-          onAiClick={() => toggleView('ai')}
-          isFlashcardsActive={activeView === 'flashcards'}
-          onFlashcardsClick={() => toggleView('flashcards')}
-          isWatchActive={activeView === 'watch'}
-          onWatchClick={() => toggleView('watch')}
-          isContactActive={activeView === 'contact'}
-          onContactClick={() => toggleView('contact')}
-          isFaqActive={activeView === 'faq'}
-          onFaqClick={() => toggleView('faq')}
-          isTermsActive={activeView === 'terms'}
-          onTermsClick={() => toggleView('terms')}
-          // Update Sidebar Home click to route to the landing page
-          onHomeClick={() => setActiveView('landing')} 
-        />
-      </div>
-
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-        <div className={`flex items-center justify-between p-4 border-b lg:hidden ${themeColors.sidebarBorder} ${themeColors.card}`}>
-          <button onClick={() => setIsMobileMenuOpen(true)} className={themeColors.textSecondary}>
-            <Menu className="w-6 h-6" />
-          </button>
-          {/* Update Mobile Logo to route to the landing page */}
-          <div 
-            className="flex items-center gap-2 font-black tracking-tighter cursor-pointer"
-            onClick={() => { setActiveView('landing'); setIsMobileMenuOpen(false); }}
-          >
-            <DevNexusLogo className="w-6 h-6 text-blue-500" />
-            DevNexus
+        
+        {/* Conditionally render the mobile header */}
+        {!isFullScreenView && (
+          <div className={`flex items-center justify-between p-4 border-b lg:hidden ${themeColors.sidebarBorder} ${themeColors.card}`}>
+            <button onClick={() => setIsMobileMenuOpen(true)} className={themeColors.textSecondary}>
+              <Menu className="w-6 h-6" />
+            </button>
+            <div 
+              className="flex items-center gap-2 font-black tracking-tighter cursor-pointer"
+              onClick={() => { setActiveView('landing'); setIsMobileMenuOpen(false); }}
+            >
+              <DevNexusLogo className="w-6 h-6 text-blue-500" />
+              DevNexus
+            </div>
+            <div className="w-6" />
           </div>
-          <div className="w-6" />
-        </div>
+        )}
 
-        {/* Group Landing and Playground together since they both need full height */}
-        <div className={['playground', 'landing'].includes(activeView) ? 'flex-1 min-h-0' : 'flex-1 overflow-y-auto'}>
+        <div className={activeView === 'playground' ? 'flex-1 min-h-0' : 'flex-1 overflow-y-auto'}>
           {activeView === 'playground' ? (
             <div className="h-full">
               <Playground themeColors={themeColors} />
             </div>
           ) : activeView === 'landing' ? (
-            <div className="h-full">
-              <LandingPage onLaunchPlayground={() => toggleView('playground')} />
+            <LandingPage 
+              onLaunchPlayground={() => toggleView('playground')} 
+              onLoginClick={() => toggleView('auth')} // Passed prop for landing page login button
+            />
+          ) : activeView === 'auth' ? (
+            <div className="h-full w-full">
+              {/* New dedicated Auth Page component */}
+              <AuthPage 
+                onLogin={handleLogin} 
+                themeColors={themeColors} 
+                onBack={() => setActiveView('landing')} 
+              />
             </div>
           ) : (
-          <main className="max-w-5xl mx-auto p-4 md:p-10">
-            {activeView === 'quiz' && <Quiz themeColors={themeColors} onQuizComplete={() => {}} />}
-            {activeView === 'ai' && <Assistant themeColors={themeColors} />}
-            {activeView === 'flashcards' && <Flashcards themeColors={themeColors} />}
-            {activeView === 'watch' && <Watch themeColors={themeColors} user={user} onRequireAuth={() => setIsAuthModalOpen(true)} />}
-            {activeView === 'contact' && <Contact themeColors={themeColors} />}
-            {activeView === 'faq' && <FAQ themeColors={themeColors} />}
-            {activeView === 'terms' && <Terms themeColors={themeColors} />}
-            {activeView === 'docs' && <DocContent doc={currentDoc} themeColors={themeColors} />}
+            <main className="max-w-5xl mx-auto p-4 md:p-10">
+              {activeView === 'quiz' && <Quiz themeColors={themeColors} onQuizComplete={() => {}} />}
+              {activeView === 'ai' && <Assistant themeColors={themeColors} />}
+              {activeView === 'flashcards' && <Flashcards themeColors={themeColors} />}
+              {activeView === 'watch' && <Watch themeColors={themeColors} user={user} onRequireAuth={() => setActiveView('auth')} />}
+              {activeView === 'contact' && <Contact themeColors={themeColors} />}
+              {activeView === 'faq' && <FAQ themeColors={themeColors} />}
+              {activeView === 'terms' && <Terms themeColors={themeColors} />}
+              {activeView === 'docs' && <DocContent doc={currentDoc} themeColors={themeColors} />}
 
-            <Footer
-              themeColors={themeColors}
-              onTermsClick={() => toggleView('terms')}
-              onFaqClick={() => toggleView('faq')}
-              onContactClick={() => toggleView('contact')}
-            />
-          </main>
+              <Footer
+                themeColors={themeColors}
+                onTermsClick={() => toggleView('terms')}
+                onFaqClick={() => toggleView('faq')}
+                onContactClick={() => toggleView('contact')}
+              />
+            </main>
           )}
         </div>
       </div>
