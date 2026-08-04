@@ -5,6 +5,7 @@ import { Assistant } from './components/Assistant';
 import { AuthModal } from "./components/AuthModal";
 import { ResetPassword } from "./components/ResetPassword";
 import { Playground } from './components/Playground';
+import { LandingPage } from './components/LandingPage';
 import { Quiz } from './components/Quiz';
 import { Flashcards } from './components/Flashcards';
 import { Watch } from './components/Watch';
@@ -81,22 +82,19 @@ function Footer({ themeColors, onTermsClick, onFaqClick, onContactClick }: any) 
 function App() {
   const [library, setLibrary] = useState<DocLibrary>('html');
   const [currentDocId, setCurrentDocId] = useState<string>('html');
-  const [activeView, setActiveView] = useState<string>('docs');
+  // Default the active view to 'landing' instead of 'docs'
+  const [activeView, setActiveView] = useState<string>('landing'); 
   const [user, setUser] = useState<User | null>(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [loadingUser, setLoadingUser] = useState(true); // Persist check starts here
+  const [loadingUser, setLoadingUser] = useState(true); 
   const [theme, setTheme] = useState<Theme>('dark');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const themeColors = THEMES[theme];
 
-  // A password reset link (e.g. https://yoursite.com/?token=...) should show
-  // the reset screen directly — it's not part of the normal app navigation,
-  // and the person clicking it isn't logged in yet.
   const isResetPasswordRoute = new URLSearchParams(window.location.search).has('token');
 
-  // ========= PERSISTENT LOGIN CHECK =========
   useEffect(() => {
     if (isResetPasswordRoute) {
       setLoadingUser(false);
@@ -107,7 +105,7 @@ function App() {
       if (currentUser) {
         setUser(currentUser);
       }
-      setLoadingUser(false); // Stop loading only after verification
+      setLoadingUser(false); 
     };
     initAuth();
   }, [isResetPasswordRoute]);
@@ -121,7 +119,7 @@ function App() {
   const handleLogout = () => {
     localStorage.removeItem("token");
     setUser(null);
-    if (['quiz', 'ai', 'flashcards'].includes(activeView)) setActiveView('docs');
+    if (['quiz', 'ai', 'flashcards'].includes(activeView)) setActiveView('landing');
   };
 
   const handleDocSelect = (id: string) => {
@@ -205,7 +203,8 @@ function App() {
           onFaqClick={() => toggleView('faq')}
           isTermsActive={activeView === 'terms'}
           onTermsClick={() => toggleView('terms')}
-          onHomeClick={() => { setLibrary('html'); setCurrentDocId('html'); setActiveView('docs'); }}
+          // Update Sidebar Home click to route to the landing page
+          onHomeClick={() => setActiveView('landing')} 
         />
       </div>
 
@@ -214,17 +213,26 @@ function App() {
           <button onClick={() => setIsMobileMenuOpen(true)} className={themeColors.textSecondary}>
             <Menu className="w-6 h-6" />
           </button>
-          <div className="flex items-center gap-2 font-black tracking-tighter">
+          {/* Update Mobile Logo to route to the landing page */}
+          <div 
+            className="flex items-center gap-2 font-black tracking-tighter cursor-pointer"
+            onClick={() => { setActiveView('landing'); setIsMobileMenuOpen(false); }}
+          >
             <DevNexusLogo className="w-6 h-6 text-blue-500" />
             DevNexus
           </div>
           <div className="w-6" />
         </div>
 
-        <div className={activeView === 'playground' ? 'flex-1 min-h-0' : 'flex-1 overflow-y-auto'}>
+        {/* Group Landing and Playground together since they both need full height */}
+        <div className={['playground', 'landing'].includes(activeView) ? 'flex-1 min-h-0' : 'flex-1 overflow-y-auto'}>
           {activeView === 'playground' ? (
             <div className="h-full">
               <Playground themeColors={themeColors} />
+            </div>
+          ) : activeView === 'landing' ? (
+            <div className="h-full">
+              <LandingPage onLaunchPlayground={() => toggleView('playground')} />
             </div>
           ) : (
           <main className="max-w-5xl mx-auto p-4 md:p-10">
