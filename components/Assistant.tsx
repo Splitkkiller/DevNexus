@@ -16,7 +16,7 @@ export const Assistant: React.FC<AssistantProps> = ({ contextDocName, themeColor
     {
       id: 'welcome',
       role: 'model',
-      text: "Hello! I'm your DevNexus AI Tutor. I can explain complex concepts, debug your code, or generate examples for HTML, CSS, and JavaScript. What can I help you with today?"
+      text: "Hello! I'm your Codectionary AI Tutor. I can explain complex concepts, debug your code, or generate examples for HTML, CSS, and JavaScript. What can I help you with today?"
     }
   ]);
   const [isThinking, setIsThinking] = useState(false);

@@ -529,7 +529,7 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Page Layout with Headings',
                 description: 'Using headings to structure a typical page layout.',
-                code: '<h1>DevNexus Blog</h1>\n<article>\n  <h2>Understanding Closures in JavaScript</h2>\n  <h3>What is a Closure?</h3>\n  <p>A closure gives a function access to its outer scope...</p>\n  <h3>Common Use Cases</h3>\n</article>'
+                code: '<h1>Codectionary Blog</h1>\n<article>\n  <h2>Understanding Closures in JavaScript</h2>\n  <h3>What is a Closure?</h3>\n  <p>A closure gives a function access to its outer scope...</p>\n  <h3>Common Use Cases</h3>\n</article>'
             },
             {
                 title: 'Styled Headings',
@@ -900,7 +900,7 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Page Header',
                 description: 'A typical site-wide header with logo and navigation.',
-                code: '<header>\n  <h1>DevNexus</h1>\n  <nav>\n    <a href="/docs">Docs</a>\n    <a href="/playground">Playground</a>\n  </nav>\n</header>'
+                code: '<header>\n  <h1>Codectionary</h1>\n  <nav>\n    <a href="/docs">Docs</a>\n    <a href="/playground">Playground</a>\n  </nav>\n</header>'
             },
             {
                 title: 'Article Header',
@@ -910,7 +910,7 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Styled Header',
                 description: 'A page header with basic styling.',
-                code: '<header style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: #1f2937; color: white;">\n  <strong>DevNexus</strong>\n  <nav style="display: flex; gap: 16px;">\n    <a href="#" style="color: white;">Home</a>\n    <a href="#" style="color: white;">About</a>\n  </nav>\n</header>'
+                code: '<header style="display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: #1f2937; color: white;">\n  <strong>Codectionary</strong>\n  <nav style="display: flex; gap: 16px;">\n    <a href="#" style="color: white;">Home</a>\n    <a href="#" style="color: white;">About</a>\n  </nav>\n</header>'
             }
         ],
         attributes: [],
@@ -968,7 +968,7 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Page Footer',
                 description: 'A typical site-wide footer with copyright and links.',
-                code: '<footer>\n  <p>&copy; 2026 DevNexus. All rights reserved.</p>\n  <nav>\n    <a href="/terms">Terms</a>\n    <a href="/privacy">Privacy</a>\n  </nav>\n</footer>'
+                code: '<footer>\n  <p>&copy; 2026 Codectionary. All rights reserved.</p>\n  <nav>\n    <a href="/terms">Terms</a>\n    <a href="/privacy">Privacy</a>\n  </nav>\n</footer>'
             },
             {
                 title: 'Article Footer',
@@ -978,7 +978,7 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Styled Footer',
                 description: 'A page footer with basic layout styling.',
-                code: '<footer style="display: flex; justify-content: space-between; padding: 24px; background: #111827; color: #9ca3af; font-size: 14px;">\n  <span>&copy; 2026 DevNexus</span>\n  <span>Made with care in Manchester</span>\n</footer>'
+                code: '<footer style="display: flex; justify-content: space-between; padding: 24px; background: #111827; color: #9ca3af; font-size: 14px;">\n  <span>&copy; 2026 Codectionary</span>\n  <span>Made with care in Manchester</span>\n</footer>'
             }
         ],
         attributes: [],
@@ -1145,7 +1145,7 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Code Block',
                 description: 'Displaying a multi-line code block with preserved formatting.',
-                code: '<pre><code>function greet(name) {\n  console.log(`Hello, ${name}!`);\n}\n\ngreet("DevNexus");</code></pre>'
+                code: '<pre><code>function greet(name) {\n  console.log(`Hello, ${name}!`);\n}\n\ngreet("Codectionary");</code></pre>'
             },
             {
                 title: 'Keyboard Shortcut',
@@ -1429,12 +1429,12 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Essential Meta Tags',
                 description: 'The meta tags almost every page should include.',
-                code: '<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<meta name="description" content="Learn web development with DevNexus.">'
+                code: '<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<meta name="description" content="Learn web development with Codectionary.">'
             },
             {
                 title: 'Social Media Preview (Open Graph)',
                 description: 'Meta tags that control how a link looks when shared on social media.',
-                code: '<meta property="og:title" content="DevNexus - Learn to Code">\n<meta property="og:description" content="An interactive platform for learning web development.">\n<meta property="og:image" content="https://devnexus.com/preview.png">'
+                code: '<meta property="og:title" content="Codectionary - Learn to Code">\n<meta property="og:description" content="An interactive platform for learning web development.">\n<meta property="og:image" content="https://codectionary.com/preview.png">'
             },
             {
                 title: 'SEO and Robots',
@@ -1550,7 +1550,7 @@ export const DOCS: DocItem[] = [
             {
                 title: 'FAQ Accordion',
                 description: 'Multiple details elements used to build an FAQ section.',
-                code: '<details>\n  <summary>Is DevNexus free?</summary>\n  <p>Yes, all core learning content is free.</p>\n</details>\n<details>\n  <summary>Do I need an account?</summary>\n  <p>An account is needed to save progress and take quizzes.</p>\n</details>'
+                code: '<details>\n  <summary>Is Codectionary free?</summary>\n  <p>Yes, all core learning content is free.</p>\n</details>\n<details>\n  <summary>Do I need an account?</summary>\n  <p>An account is needed to save progress and take quizzes.</p>\n</details>'
             },
             {
                 title: 'Open by Default',
@@ -1663,7 +1663,7 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Organization Contact Block',
                 description: 'Business contact information.',
-                code: '<address>\n  DevNexus HQ<br>\n  123 Tech Street<br>\n  Manchester, UK<br>\n  <a href="tel:+441234567890">+44 1234 567890</a>\n</address>'
+                code: '<address>\n  Codectionary HQ<br>\n  123 Tech Street<br>\n  Manchester, UK<br>\n  <a href="tel:+441234567890">+44 1234 567890</a>\n</address>'
             }
         ],
         attributes: [],
@@ -1800,7 +1800,7 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Base URL',
                 description: 'Setting a base so relative links resolve consistently.',
-                code: '<head>\n  <base href="https://devnexus.com/docs/">\n</head>\n<body>\n  <a href="html">HTML Docs</a>\n  <!-- resolves to https://devnexus.com/docs/html -->\n</body>'
+                code: '<head>\n  <base href="https://codectionary.com/docs/">\n</head>\n<body>\n  <a href="html">HTML Docs</a>\n  <!-- resolves to https://codectionary.com/docs/html -->\n</body>'
             },
             {
                 title: 'Base Target',
@@ -2348,17 +2348,17 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Basic Page Title',
                 description: 'A simple, descriptive page title.',
-                code: '<head>\n  <title>DevNexus - Learn to Code</title>\n</head>'
+                code: '<head>\n  <title>Codectionary - Learn to Code</title>\n</head>'
             },
             {
                 title: 'Dynamic Page Title Pattern',
                 description: 'A common convention for per-page titles with a site name suffix.',
-                code: '<title>HTML Documentation | DevNexus</title>'
+                code: '<title>HTML Documentation | Codectionary</title>'
             },
             {
                 title: 'Updating Title with JavaScript',
                 description: 'Changing the title dynamically, such as for unread notifications.',
-                code: '<script>\n  document.title = `(3) New Messages - DevNexus`;\n</script>'
+                code: '<script>\n  document.title = `(3) New Messages - Codectionary`;\n</script>'
             }
         ],
         attributes: [],
@@ -2416,7 +2416,7 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Site Search',
                 description: 'Wrapping a site-wide search form.',
-                code: '<search>\n  <form action="/search" method="get">\n    <label for="q">Search DevNexus</label>\n    <input type="search" id="q" name="q" placeholder="Search docs...">\n    <button type="submit">Search</button>\n  </form>\n</search>'
+                code: '<search>\n  <form action="/search" method="get">\n    <label for="q">Search Codectionary</label>\n    <input type="search" id="q" name="q" placeholder="Search docs...">\n    <button type="submit">Search</button>\n  </form>\n</search>'
             },
             {
                 title: 'Filter Controls',
@@ -2557,17 +2557,17 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Typical Head Contents',
                 description: 'A well-formed head with the essentials.',
-                code: '<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>DevNexus - Learn to Code</title>\n  <link rel="stylesheet" href="styles.css">\n</head>'
+                code: '<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Codectionary - Learn to Code</title>\n  <link rel="stylesheet" href="styles.css">\n</head>'
             },
             {
                 title: 'Head with a Script',
                 description: 'Linking an external script from the head, deferred so it does not block rendering.',
-                code: '<head>\n  <title>My App</title>\n  <script src="app.js" defer></script>\n</head>'
+                code: '<head>\n  <title>Codectionary - Learn to Code</title>\n  <script src="app.js" defer></script>\n</head>'
             },
             {
                 title: 'Head with Favicon and Description',
                 description: 'Additional common head metadata.',
-                code: '<head>\n  <title>My Blog</title>\n  <link rel="icon" href="/favicon.ico">\n  <meta name="description" content="Thoughts on web development.">\n</head>'
+                code: '<head>\n  <title>Codectionary - Learn to Code</title>\n  <link rel="icon" href="/favicon.ico">\n  <meta name="description" content="Thoughts on web development.">\n</head>'
             }
         ],
         attributes: [],
@@ -2682,7 +2682,7 @@ export const DOCS: DocItem[] = [
             {
                 title: 'Title with Subtitle',
                 description: 'Grouping a page title with a descriptive subtitle.',
-                code: '<hgroup>\n  <h1>DevNexus</h1>\n  <p>Learn to code, one tag at a time.</p>\n</hgroup>'
+                code: '<hgroup>\n  <h1>Codectionary</h1>\n  <p>Learn to code, one tag at a time.</p>\n</hgroup>'
             },
             {
                 title: 'Article Title with Byline',

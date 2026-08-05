@@ -214,7 +214,7 @@ export const Quiz: React.FC<QuizProps> = ({ themeColors, onQuizComplete }) => {
   };
 
   const handleShareScore = (percentage: number, grade: string) => {
-    const text = `🏆 DevNexus Quiz Result\n\nSubject: ${selectedCategory.toUpperCase()}\nDifficulty: ${selectedDifficulty.toUpperCase()}\nScore: ${percentage}% (${grade})\nStreak: ${bestStreak} 🔥\n\nCan you beat my score?`;
+    const text = `🏆 Codectionary Quiz Result\n\nSubject: ${selectedCategory.toUpperCase()}\nDifficulty: ${selectedDifficulty.toUpperCase()}\nScore: ${percentage}% (${grade})\nStreak: ${bestStreak} 🔥\n\nCan you beat my score?`;
     navigator.clipboard.writeText(text);
     alert("Score copied to clipboard!");
   };

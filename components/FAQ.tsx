@@ -18,10 +18,10 @@ interface FAQItem {
 
 const FAQ_DATA: FAQItem[] = [
   // General
-  { id: 'g1', category: 'general', question: "Is DevNexus free to use?", answer: "Yes, DevNexus offers a comprehensive free tier that includes access to documentation, basic quizzes, and the playground. Some advanced features like personalized stats and the AI assistant require a free account." },
+  { id: 'g1', category: 'general', question: "Is Codectionary free to use?", answer: "Yes, Codectionary offers a comprehensive free tier that includes access to documentation, basic quizzes, and the playground. Some advanced features like personalized stats and the AI assistant require a free account." },
   { id: 'g2', category: 'general', question: "Do I need to create an account?", answer: "You can browse the documentation and use the basic playground as a guest. However, to save your progress, track quiz streaks, save videos, and use the AI Tutor, you'll need to sign up." },
   { id: 'g3', category: 'general', question: "How do I reset my password?", answer: "Currently, since this is a demo environment, account management features like password reset are mocked. In a production version, you would find this in your Profile settings." },
-  { id: 'g4', category: 'general', question: "What programming languages can I learn here?", answer: "DevNexus focuses on essential web and software engineering languages: HTML, CSS, JavaScript, TypeScript, Python, and Java." },
+  { id: 'g4', category: 'general', question: "What programming languages can I learn here?", answer: "Codectionary focuses on essential web and software engineering languages: HTML, CSS, JavaScript, TypeScript, Python, and Java." },
 
   // Website Features
   { id: 'w1', category: 'website', question: "How does the IDE Playground work?", answer: "The Playground runs your HTML, CSS, and JavaScript code locally in your browser within a sandboxed iframe. No data is sent to a server, ensuring fast performance and privacy." },
@@ -82,7 +82,7 @@ export const FAQ: React.FC<FAQProps> = ({ themeColors }) => {
         </div>
         <div>
           <h1 className={`text-2xl font-bold ${themeColors.text}`}>Frequently Asked Questions</h1>
-          <p className={themeColors.textSecondary}>Find answers to common questions about DevNexus</p>
+          <p className={themeColors.textSecondary}>Find answers to common questions about Codectionary</p>
         </div>
       </div>
 

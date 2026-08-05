@@ -39,7 +39,7 @@ export const Contact: React.FC<ContactProps> = ({ themeColors }) => {
         </div>
         <div>
           <h1 className={`text-2xl font-bold ${themeColors.text}`}>Contact Us</h1>
-          <p className={themeColors.textSecondary}>Get in touch with the DevNexus team</p>
+          <p className={themeColors.textSecondary}>Get in touch with the Codectionary team</p>
         </div>
       </div>
 
@@ -64,7 +64,7 @@ export const Contact: React.FC<ContactProps> = ({ themeColors }) => {
                 <div>
                   <h3 className={`font-bold ${themeColors.text}`}>Support</h3>
                   <p className={`text-sm ${themeColors.textSecondary} mb-2`}>For technical issues and feedback</p>
-                  <a href="mailto:support@devnexus.com" className="text-brand-400 hover:underline">support@devnexus.com</a>
+                  <a href="mailto:support@codectionary.com" className="text-brand-400 hover:underline">support@codectionary.com</a>
                 </div>
               </div>
 

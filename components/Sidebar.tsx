@@ -169,7 +169,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <DevNexusLogo className="w-9 h-9 relative z-10 drop-shadow-md" />
           </div>
           <div>
-             <h1 className={`text-xl font-extrabold tracking-tight ${themeColors.text} leading-none`}>DevNexus</h1>
+             <h1 className={`text-xl font-extrabold tracking-tight ${themeColors.text} leading-none`}>Codectionary</h1>
              <span className="text-[10px] bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 font-bold uppercase tracking-widest">Reference</span>
           </div>
         </button>

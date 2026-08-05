@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Sidebar, DevNexusLogo } from './components/Sidebar';
+import { Sidebar, DevNexusLogo as CodectionaryLogo } from './components/Sidebar';
 import { DocContent } from './components/DocContent';
 import { Assistant } from './components/Assistant';
-// Changed from AuthModal to AuthPage
 import { AuthPage } from "./components/AuthPage"; 
 import { ResetPassword } from "./components/ResetPassword";
 import { Playground } from './components/Playground';
@@ -75,7 +74,7 @@ function Footer({ themeColors, onTermsClick, onFaqClick, onContactClick }: any) 
         <button onClick={onContactClick} className="hover:underline">Contact</button>
         <button onClick={onTermsClick} className="hover:underline">Terms</button>
       </div>
-      <p className="opacity-50">© {new Date().getFullYear()} DevNexus — All rights reserved.</p>
+      <p className="opacity-50">© {new Date().getFullYear()} Codectionary — All rights reserved.</p>
     </footer>
   );
 }
@@ -93,7 +92,6 @@ function App() {
   const themeColors = THEMES[theme];
   const isResetPasswordRoute = new URLSearchParams(window.location.search).has('token');
   
-  // Boolean to determine if the current view should hide the sidebar/header
   const isFullScreenView = activeView === 'landing' || activeView === 'auth';
 
   useEffect(() => {
@@ -114,7 +112,7 @@ function App() {
   const handleLogin = (u: User, token?: string) => {
     if (token) localStorage.setItem("token", token);
     setUser(u);
-    setActiveView('docs'); // Route directly to docs after logging in
+    setActiveView('docs'); 
   };
 
   const handleLogout = () => {
@@ -137,7 +135,6 @@ function App() {
   };
 
   const toggleView = (view: string) => {
-    // Replaced isAuthModalOpen with activeView routing
     if (['quiz', 'ai', 'flashcards'].includes(view) && !user) {
       setActiveView('auth');
       return;
@@ -154,7 +151,7 @@ function App() {
     return (
       <div className={`h-screen w-full flex flex-col items-center justify-center ${themeColors.bg} ${themeColors.text}`}>
         <Loader2 className="w-10 h-10 animate-spin text-blue-500 mb-4" />
-        <h1 className="text-xl font-black tracking-widest animate-pulse">DEVNEXUS</h1>
+        <h1 className="text-xl font-black tracking-widest animate-pulse">CODECTIONARY</h1>
       </div>
     );
   }
@@ -164,7 +161,6 @@ function App() {
   return (
     <div className={`flex h-screen w-full ${themeColors.bg} ${themeColors.text} font-sans overflow-hidden transition-colors`}>
       
-      {/* Conditionally render the Sidebar only if we are NOT in a full screen view */}
       {!isFullScreenView && (
         <>
           {isMobileMenuOpen && (
@@ -210,7 +206,6 @@ function App() {
 
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         
-        {/* Conditionally render the mobile header */}
         {!isFullScreenView && (
           <div className={`flex items-center justify-between p-4 border-b lg:hidden ${themeColors.sidebarBorder} ${themeColors.card}`}>
             <button onClick={() => setIsMobileMenuOpen(true)} className={themeColors.textSecondary}>
@@ -220,8 +215,8 @@ function App() {
               className="flex items-center gap-2 font-black tracking-tighter cursor-pointer"
               onClick={() => { setActiveView('landing'); setIsMobileMenuOpen(false); }}
             >
-              <DevNexusLogo className="w-6 h-6 text-blue-500" />
-              DevNexus
+              <CodectionaryLogo className="w-6 h-6 text-blue-500" />
+              Codectionary
             </div>
             <div className="w-6" />
           </div>
@@ -235,11 +230,10 @@ function App() {
           ) : activeView === 'landing' ? (
             <LandingPage 
               onLaunchPlayground={() => toggleView('playground')} 
-              onLoginClick={() => toggleView('auth')} // Passed prop for landing page login button
+              onLoginClick={() => setActiveView('auth')}
             />
           ) : activeView === 'auth' ? (
             <div className="h-full w-full">
-              {/* New dedicated Auth Page component */}
               <AuthPage 
                 onLogin={handleLogin} 
                 themeColors={themeColors} 

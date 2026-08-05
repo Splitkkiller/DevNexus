@@ -30,7 +30,7 @@ export const Terms: React.FC<TermsProps> = ({ themeColors }) => {
             </h2>
             <div className={`${themeColors.card} border ${themeColors.cardBorder} p-6 rounded-xl`}>
               <p className={`${themeColors.textSecondary} leading-relaxed`}>
-                By accessing and using DevNexus ("the Service"), you unconditionally accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to abide by these terms, you are strictly prohibited from using or accessing this platform. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.
+                By accessing and using Codectionary ("the Service"), you unconditionally accept and agree to be bound by the terms and provisions of this agreement. If you do not agree to abide by these terms, you are strictly prohibited from using or accessing this platform. In addition, when using these particular services, you shall be subject to any posted guidelines or rules applicable to such services.
               </p>
             </div>
           </section>
@@ -41,7 +41,7 @@ export const Terms: React.FC<TermsProps> = ({ themeColors }) => {
             </h2>
             <div className={`${themeColors.card} border ${themeColors.cardBorder} p-6 rounded-xl`}>
               <p className={`${themeColors.textSecondary} leading-relaxed mb-4`}>
-                The Site and its original content, features, interactive quiz modules, and functionality are owned by DevNexus and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.
+                The Site and its original content, features, interactive quiz modules, and functionality are owned by Codectionary and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.
               </p>
               <ul className={`list-disc pl-5 ${themeColors.textSecondary} space-y-2`}>
                 <li>You may not duplicate, copy, reverse-engineer, or reuse any portion of the HTML/CSS/JS, underlying backend architectures, or visual design elements.</li>
@@ -61,7 +61,7 @@ export const Terms: React.FC<TermsProps> = ({ themeColors }) => {
               <ul className={`list-disc pl-5 ${themeColors.textSecondary} space-y-2`}>
                 <li><strong className={themeColors.text}>Malicious Actions:</strong> Upload or transmit content that contains software viruses, Trojan horses, or any other computer code designed to interrupt, destroy, or limit the functionality of the Service.</li>
                 <li><strong className={themeColors.text}>Exploitation:</strong> Attempt to probe, scan, or test the vulnerability of our system or network, or breach security or authentication measures without proper authorization.</li>
-                <li><strong className={themeColors.text}>Impersonation:</strong> Impersonate any person, entity, or DevNexus staff member, or falsely state your affiliation with a person or entity.</li>
+                <li><strong className={themeColors.text}>Impersonation:</strong> Impersonate any person, entity, or Codectionary staff member, or falsely state your affiliation with a person or entity.</li>
                 <li><strong className={themeColors.text}>Disruption:</strong> Interfere with or disrupt the Service, servers, or networks connected to the Service, or disobey any requirements, procedures, policies, or regulations of connected networks.</li>
               </ul>
             </div>
@@ -89,7 +89,7 @@ export const Terms: React.FC<TermsProps> = ({ themeColors }) => {
             </h2>
             <div className={`${themeColors.card} border ${themeColors.cardBorder} p-6 rounded-xl`}>
               <p className={`${themeColors.textSecondary} leading-relaxed`}>
-                You are solely responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify DevNexus immediately of any unauthorized use of your account or any other breach of security. Selling, trading, or sharing premium account access with unauthorized third parties constitutes a material breach of these terms.
+                You are solely responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You agree to notify Codectionary immediately of any unauthorized use of your account or any other breach of security. Selling, trading, or sharing premium account access with unauthorized third parties constitutes a material breach of these terms.
               </p>
             </div>
           </section>
@@ -103,14 +103,14 @@ export const Terms: React.FC<TermsProps> = ({ themeColors }) => {
                 We may terminate or suspend your access to the Site instantly, without prior notice or liability, for any reason whatsoever, including without limitation if you breach the Terms of Service. Upon termination, your right to use the Service will cease immediately, resulting in the permanent forfeiture of all accumulated data, streaks, and account status.
               </p>
               <p className={`${themeColors.textSecondary} leading-relaxed`}>
-                In no event shall DevNexus, nor its directors, employees, partners, or agents, be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your access to, use of, or inability to use the Service.
+                In no event shall Codectionary, nor its directors, employees, partners, or agents, be liable for any indirect, incidental, special, consequential, or punitive damages arising out of your access to, use of, or inability to use the Service.
               </p>
             </div>
           </section>
 
           <div className={`pt-8 border-t ${themeColors.cardBorder} text-center`}>
             <p className={`${themeColors.textSecondary} text-sm`}>
-              Questions about the Terms of Service should be sent to <a href="mailto:legal@devnexus.com" className="text-brand-400 hover:text-brand-300 transition-colors hover:underline">legal@devnexus.com</a>.
+              Questions about the Terms of Service should be sent to <a href="mailto:legal@codectionary.com" className="text-brand-400 hover:text-brand-300 transition-colors hover:underline">legal@codectionary.com</a>.
             </p>
           </div>
 

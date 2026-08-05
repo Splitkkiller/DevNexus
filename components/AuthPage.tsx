@@ -56,7 +56,7 @@ export function AuthPage({ onLogin, themeColors, onBack }: AuthPageProps) {
           <p className={`text-sm mt-2 ${themeColors.textSecondary}`}>
             {isLogin 
               ? 'Enter your credentials to access your account' 
-              : 'Sign up to start learning with DevNexus'}
+              : 'Sign up to start learning with Codectionary'}
           </p>
         </div>
 

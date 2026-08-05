@@ -50,7 +50,7 @@ const INITIAL_HTML = `<!DOCTYPE html>
     <title>My Project</title>
   </head>
   <body>
-    <h1>Hello, DevNexus!</h1>
+    <h1>Hello, Codectionary!</h1>
   </body>
 </html>`;
 
@@ -144,7 +144,7 @@ const PYODIDE_WORKER_CODE = `
 `;
 
 export const Playground: React.FC<PlaygroundProps> = ({ themeColors }) => {
-  const [projectName, setProjectName] = useState('DevStudio Project');
+  const [projectName, setProjectName] = useState('Codectionary Project');
   const [files, setFiles] = useState<PlaygroundFile[]>(DEFAULT_FILES);
   const [activeFileId, setActiveFileId] = useState('1');
   

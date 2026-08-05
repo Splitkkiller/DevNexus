@@ -502,7 +502,7 @@ export const Watch: React.FC<WatchProps> = ({ themeColors, user, onRequireAuth }
                           </div>
                           <div>
                              <p className="text-white font-bold text-lg leading-none">{playingVideo.channel}</p>
-                             <p className="text-gray-400 text-xs mt-1">Subscribed via DevNexus</p>
+                             <p className="text-gray-400 text-xs mt-1">Subscribed via Codectionary</p>
                           </div>
                       </div>
                       <div className="flex gap-2 text-sm text-gray-400 mt-3">
