@@ -1,215 +1,151 @@
-import React, { useState, useEffect } from "react";
-import { X, Check, ArrowRight, Loader2, ArrowLeft } from "lucide-react"; 
-import { User as UserType, ThemeColors } from "../types";
-import { API_BASE_URL } from "../apiConfig";
+import React, { useState } from 'react';
+import { Mail, Lock, User as UserIcon, Loader2, ArrowLeft } from 'lucide-react';
+import { User, ThemeColors } from '../types';
+import { login, register } from '../auth';
 
-interface AuthModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  onLogin: (user: UserType, token?: string) => void;
+interface AuthPageProps {
+  onLogin: (user: User, token?: string) => void;
   themeColors: ThemeColors;
+  onBack: () => void;
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ 
-  isOpen, 
-  onClose, 
-  onLogin, 
-  themeColors 
-}) => {
-  // Mode now includes "forgot"
-  const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
-  
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
-
+export function AuthPage({ onLogin, themeColors, onBack }: AuthPageProps) {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successMsg, setSuccessMsg] = useState<string | null>(null); 
 
-  // Validation States
-  const [emailValid, setEmailValid] = useState<boolean | null>(null);
-  const [passwordValid, setPasswordValid] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    setEmailValid(/^\S+@\S+\.\S+$/.test(email));
-    setPasswordValid(password.length >= 8);
-  }, [email, password]);
-
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
     setLoading(true);
-    setError(null);
-    setSuccessMsg(null);
-
-    let endpoint = "";
-    if (mode === "login") endpoint = `${API_BASE_URL}/login.php`;
-    else if (mode === "register") endpoint = `${API_BASE_URL}/register.php`;
-    else if (mode === "forgot") endpoint = `${API_BASE_URL}/forgot_password.php`;
-
     try {
-      // Construct body based on mode
-      const body: any = { email };
-      if (mode === "login" || mode === "register") body.password = password;
-      if (mode === "login") body.rememberMe = rememberMe;
-      if (mode === "register") body.name = name;
-
-      const res = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        if (mode === "forgot") {
-          setSuccessMsg(data.message);
-          // DEBUG: Log the reset link to console for local testing
-          if(data.debug_link) console.log("RESET LINK:", data.debug_link);
-        } else {
-          onLogin(data.user, data.token);
-          onClose();
-        }
+      if (isLogin) {
+        const { user, token } = await login(email, password);
+        onLogin(user, token);
       } else {
-        setError(data.message || "Authentication failed");
+        const { user, token } = await register(email, password, name);
+        onLogin(user, token);
       }
-    } catch (err) {
-      setError("Server connection failed.");
+    } catch (err: any) {
+      setError(err.message || 'Authentication failed');
     } finally {
       setLoading(false);
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex justify-center items-center z-[100] p-4">
-      <div className={`${themeColors.card} ${themeColors.text} w-full max-w-md rounded-2xl p-8 shadow-2xl relative border ${themeColors.cardBorder}`}>
+    <div className={`min-h-full flex flex-col items-center justify-center p-4 ${themeColors.bg}`}>
+      <div className={`w-full max-w-md p-8 rounded-2xl border ${themeColors.cardBorder} ${themeColors.card} shadow-2xl relative`}>
         
-        <button onClick={onClose} className="absolute right-5 top-5 opacity-40 hover:opacity-100"><X /></button>
+        {/* Back button to return to Landing Page */}
+        <button 
+          onClick={onBack}
+          className={`absolute top-6 left-6 flex items-center gap-2 text-sm ${themeColors.textSecondary} hover:${themeColors.text} transition-colors`}
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Home
+        </button>
 
-        <div className="text-center mb-6">
-          <h2 className="text-2xl font-black mb-1">DevNexus</h2>
-          <p className={`text-sm ${themeColors.textSecondary}`}>
-            {mode === "login" && "Welcome back!"}
-            {mode === "register" && "Join the community"}
-            {mode === "forgot" && "Reset your password"}
+        <div className="text-center mb-8 mt-6">
+          <h2 className={`text-2xl font-bold ${themeColors.text}`}>
+            {isLogin ? 'Welcome Back' : 'Create Account'}
+          </h2>
+          <p className={`text-sm mt-2 ${themeColors.textSecondary}`}>
+            {isLogin 
+              ? 'Enter your credentials to access your account' 
+              : 'Sign up to start learning with DevNexus'}
           </p>
         </div>
 
-        {/* Success Message UI for Forgot Password */}
-        {successMsg ? (
-          <div className="text-center space-y-4">
-            <div className="p-4 bg-green-500/10 border border-green-500/20 text-green-500 rounded-xl text-sm">
-              {successMsg}
-            </div>
-            <button 
-              onClick={() => { setMode("login"); setSuccessMsg(null); }}
-              className="text-blue-500 font-bold hover:underline"
-            >
-              Back to Login
-            </button>
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+            {error}
           </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {mode === "register" && (
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {!isLogin && (
+            <div>
+              <label className={`block text-xs font-semibold uppercase mb-1.5 ${themeColors.textSecondary}`}>
+                Full Name
+              </label>
+              <div className="relative">
+                <UserIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="John Doe"
+                  className={`w-full pl-10 pr-4 py-3 rounded-xl border ${themeColors.inputBorder} ${themeColors.inputBg} ${themeColors.text} focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm`}
+                />
+              </div>
+            </div>
+          )}
+
+          <div>
+            <label className={`block text-xs font-semibold uppercase mb-1.5 ${themeColors.textSecondary}`}>
+              Email Address
+            </label>
+            <div className="relative">
+              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
               <input
-                className={`w-full p-3 rounded-xl border ${themeColors.inputBg} ${themeColors.inputBorder} outline-none focus:border-blue-500`}
-                placeholder="Full Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="name@example.com"
+                className={`w-full pl-10 pr-4 py-3 rounded-xl border ${themeColors.inputBorder} ${themeColors.inputBg} ${themeColors.text} focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm`}
               />
-            )}
+            </div>
+          </div>
 
-            <input
-              type="email"
-              className={`w-full p-3 rounded-xl border ${themeColors.inputBg} ${themeColors.inputBorder} outline-none focus:border-blue-500`}
-              placeholder="Email Address"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-
-            {mode !== "forgot" && (
+          <div>
+            <label className={`block text-xs font-semibold uppercase mb-1.5 ${themeColors.textSecondary}`}>
+              Password
+            </label>
+            <div className="relative">
+              <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
               <input
                 type="password"
-                className={`w-full p-3 rounded-xl border ${themeColors.inputBg} ${themeColors.inputBorder} outline-none focus:border-blue-500`}
-                placeholder="Password"
+                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                className={`w-full pl-10 pr-4 py-3 rounded-xl border ${themeColors.inputBorder} ${themeColors.inputBg} ${themeColors.text} focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm`}
               />
-            )}
-
-            {/* Remember Me & Forgot Password Link */}
-            {mode === "login" && (
-              <div className="flex justify-between items-center text-sm">
-                <div 
-                  className="flex items-center gap-2 cursor-pointer group"
-                  onClick={() => setRememberMe(!rememberMe)}
-                >
-                  <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${
-                    rememberMe ? 'bg-blue-600 border-blue-600' : 'border-neutral-500 group-hover:border-blue-400'
-                  }`}>
-                    {rememberMe && <Check className="w-3 h-3 text-white" strokeWidth={4} />}
-                  </div>
-                  <span className="opacity-70 group-hover:opacity-100 select-none">Remember me</span>
-                </div>
-                
-                <button 
-                  type="button" 
-                  onClick={() => { setMode("forgot"); setError(null); }}
-                  className="text-blue-500 hover:underline"
-                >
-                  Forgot Password?
-                </button>
-              </div>
-            )}
-
-            {error && <p className="text-red-500 text-xs text-center">{error}</p>}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex justify-center items-center gap-2 shadow-lg shadow-blue-900/20"
-            >
-              {loading ? <Loader2 className="animate-spin w-5 h-5" /> : (
-                <>
-                  {mode === "login" && "Sign In"}
-                  {mode === "register" && "Create Account"}
-                  {mode === "forgot" && "Send Reset Link"}
-                  {(mode === "login" || mode === "register") && <ArrowRight className="w-4 h-4" />}
-                </>
-              )}
-            </button>
-          </form>
-        )}
-
-        {/* Footer Links */}
-        {!successMsg && (
-          <div className="mt-6 text-center text-sm">
-            {mode === "forgot" ? (
-              <button 
-                onClick={() => { setMode("login"); setError(null); }}
-                className="text-neutral-500 hover:text-white flex items-center gap-2 mx-auto transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" /> Back to Login
-              </button>
-            ) : (
-              <button 
-                onClick={() => {
-                  setMode(mode === "login" ? "register" : "login");
-                  setError(null);
-                }}
-                className="text-blue-500 font-bold hover:underline"
-              >
-                {mode === "login" ? "Need an account? Register" : "Already have an account? Login"}
-              </button>
-            )}
+            </div>
           </div>
-        )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full mt-2 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-900/20 flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+            {isLogin ? 'Sign In' : 'Create Account'}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center">
+          <button
+            type="button"
+            onClick={() => setIsLogin(!isLogin)}
+            className={`text-sm text-blue-400 hover:underline`}
+          >
+            {isNeedAccountText(isLogin)}
+          </button>
+        </div>
+
       </div>
     </div>
   );
-};
+}
+
+function isNeedAccountText(isLogin: boolean) {
+  return isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in";
+}
 
