@@ -4,4 +4,4 @@
 // personal override that git won't track) to point somewhere other than
 // the default local XAMPP setup — e.g. your real domain once this is
 // deployed.
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost/devnexus-api";
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://api.codectionary.com";
