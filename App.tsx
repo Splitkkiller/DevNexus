@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Analytics } from '@vercel/analytics/react';
 import { Sidebar, DevNexusLogo as CodectionaryLogo } from './components/Sidebar';
 import { DocContent } from './components/DocContent';
 import { Assistant } from './components/Assistant';
@@ -261,6 +262,9 @@ function App() {
           )}
         </div>
       </div>
+
+      {/* Vercel Web Analytics Wrapper */}
+      <Analytics />
     </div>
   );
 }
