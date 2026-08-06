@@ -80,12 +80,18 @@ export function LandingPage({ onLaunchPlayground, onLoginClick }: LandingPagePro
 
       {/* ===== Glassmorphism Navigation ===== */}
       <nav className={`flex items-center justify-between px-6 py-4 sticky top-0 z-50 transition-all duration-700 border-b border-white/5 bg-[#0b0f1a]/70 backdrop-blur-xl ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
-        <div className="flex items-center gap-2 select-none cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-1.5 rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.3)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] transition-shadow">
-            <Code2 className="w-5 h-5 text-white" />
+        <div className="flex items-center gap-3 select-none cursor-pointer group" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+          <div className="flex items-center gap-2">
+            <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-1.5 rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.3)] group-hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] transition-shadow">
+              <Code2 className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-extrabold text-lg tracking-wide text-white">
+              Codectionary
+            </span>
           </div>
-          <span className="font-extrabold text-lg tracking-wide text-white">
-            Codectionary
+          {/* Small Beta Badge added here */}
+          <span className="text-[10px] bg-blue-500/10 text-blue-400 font-bold px-2 py-0.5 rounded-full border border-blue-500/20 uppercase tracking-widest">
+            Beta
           </span>
         </div>
         
@@ -452,7 +458,7 @@ export function LandingPage({ onLaunchPlayground, onLoginClick }: LandingPagePro
         </div>
 
         <div className="max-w-7xl mx-auto pt-8 border-t border-[#1e293b] text-left sm:text-center text-sm font-medium text-[#64748b] flex flex-col sm:flex-row justify-between items-center gap-4">
-          <p>© {new Date().getFullYear()} Codectionary Inc. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Codectionary Inc. All rights reserved. <span className="ml-2 text-xs opacity-60 font-mono">v1.0.0-beta</span></p>
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
             All systems operational
