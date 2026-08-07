@@ -14,6 +14,7 @@ import { Contact } from './components/Contact';
 import { FAQ } from './components/FAQ';
 import { Terms } from './components/Terms';
 import { DOCS } from './data';
+import { Blog } from './components/Blog';
 import { Menu, Instagram, Twitter, Loader2 } from 'lucide-react';
 import { DocLibrary, User, Theme, ThemeColors } from './types';
 import { fetchCurrentUser } from './auth';
