@@ -13,8 +13,8 @@ import { Watch } from './components/Watch';
 import { Contact } from './components/Contact';
 import { FAQ } from './components/FAQ';
 import { Terms } from './components/Terms';
+import { Blog } from './components/blog';
 import { DOCS } from './data';
-import { Blog } from './components/Blog';
 import { Menu, Instagram, Twitter, Loader2 } from 'lucide-react';
 import { DocLibrary, User, Theme, ThemeColors } from './types';
 import { fetchCurrentUser } from './auth';
@@ -64,7 +64,7 @@ const THEMES: Record<Theme, ThemeColors> = {
   },
 };
 
-function Footer({ themeColors, onTermsClick, onFaqClick, onContactClick }: any) {
+function Footer({ themeColors, onTermsClick, onFaqClick, onContactClick, onBlogClick }: any) {
   return (
     <footer className={`w-full mt-12 py-8 border-t ${themeColors.sidebarBorder} flex flex-col items-center gap-4 text-xs ${themeColors.textSecondary}`}>
       <div className="flex gap-6">
@@ -75,6 +75,7 @@ function Footer({ themeColors, onTermsClick, onFaqClick, onContactClick }: any) 
         <button onClick={onFaqClick} className="hover:underline">FAQ</button>
         <button onClick={onContactClick} className="hover:underline">Contact</button>
         <button onClick={onTermsClick} className="hover:underline">Terms</button>
+        <button onClick={onBlogClick} className="hover:underline">Blog & Changelog</button>
       </div>
       <p className="opacity-50">© {new Date().getFullYear()} Codectionary — All rights reserved.</p>
     </footer>
@@ -233,6 +234,7 @@ function App() {
             <LandingPage 
               onLaunchPlayground={() => toggleView('playground')} 
               onLoginClick={() => setActiveView('auth')}
+              onNavigate={(view) => setActiveView(view)}
             />
           ) : activeView === 'auth' ? (
             <div className="h-full w-full">
@@ -251,6 +253,7 @@ function App() {
               {activeView === 'contact' && <Contact themeColors={themeColors} />}
               {activeView === 'faq' && <FAQ themeColors={themeColors} />}
               {activeView === 'terms' && <Terms themeColors={themeColors} />}
+              {activeView === 'blog' && <Blog themeColors={themeColors} />}
               {activeView === 'docs' && <DocContent doc={currentDoc} themeColors={themeColors} />}
 
               <Footer
@@ -258,13 +261,13 @@ function App() {
                 onTermsClick={() => toggleView('terms')}
                 onFaqClick={() => toggleView('faq')}
                 onContactClick={() => toggleView('contact')}
+                onBlogClick={() => toggleView('blog')}
               />
             </main>
           )}
         </div>
       </div>
 
-      {/* Vercel Web Analytics Wrapper */}
       <Analytics />
     </div>
   );
