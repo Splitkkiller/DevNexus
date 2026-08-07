@@ -14,6 +14,7 @@ import { Contact } from './components/Contact';
 import { FAQ } from './components/FAQ';
 import { Terms } from './components/Terms';
 import { Blog } from './components/Blog';
+import { CookieBanner } from './components/CookieBanner';
 import { DOCS } from './data';
 import { Menu, Instagram, Twitter, Loader2 } from 'lucide-react';
 import { DocLibrary, User, Theme, ThemeColors } from './types';
@@ -268,6 +269,7 @@ function App() {
         </div>
       </div>
 
+      <CookieBanner onNavigate={(view) => setActiveView(view)} />
       <Analytics />
     </div>
   );
