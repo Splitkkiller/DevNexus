@@ -13,7 +13,7 @@ import { Watch } from './components/Watch';
 import { Contact } from './components/Contact';
 import { FAQ } from './components/FAQ';
 import { Terms } from './components/Terms';
-import { Blog } from './components/blog';
+import { Blog } from './components/Blog';
 import { DOCS } from './data';
 import { Menu, Instagram, Twitter, Loader2 } from 'lucide-react';
 import { DocLibrary, User, Theme, ThemeColors } from './types';
